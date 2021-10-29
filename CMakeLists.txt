@@ -10,6 +10,7 @@ set(CMAKE_BUILD_TYPE Debug)
 #set source files
 set(SRC_FILES
 Source/main.cpp
+Source/rendering_application.cpp
 )
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
