@@ -7,6 +7,11 @@ project(VulkanProject)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 
+#set header files
+set(HEADER_FILES
+	Source/rendering_application.hpp
+)
+
 #set source files
 set(SRC_FILES
 Source/main.cpp
@@ -53,7 +58,7 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
 #add the executable
-add_executable(VulkanProject ${SRC_FILES})
+add_executable(VulkanProject ${HEADER_FILES} ${SRC_FILES})
 
 target_link_libraries(VulkanProject 
     PUBLIC
