@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cstdint>
+#include <vector>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -17,19 +18,24 @@ namespace rendering_engine
     {
         public:
         //Public constructor
-        RenderingApplication( int const width, int const height );
+        RenderingApplication( int const width, int const height, char const* title );
         virtual ~RenderingApplication();
 
         //Interface to run rendering application
         virtual void Run();
 
         protected:
-        virtual void InitializeWindow();
+        void Shutdown();
+        void InitializeWindow();
+        void InitializeVulkan();
+        void CreateInstance();
 
         protected:
         int const mWidth;
         int const mHeight;
+        char const* mTitle;
 
         GLFWwindow* mWindow;
+        VkInstance mInstance;
     };  
 }

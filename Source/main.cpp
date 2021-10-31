@@ -11,7 +11,7 @@ int main()
 {
 	std::cout << "Vulkan App is running..." << std::endl;
 
-    std::unique_ptr<RenderingApplication> app = std::make_unique<RenderingApplication>( 800, 600 );
+    std::unique_ptr<RenderingApplication> app = std::make_unique<RenderingApplication>( 800, 600, "Vulkan Application" );
     try
     {
         app->Run();
