@@ -28,7 +28,19 @@ namespace rendering_engine
         void Shutdown();
         void InitializeWindow();
         void InitializeVulkan();
+        
         void CreateInstance();
+        bool CheckValidationLayerSupport();
+
+        std::vector<const char*> GetRequiredExtensions();
+        static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                            VkDebugUtilsMessageTypeFlagsEXT messageType,
+                                                            const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                                                            void* pUserData);
+        void SetupDebugMessenger();
+        VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT const* pCreateInfo, 
+                                              VkAllocationCallbacks const* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+        static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 
         protected:
         int const mWidth;
@@ -37,5 +49,8 @@ namespace rendering_engine
 
         GLFWwindow* mWindow;
         VkInstance mInstance;
+
+        std::vector<const char*> const mValidationLayers = {"VK_LAYER_KHRONOS_validation"};
+        VkDebugUtilsMessengerEXT mDebugMessenger;
     };  
 }
