@@ -36,10 +36,6 @@ void RenderingApplication::Run()
 
 void RenderingApplication::Shutdown()
 {
-    if (enableValidationLayers) 
-    {
-        DestroyDebugUtilsMessengerEXT(mInstance, nullptr, nullptr);
-    }
     vkDestroyInstance(mInstance, nullptr);
     glfwDestroyWindow(mWindow);
     glfwTerminate();
@@ -60,12 +56,6 @@ void RenderingApplication::InitializeVulkan()
 {
     //Create vulkan instance.
     CreateInstance();
-
-    #ifdef NDEBUG
-    // nondebug
-    #else
-    SetupDebugMessenger();
-    #endif
 }
 
 void RenderingApplication::CreateInstance()
@@ -96,11 +86,6 @@ void RenderingApplication::CreateInstance()
     createInfo.enabledExtensionCount = glfwExtensionCount;
     createInfo.ppEnabledExtensionNames = glfwExtensions;
 
-
-    if (CreateDebugUtilsMessengerEXT(mInstance, nullptr, nullptr, nullptr) != VK_SUCCESS) 
-    {
-        throw std::runtime_error("failed to set up debug messenger!");
-    }
     if (enableValidationLayers) 
     {
         createInfo.enabledLayerCount = static_cast<uint32_t>(mValidationLayers.size());
@@ -224,10 +209,6 @@ VkResult RenderingApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
 }
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
 {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-    if (func != nullptr) 
-    {
-        func(instance, debugMessenger, pAllocator);
-    }
+
 }
 } //namespace rendering_engine
