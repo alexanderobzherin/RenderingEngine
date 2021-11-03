@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdint>
 #include <vector>
+#include <optional>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -14,6 +15,16 @@
 
 namespace rendering_engine
 {
+    struct QueueFamilyIndices 
+    {
+        std::optional<uint32_t> graphicsFamily;
+
+        bool IsComplete()
+        {
+            return graphicsFamily.has_value();
+        }
+    };
+
     class RenderingApplication
     {
         public:
@@ -41,6 +52,10 @@ namespace rendering_engine
         VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT const* pCreateInfo, 
                                               VkAllocationCallbacks const* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
         static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
+
+        void PickPhysicalDevice();
+        bool IsDeviceSuitable(VkPhysicalDevice device);
+        QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
         protected:
         int const mWidth;
