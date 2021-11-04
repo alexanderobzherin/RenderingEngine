@@ -36,11 +36,10 @@ void RenderingApplication::Run()
 
 void RenderingApplication::Shutdown()
 {
+    vkDestroyDevice(mLogicalDevice, nullptr);
     vkDestroyInstance(mInstance, nullptr);
     glfwDestroyWindow(mWindow);
     glfwTerminate();
-
-    vkDestroyDevice(mLogicalDevice, nullptr);
 }
 
 void RenderingApplication::InitializeWindow()
