@@ -57,6 +57,8 @@ namespace rendering_engine
         bool IsDeviceSuitable(VkPhysicalDevice device);
         QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
+        void CreateLogicalDevice();
+
         protected:
         int const mWidth;
         int const mHeight;
@@ -64,6 +66,9 @@ namespace rendering_engine
 
         GLFWwindow* mWindow;
         VkInstance mInstance;
+
+        VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
+        VkDevice mLogicalDevice;
 
         std::vector<const char*> const mValidationLayers = {"VK_LAYER_KHRONOS_validation"};
         VkDebugUtilsMessengerEXT mDebugMessenger;
