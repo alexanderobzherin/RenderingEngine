@@ -18,10 +18,11 @@ namespace rendering_engine
     struct QueueFamilyIndices 
     {
         std::optional<uint32_t> graphicsFamily;
+        std::optional<uint32_t> presentFamily;
 
         bool IsComplete()
         {
-            return graphicsFamily.has_value();
+            return graphicsFamily.has_value() && presentFamily.has_value();
         }
     };
 
@@ -59,13 +60,18 @@ namespace rendering_engine
 
         void CreateLogicalDevice();
 
+        void CreateSurface();
+
         protected:
         int const mWidth;
         int const mHeight;
         char const* mTitle;
 
+        VkSurfaceKHR mSurface;
         GLFWwindow* mWindow;
         VkInstance mInstance;
+
+        VkQueue mPresentQueue;
 
         VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
         VkDevice mLogicalDevice;

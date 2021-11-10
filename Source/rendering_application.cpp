@@ -1,5 +1,6 @@
 #include "rendering_application.hpp"
 #include <cstring>
+#include <set>
 
 namespace rendering_engine
 {
@@ -37,6 +38,7 @@ void RenderingApplication::Run()
 void RenderingApplication::Shutdown()
 {
     vkDestroyDevice(mLogicalDevice, nullptr);
+    vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
     vkDestroyInstance(mInstance, nullptr);
     glfwDestroyWindow(mWindow);
     glfwTerminate();
@@ -59,6 +61,8 @@ void RenderingApplication::InitializeVulkan()
     CreateInstance();
     //Setup debug messenger
     //TODO
+    //Create sueface
+    CreateSurface();
     //Pick graphic card
     PickPhysicalDevice();
     //Create logical device
@@ -282,13 +286,20 @@ QueueFamilyIndices RenderingApplication::FindQueueFamilies(VkPhysicalDevice devi
         {
             indices.graphicsFamily = i;
         }
+
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mSurface, &presentSupport);
+        if (presentSupport) 
+        {
+            indices.presentFamily = i;
+        }
         if(indices.IsComplete())
         {
             break;
         }
 
-    i++;
-}
+        i++;
+    }
     return indices;
 }
 
@@ -296,20 +307,33 @@ void RenderingApplication::CreateLogicalDevice()
 {
     QueueFamilyIndices indices = FindQueueFamilies(mPhysicalDevice);
 
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+    float queuePriority = 1.0f;
+    for (uint32_t queueFamily : uniqueQueueFamilies) 
+    {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
+
     VkDeviceQueueCreateInfo queueCreateInfo{};
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
     queueCreateInfo.queueCount = 1;
 
-    float queuePriority = 1.0f;
     queueCreateInfo.pQueuePriorities = &queuePriority;
 
     VkPhysicalDeviceFeatures deviceFeatures{};
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-    createInfo.pQueueCreateInfos = &queueCreateInfo;
-    createInfo.queueCreateInfoCount = 1;
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 
     createInfo.pEnabledFeatures = &deviceFeatures;
 
@@ -328,6 +352,17 @@ void RenderingApplication::CreateLogicalDevice()
     if (vkCreateDevice(mPhysicalDevice, &createInfo, nullptr, &mLogicalDevice) != VK_SUCCESS) 
     {
         throw std::runtime_error("failed to create logical device!");
+    }
+
+    vkGetDeviceQueue(mLogicalDevice, indices.graphicsFamily.value(), 0, &mPresentQueue);
+    vkGetDeviceQueue(mLogicalDevice, indices.presentFamily.value(), 0, &mPresentQueue);
+}
+
+void RenderingApplication::CreateSurface()
+{
+    if (glfwCreateWindowSurface(mInstance, mWindow, nullptr, &mSurface) != VK_SUCCESS) 
+    {
+        throw std::runtime_error("failed to create window surface!");
     }
 }
 } //namespace rendering_engine
