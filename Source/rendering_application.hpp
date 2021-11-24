@@ -26,6 +26,13 @@ namespace rendering_engine
         }
     };
 
+    struct SwapChainSupportDetails
+    {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
+    };
+
     class RenderingApplication
     {
         public:
@@ -53,14 +60,22 @@ namespace rendering_engine
         VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT const* pCreateInfo, 
                                               VkAllocationCallbacks const* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
         static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
-
+        void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+                
         void PickPhysicalDevice();
         bool IsDeviceSuitable(VkPhysicalDevice device);
         QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
         void CreateLogicalDevice();
-
         void CreateSurface();
+        bool CheckDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
+
+
+        void CreateSwapChain();
+        SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+        VkSurfaceFormatKHR ChooseSwapSurfaceFormat(std::vector<VkSurfaceFormatKHR> const & availableFormats);
+        VkPresentModeKHR ChooseSwapPresentMode(std::vector<VkPresentModeKHR>const & availablePresentModes);
+        VkExtent2D ChooseSwapExtent( VkSurfaceCapabilitiesKHR const & capabilities );
 
         protected:
         int const mWidth;
@@ -78,5 +93,12 @@ namespace rendering_engine
 
         std::vector<const char*> const mValidationLayers = {"VK_LAYER_KHRONOS_validation"};
         VkDebugUtilsMessengerEXT mDebugMessenger;
+
+        std::vector<const char*> const mDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
+        VkSwapchainKHR mSwapChain;
+        std::vector<VkImage> mSwapChainImages;
+        VkFormat mSwapChainImageFormat;
+        VkExtent2D mSwapChainExtent;
     };  
 }

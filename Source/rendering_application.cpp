@@ -1,6 +1,7 @@
 #include "rendering_application.hpp"
 #include <cstring>
 #include <set>
+#include <algorithm>
 
 namespace rendering_engine
 {
@@ -37,7 +38,12 @@ void RenderingApplication::Run()
 
 void RenderingApplication::Shutdown()
 {
+    vkDestroySwapchainKHR(mLogicalDevice, mSwapChain, nullptr);
     vkDestroyDevice(mLogicalDevice, nullptr);
+    if (enableValidationLayers) 
+    {
+        DestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
+    }
     vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
     vkDestroyInstance(mInstance, nullptr);
     glfwDestroyWindow(mWindow);
@@ -57,16 +63,12 @@ void RenderingApplication::InitializeWindow()
 
 void RenderingApplication::InitializeVulkan()
 {
-    //Create vulkan instance.
     CreateInstance();
-    //Setup debug messenger
-    //TODO
-    //Create sueface
+    SetupDebugMessenger();
     CreateSurface();
-    //Pick graphic card
     PickPhysicalDevice();
-    //Create logical device
     CreateLogicalDevice();
+    CreateSwapChain();
 }
 
 void RenderingApplication::CreateInstance()
@@ -89,44 +91,29 @@ void RenderingApplication::CreateInstance()
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
-    uint32_t glfwExtensionCount = 0;
-    const char** glfwExtensions;
-
-    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-    createInfo.enabledExtensionCount = glfwExtensionCount;
-    createInfo.ppEnabledExtensionNames = glfwExtensions;
-
-    if (enableValidationLayers) 
-    {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(mValidationLayers.size());
-        createInfo.ppEnabledLayerNames = mValidationLayers.data();
-    } else 
-    {
-        createInfo.enabledLayerCount = 0;
-    }
-
     auto extensionsNames = GetRequiredExtensions();
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensionsNames.size());
     createInfo.ppEnabledExtensionNames = extensionsNames.data();
 
+    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+    if (enableValidationLayers) 
+    {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(mValidationLayers.size());
+        createInfo.ppEnabledLayerNames = mValidationLayers.data();
+
+        PopulateDebugMessengerCreateInfo(debugCreateInfo);
+        createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
+    } 
+    else 
+    {
+        createInfo.enabledLayerCount = 0;
+
+        createInfo.pNext = nullptr;
+    }
+
     if (vkCreateInstance(&createInfo, nullptr, &mInstance) != VK_SUCCESS) 
     {
         throw std::runtime_error("failed to create instance!");
-    }
-
-    uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-    std::vector<VkExtensionProperties> extensions(extensionCount);
-
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-
-    std::cout << "available extensions:\n";
-
-    for (const auto& extension : extensions) 
-    {
-        std::cout << '\t' << extension.extensionName << '\n';
     }
 }
 
@@ -193,16 +180,12 @@ void RenderingApplication::SetupDebugMessenger()
     }
 
     VkDebugUtilsMessengerCreateInfoEXT createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-    
-    //Finally, the pfnUserCallback field specifies the pointer to the callback function. 
-    //You can optionally pass a pointer to the pUserData field which will be passed along
-    //to the callback function via the pUserData parameter. You could use this to pass a
-    //pointer to the HelloTriangleApplication class, for example.
-    createInfo.pfnUserCallback = nullptr;
-    createInfo.pUserData = nullptr; // Optional
+    PopulateDebugMessengerCreateInfo(createInfo);
+
+    if (CreateDebugUtilsMessengerEXT(mInstance, &createInfo, nullptr, &mDebugMessenger) != VK_SUCCESS) 
+    {
+        throw std::runtime_error("failed to set up debug messenger!");
+    }
 }
 
 VkResult RenderingApplication::CreateDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT const* pCreateInfo, 
@@ -220,7 +203,20 @@ VkResult RenderingApplication::CreateDebugUtilsMessengerEXT(VkInstance instance,
 }
 void RenderingApplication::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
 {
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    if (func != nullptr) 
+    {
+        func(instance, debugMessenger, pAllocator);
+    }  
+}
 
+void RenderingApplication::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+{
+    createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    createInfo.pfnUserCallback = DebugCallback;    
 }
 
 void RenderingApplication::PickPhysicalDevice()
@@ -265,8 +261,17 @@ bool RenderingApplication::IsDeviceSuitable(VkPhysicalDevice device)
     return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
            deviceFeatures.geometryShader;
     */
-   QueueFamilyIndices indices = FindQueueFamilies(device);
-   return indices.IsComplete();
+    QueueFamilyIndices indices = FindQueueFamilies(device);
+
+    bool extensionsSupported = CheckDeviceExtensionSupport(device);
+
+    bool swapChainAdequate = false;
+    if(extensionsSupported)
+    {
+        auto const swapChainSupport = QuerySwapChainSupport(device);
+        swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+    }
+    return indices.IsComplete() && extensionsSupported;
 }
 
 QueueFamilyIndices RenderingApplication::FindQueueFamilies(VkPhysicalDevice device)
@@ -337,7 +342,8 @@ void RenderingApplication::CreateLogicalDevice()
 
     createInfo.pEnabledFeatures = &deviceFeatures;
 
-    createInfo.enabledExtensionCount = 0;
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(mDeviceExtensions.size());;
+    createInfo.ppEnabledExtensionNames = mDeviceExtensions.data();
 
     if (enableValidationLayers)
     {
@@ -365,4 +371,157 @@ void RenderingApplication::CreateSurface()
         throw std::runtime_error("failed to create window surface!");
     }
 }
+
+bool RenderingApplication::CheckDeviceExtensionSupport(VkPhysicalDevice physicalDevice)
+{
+    uint32_t extensionCount;
+    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(mDeviceExtensions.begin(), mDeviceExtensions.end());
+
+    for (const auto& extension : availableExtensions) {
+        requiredExtensions.erase(extension.extensionName);
+    }
+
+    return requiredExtensions.empty();
+}
+
+
+void RenderingApplication::CreateSwapChain()
+{
+    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport( mPhysicalDevice );
+
+    VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
+    VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
+    VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
+
+    uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+    if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) 
+    {
+        imageCount = swapChainSupport.capabilities.maxImageCount;
+    }
+
+    VkSwapchainCreateInfoKHR createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    createInfo.surface = mSurface;
+
+    createInfo.minImageCount = imageCount;
+    createInfo.imageFormat = surfaceFormat.format;
+    createInfo.imageColorSpace = surfaceFormat.colorSpace;
+    createInfo.imageExtent = extent;
+    createInfo.imageArrayLayers = 1;
+    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    QueueFamilyIndices indices = FindQueueFamilies(mPhysicalDevice);
+    uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+    if (indices.graphicsFamily != indices.presentFamily) {
+        createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        createInfo.queueFamilyIndexCount = 2;
+        createInfo.pQueueFamilyIndices = queueFamilyIndices;
+    } 
+    else 
+    {
+        createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        createInfo.queueFamilyIndexCount = 0; // Optional
+        createInfo.pQueueFamilyIndices = nullptr; // Optional
+    }
+
+    createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    createInfo.presentMode = presentMode;
+    createInfo.clipped = VK_TRUE;
+    createInfo.oldSwapchain = VK_NULL_HANDLE;
+
+    if (vkCreateSwapchainKHR(mLogicalDevice, &createInfo, nullptr, &mSwapChain) != VK_SUCCESS) 
+    {
+        throw std::runtime_error("failed to create swap chain!");
+    }
+
+    vkGetSwapchainImagesKHR(mLogicalDevice, mSwapChain, &imageCount, nullptr);
+    mSwapChainImages.resize(imageCount);
+    vkGetSwapchainImagesKHR(mLogicalDevice, mSwapChain, &imageCount, mSwapChainImages.data());
+
+    mSwapChainImageFormat = surfaceFormat.format;
+    mSwapChainExtent = extent;
+}
+
+SwapChainSupportDetails RenderingApplication::QuerySwapChainSupport(VkPhysicalDevice device)
+{
+    SwapChainSupportDetails scsDetails;
+
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR( device, mSurface, &scsDetails.capabilities );
+
+    uint32_t formatCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, nullptr);
+
+    if (formatCount != 0) 
+    {
+        scsDetails.formats.resize(formatCount);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, scsDetails.formats.data());
+    }
+
+    uint32_t presentModeCount;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, nullptr);
+
+    if (presentModeCount != 0) 
+    {
+        scsDetails.presentModes.resize(presentModeCount);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, scsDetails.presentModes.data());
+    }
+
+    return scsDetails;
+}
+
+VkSurfaceFormatKHR RenderingApplication::ChooseSwapSurfaceFormat(std::vector<VkSurfaceFormatKHR> const & availableFormats)
+{
+    for (const auto& availableFormat : availableFormats) 
+    {
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) 
+        {
+            return availableFormat;
+        }
+    }
+
+    return availableFormats[0];
+}
+
+VkPresentModeKHR RenderingApplication::ChooseSwapPresentMode(std::vector<VkPresentModeKHR>const & availablePresentModes)
+{
+    for (const auto& availablePresentMode : availablePresentModes) 
+    {
+        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) 
+        {
+            return availablePresentMode;
+        }
+    }
+    return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+VkExtent2D RenderingApplication::ChooseSwapExtent( VkSurfaceCapabilitiesKHR const & capabilities )
+{
+    if (capabilities.currentExtent.width != UINT32_MAX) 
+    {
+        return capabilities.currentExtent;
+    } 
+    else 
+    {
+        int width, height;
+        glfwGetFramebufferSize(mWindow, &width, &height);
+
+        VkExtent2D actualExtent = {
+            static_cast<uint32_t>(width),
+            static_cast<uint32_t>(height)
+        };
+
+        actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+        actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+        return actualExtent;
+    }   
+}
+
 } //namespace rendering_engine
