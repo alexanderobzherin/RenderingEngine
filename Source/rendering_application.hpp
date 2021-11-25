@@ -77,6 +77,8 @@ namespace rendering_engine
         VkPresentModeKHR ChooseSwapPresentMode(std::vector<VkPresentModeKHR>const & availablePresentModes);
         VkExtent2D ChooseSwapExtent( VkSurfaceCapabilitiesKHR const & capabilities );
 
+        void CreateImageView();
+
         protected:
         int const mWidth;
         int const mHeight;
@@ -100,5 +102,7 @@ namespace rendering_engine
         std::vector<VkImage> mSwapChainImages;
         VkFormat mSwapChainImageFormat;
         VkExtent2D mSwapChainExtent;
+
+        std::vector<VkImageView> mSwapChainImageViews;
     };  
 }
