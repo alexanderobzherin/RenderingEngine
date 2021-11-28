@@ -1,9 +1,40 @@
-rm -rf build
+#Build script for VulkanProject
+#Written by Alexander Obzherin
 
-mkdir build
+PROJECT_ROOT_PATH=$(pwd)
+PATH_SHADERS_SOURCE=$PROJECT_ROOT_PATH/Shaders
+PATH_SHADERS_BIN=$PROJECT_ROOT_PATH/
+echo $PATH_SHADERS
 
-cd build
-
+#Clean previousle created binaries
+rm -rf Build
+#Create new build directory and step into it
+mkdir Build
+cd Build
+#Run root cmake file
 cmake ..
-
+#Run make file
 make
+
+#Shader compilation
+
+#find shader compiler and store path to it.
+PATH_TO_SHADER_COMPILER=$(find / -name glslc 2>/dev/null)
+if ! test -f "$PATH_TO_SHADER_COMPILER"; then
+    echo "Shader compiler not found."
+    exit 1
+fi
+
+echo "Shader compilation..."
+
+mkdir Intermediate
+cd Intermediate
+mkdir Shaders
+cd Shaders
+PATH_SHADERS_BIN=$(pwd)
+
+#TODO generalize searching for source shaders file and building into Intermediate/Build/
+#/usr/bin/glslc /home/alexander/Development/vulkanproject/Shaders/basic_shader.vert -o /home/alexander/Development/vulkanproject/Build/Intermediate/Shaders/basic_shader_vert.spv
+
+$PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.vert -o $PATH_SHADERS_BIN/basic_shader_vert.spv
+$PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.frag -o $PATH_SHADERS_BIN/basic_shader_frag.spv

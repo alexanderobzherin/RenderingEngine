@@ -79,6 +79,8 @@ namespace rendering_engine
 
         void CreateImageView();
 
+        void CreateGraphicsPipeline();
+
         protected:
         int const mWidth;
         int const mHeight;

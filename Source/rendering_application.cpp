@@ -560,4 +560,9 @@ void RenderingApplication::CreateImageView()
     }
 }
 
+void RenderingApplication::CreateGraphicsPipeline()
+{
+    
+}
+
 } //namespace rendering_engine
