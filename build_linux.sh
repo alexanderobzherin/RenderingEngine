@@ -4,7 +4,6 @@
 PROJECT_ROOT_PATH=$(pwd)
 PATH_SHADERS_SOURCE=$PROJECT_ROOT_PATH/Shaders
 PATH_SHADERS_BIN=$PROJECT_ROOT_PATH/
-echo $PATH_SHADERS
 
 #Clean previousle created binaries
 rm -rf Build
@@ -32,9 +31,6 @@ cd Intermediate
 mkdir Shaders
 cd Shaders
 PATH_SHADERS_BIN=$(pwd)
-
-#TODO generalize searching for source shaders file and building into Intermediate/Build/
-#/usr/bin/glslc /home/alexander/Development/vulkanproject/Shaders/basic_shader.vert -o /home/alexander/Development/vulkanproject/Build/Intermediate/Shaders/basic_shader_vert.spv
 
 $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.vert -o $PATH_SHADERS_BIN/basic_shader_vert.spv
 $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.frag -o $PATH_SHADERS_BIN/basic_shader_frag.spv
