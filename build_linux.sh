@@ -3,7 +3,6 @@
 
 PROJECT_ROOT_PATH=$(pwd)
 PATH_SHADERS_SOURCE=$PROJECT_ROOT_PATH/Shaders
-PATH_SHADERS_BIN=$PROJECT_ROOT_PATH/
 
 #Clean previousle created binaries
 rm -rf Build
@@ -24,7 +23,7 @@ if ! test -f "$PATH_TO_SHADER_COMPILER"; then
     exit 1
 fi
 
-echo "Shader compilation..."
+echo "Shaders compilation..."
 
 mkdir Intermediate
 cd Intermediate
