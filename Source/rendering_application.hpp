@@ -129,5 +129,7 @@ namespace rendering_engine
         VkExtent2D mSwapChainExtent;
 
         std::vector<VkImageView> mSwapChainImageViews;
+
+        VkPipelineLayout mPipelineLayout;
     };  
 }
