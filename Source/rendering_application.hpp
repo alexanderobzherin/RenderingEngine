@@ -79,7 +79,7 @@ namespace rendering_engine
         VkExtent2D ChooseSwapExtent( VkSurfaceCapabilitiesKHR const & capabilities );
 
         void CreateImageView();
-
+        void CreateRenderPass();
         void CreateGraphicsPipeline();
 
         static std::vector<char> ReadFile( std::string const & filename )
@@ -130,6 +130,8 @@ namespace rendering_engine
 
         std::vector<VkImageView> mSwapChainImageViews;
 
+        VkRenderPass mRenderPass;
         VkPipelineLayout mPipelineLayout;
+        VkPipeline mGraphicsPipeline;
     };  
 }
