@@ -9,27 +9,35 @@ rm -rf Build
 #Create new build directory and step into it
 mkdir Build
 cd Build
+PATH_TO_BUILD=$(pwd)
 #Run root cmake file
 cmake ..
 #Run make file
 make
 
 #Shader compilation
+CompileShaders()
+{
+    echo "Shaders compilation..."
+    cd $PATH_TO_BUILD
+    mkdir Intermediate
+    cd Intermediate
+    mkdir Shaders
+    cd Shaders
+    PATH_SHADERS_BIN=$(pwd)
 
-#find shader compiler and store path to it.
-PATH_TO_SHADER_COMPILER=$(find / -name glslc 2>/dev/null)
-if ! test -f "$PATH_TO_SHADER_COMPILER"; then
-    echo "Shader compiler not found."
-    exit 1
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.vert -o $PATH_SHADERS_BIN/basic_shader_vert.spv
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.frag -o $PATH_SHADERS_BIN/basic_shader_frag.spv
+}
+
+echo "Finding shader compiler..."
+
+find / -name glslc 2>/dev/null |
+while read -r PATH_TO_SHADER_COMPILER
+do
+if test -f $PATH_TO_SHADER_COMPILER; then
+    echo "Shader compiler found $PATH_TO_SHADER_COMPILER"
+    CompileShaders
+    break
 fi
-
-echo "Shaders compilation..."
-
-mkdir Intermediate
-cd Intermediate
-mkdir Shaders
-cd Shaders
-PATH_SHADERS_BIN=$(pwd)
-
-$PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.vert -o $PATH_SHADERS_BIN/basic_shader_vert.spv
-$PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.frag -o $PATH_SHADERS_BIN/basic_shader_frag.spv
+done
