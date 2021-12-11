@@ -108,6 +108,10 @@ namespace rendering_engine
         void CreateCommandPool();
         void CreateCommandBuffers();
 
+        void Draw();
+
+        void CreateSyncObjects();
+
         protected:
         int const mWidth;
         int const mHeight;
@@ -117,6 +121,7 @@ namespace rendering_engine
         GLFWwindow* mWindow;
         VkInstance mInstance;
 
+        VkQueue mGraphicsQueue;
         VkQueue mPresentQueue;
 
         VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
@@ -141,5 +146,11 @@ namespace rendering_engine
 
         VkCommandPool mCommandPool;
         std::vector<VkCommandBuffer> mCommandBuffers;
+
+        std::vector<VkSemaphore> mImageAvailableSemaphores;
+        std::vector<VkSemaphore> mRenderFinishedSemaphores;
+        std::vector<VkFence> mInFlightFences;
+        std::vector<VkFence> mImagesInFlight;
+        size_t mCurrentFrame = 0;
     };  
 }
