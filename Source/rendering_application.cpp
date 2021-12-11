@@ -601,8 +601,8 @@ void RenderingApplication::CreateRenderPass()
 
 void RenderingApplication::CreateGraphicsPipeline()
 {
-    auto vertShaderCode = ReadFile("/home/alexander/Development/vulkanproject/Build/Intermediate/Shaders/basic_shader_frag.spv");
-    auto fragShaderCode = ReadFile("/home/alexander/Development/vulkanproject/Build/Intermediate/Shaders/basic_shader_vert.spv");    
+    auto vertShaderCode = ReadFile("/home/alexander/Development/vulkanproject/Build/Intermediate/Shaders/basic_shader_vert.spv");
+    auto fragShaderCode = ReadFile("/home/alexander/Development/vulkanproject/Build/Intermediate/Shaders/basic_shader_frag.spv");    
 
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
