@@ -81,6 +81,7 @@ namespace rendering_engine
         void CreateImageView();
         void CreateRenderPass();
         void CreateGraphicsPipeline();
+        void CreateFramebuffers();
 
         static std::vector<char> ReadFile( std::string const & filename )
         {
@@ -129,6 +130,7 @@ namespace rendering_engine
         VkExtent2D mSwapChainExtent;
 
         std::vector<VkImageView> mSwapChainImageViews;
+        std::vector<VkFramebuffer> mSwapChainFramebuffers;
 
         VkRenderPass mRenderPass;
         VkPipelineLayout mPipelineLayout;
