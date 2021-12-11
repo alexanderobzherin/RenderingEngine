@@ -105,6 +105,9 @@ namespace rendering_engine
 
         VkShaderModule CreateShaderModule(std::vector<char>& code);
 
+        void CreateCommandPool();
+        void CreateCommandBuffers();
+
         protected:
         int const mWidth;
         int const mHeight;
@@ -135,5 +138,8 @@ namespace rendering_engine
         VkRenderPass mRenderPass;
         VkPipelineLayout mPipelineLayout;
         VkPipeline mGraphicsPipeline;
+
+        VkCommandPool mCommandPool;
+        std::vector<VkCommandBuffer> mCommandBuffers;
     };  
 }
