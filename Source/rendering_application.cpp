@@ -68,10 +68,11 @@ void RenderingApplication::InitializeWindow()
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-    mWindow = glfwCreateWindow(mWidth, mHeight, mTitle, nullptr, nullptr);
-
+    mWindow = glfwCreateWindow(mWidth, mHeight, mTitle, nullptr/* Full screen view glfwGetPrimaryMonitor()*/, nullptr);
+    glfwSetWindowUserPointer(mWindow, this);
+    glfwSetFramebufferSizeCallback(mWindow, FramebufferResizeCallback);
 }
 
 void RenderingApplication::InitializeVulkan()
@@ -489,6 +490,14 @@ void RenderingApplication::CleanupSwapChain()
 
 void RenderingApplication::RecreateSwapChain()
 {
+    int width = 0;
+    int height = 0;
+    glfwGetFramebufferSize(mWindow, &width, &height);
+    while (width == 0 || height == 0) 
+    {
+        glfwGetFramebufferSize(mWindow, &width, &height);
+        glfwWaitEvents();
+    }
     vkDeviceWaitIdle(mLogicalDevice);
 
     CleanupSwapChain();
@@ -499,7 +508,6 @@ void RenderingApplication::RecreateSwapChain()
     CreateGraphicsPipeline();
     CreateFramebuffers();
     CreateCommandBuffers();
- 
 }
 
 SwapChainSupportDetails RenderingApplication::QuerySwapChainSupport(VkPhysicalDevice device)
@@ -902,7 +910,20 @@ void RenderingApplication::Draw()
         vkWaitForFences(mLogicalDevice, 1, &mInFlightFences[mCurrentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(mLogicalDevice, mSwapChain, UINT64_MAX, mImageAvailableSemaphores[mCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+        VkResult result = vkAcquireNextImageKHR(mLogicalDevice, mSwapChain, UINT64_MAX, mImageAvailableSemaphores[mCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) 
+        {
+            RecreateSwapChain();
+            return;
+        } 
+        else
+        {
+            if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) 
+            {
+                throw std::runtime_error("failed to acquire swap chain image!");
+            } 
+        }
 
         if(mImagesInFlight[imageIndex] != VK_NULL_HANDLE) 
         {
@@ -944,9 +965,22 @@ void RenderingApplication::Draw()
 
         presentInfo.pImageIndices = &imageIndex;
 
-        vkQueuePresentKHR(mPresentQueue, &presentInfo);
+        result = vkQueuePresentKHR(mPresentQueue, &presentInfo);
 
-        mCurrentFrame = (mCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) 
+        {
+            mFramebufferResized = false;
+            RecreateSwapChain();
+        } 
+        else 
+        {
+            if (result != VK_SUCCESS) 
+            {
+                throw std::runtime_error("failed to present swap chain image!");
+            }
+
+            mCurrentFrame = (mCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+        }
 }
 
 void RenderingApplication::CreateSyncObjects()
@@ -972,6 +1006,12 @@ void RenderingApplication::CreateSyncObjects()
             throw std::runtime_error("failed to create synchronization objects for a frame!");
         }
     }
+}
+
+void RenderingApplication::FramebufferResizeCallback(GLFWwindow* window, int width, int height)
+{
+    auto app = reinterpret_cast<RenderingApplication*>(glfwGetWindowUserPointer(window));
+    app->mFramebufferResized = true;
 }
 
 } //namespace rendering_engine

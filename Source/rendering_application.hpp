@@ -113,6 +113,8 @@ namespace rendering_engine
 
         void CreateSyncObjects();
 
+        static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
+
         protected:
         int const mWidth;
         int const mHeight;
@@ -153,5 +155,6 @@ namespace rendering_engine
         std::vector<VkFence> mInFlightFences;
         std::vector<VkFence> mImagesInFlight;
         size_t mCurrentFrame = 0;
+        bool mFramebufferResized = false;
     };  
 }
