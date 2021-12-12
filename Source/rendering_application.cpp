@@ -42,6 +42,7 @@ void RenderingApplication::Run()
 
 void RenderingApplication::Shutdown()
 {
+    CleanupSwapChain();
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
     {
         vkDestroySemaphore(mLogicalDevice, mRenderFinishedSemaphores[i], nullptr);
@@ -51,20 +52,6 @@ void RenderingApplication::Shutdown()
 
     vkDestroyCommandPool(mLogicalDevice, mCommandPool, nullptr);
 
-    for (auto framebuffer : mSwapChainFramebuffers) 
-    {
-        vkDestroyFramebuffer(mLogicalDevice, framebuffer, nullptr);
-    }
-
-    vkDestroyPipeline(mLogicalDevice, mGraphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(mLogicalDevice, mPipelineLayout, nullptr);
-
-    vkDestroyRenderPass(mLogicalDevice, mRenderPass, nullptr);
-    for(auto imageView : mSwapChainImageViews)
-    {
-        vkDestroyImageView(mLogicalDevice, imageView, nullptr);
-    }
-    vkDestroySwapchainKHR(mLogicalDevice, mSwapChain, nullptr);
     vkDestroyDevice(mLogicalDevice, nullptr);
     if (enableValidationLayers) 
     {
@@ -478,6 +465,41 @@ void RenderingApplication::CreateSwapChain()
 
     mSwapChainImageFormat = surfaceFormat.format;
     mSwapChainExtent = extent;
+}
+
+void RenderingApplication::CleanupSwapChain()
+{
+    for (auto framebuffer : mSwapChainFramebuffers) 
+    {
+        vkDestroyFramebuffer(mLogicalDevice, framebuffer, nullptr);
+    }
+
+    vkFreeCommandBuffers(mLogicalDevice, mCommandPool, static_cast<uint32_t>(mCommandBuffers.size()), mCommandBuffers.data());
+
+    vkDestroyPipeline(mLogicalDevice, mGraphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(mLogicalDevice, mPipelineLayout, nullptr);
+
+    vkDestroyRenderPass(mLogicalDevice, mRenderPass, nullptr);
+    for(auto imageView : mSwapChainImageViews)
+    {
+        vkDestroyImageView(mLogicalDevice, imageView, nullptr);
+    }
+    vkDestroySwapchainKHR(mLogicalDevice, mSwapChain, nullptr);
+}
+
+void RenderingApplication::RecreateSwapChain()
+{
+    vkDeviceWaitIdle(mLogicalDevice);
+
+    CleanupSwapChain();
+
+    CreateSwapChain();
+    CreateImageView();
+    CreateRenderPass();
+    CreateGraphicsPipeline();
+    CreateFramebuffers();
+    CreateCommandBuffers();
+ 
 }
 
 SwapChainSupportDetails RenderingApplication::QuerySwapChainSupport(VkPhysicalDevice device)

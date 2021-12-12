@@ -71,8 +71,9 @@ namespace rendering_engine
         void CreateSurface();
         bool CheckDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
 
-
         void CreateSwapChain();
+        void CleanupSwapChain();
+        void RecreateSwapChain();
         SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
         VkSurfaceFormatKHR ChooseSwapSurfaceFormat(std::vector<VkSurfaceFormatKHR> const & availableFormats);
         VkPresentModeKHR ChooseSwapPresentMode(std::vector<VkPresentModeKHR>const & availablePresentModes);
