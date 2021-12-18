@@ -7,7 +7,7 @@
 
 using namespace rendering_engine;
 
-int main()
+int main(int argc, char *argv[])
 {
 	std::cout << "Vulkan App is running..." << std::endl;
 

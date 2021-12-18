@@ -10,12 +10,14 @@ set(CMAKE_BUILD_TYPE Debug)
 #set header files
 set(HEADER_FILES
 	Source/rendering_application.hpp
+	Source/utility.hpp
 )
 
 #set source files
 set(SRC_FILES
 Source/main.cpp
 Source/rendering_application.cpp
+Source/utility.cpp
 )
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -57,6 +59,8 @@ find_package(glfw3 CONFIG REQUIRED)
 
 find_package(glm CONFIG REQUIRED)
 
+find_package(Boost 1.36.0 REQUIRED COMPONENTS filesystem)
+
 #add the executable
 add_executable(VulkanProject ${HEADER_FILES} ${SRC_FILES})
 
@@ -64,5 +68,6 @@ target_link_libraries(VulkanProject
     PUBLIC
     ${Vulkan_LIBRARY}
     glfw
-    glm::glm 
+    glm::glm
+	Boost::filesystem
 )

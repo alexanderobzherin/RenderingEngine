@@ -2,6 +2,8 @@
 #include <cstring>
 #include <set>
 #include <algorithm>
+#include "utility.hpp"
+#include "boost/filesystem.hpp"
 
 namespace rendering_engine
 {
@@ -662,8 +664,10 @@ void RenderingApplication::CreateRenderPass()
 
 void RenderingApplication::CreateGraphicsPipeline()
 {
-    auto vertShaderCode = ReadFile("/home/alexander/Development/vulkanproject/Build/Intermediate/Shaders/basic_shader_vert.spv");
-    auto fragShaderCode = ReadFile("/home/alexander/Development/vulkanproject/Build/Intermediate/Shaders/basic_shader_frag.spv");    
+    boost::filesystem::path currentPath = boost::filesystem::current_path();
+
+    auto vertShaderCode = Utility::ReadShaderBinaryFile(currentPath.c_str() + std::string{"/Build/Intermediate/Shaders/basic_shader_vert.spv"});
+    auto fragShaderCode = Utility::ReadShaderBinaryFile(currentPath.c_str() + std::string{"/Build/Intermediate/Shaders/basic_shader_frag.spv"});    
 
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
