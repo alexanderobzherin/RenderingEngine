@@ -17,5 +17,9 @@ class Utility
 		Utility();
 		Utility( const Utility& rhs );
 		Utility& operator=( const Utility& rhs );
+
+	public:
+		static std::string const sDefaultShadersBinaryPath;
+
 };
 }

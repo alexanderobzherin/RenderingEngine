@@ -1,5 +1,7 @@
-mkdir build
+rmdir /s /q Build
 
-cd build
+mkdir Build
 
-cmake .. -DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake
+cd Build
+
+cmake .. -DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake

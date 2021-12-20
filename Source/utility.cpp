@@ -3,6 +3,8 @@
 
 namespace rendering_engine
 {
+std::string const Utility::sDefaultShadersBinaryPath = {"/Intermediate/Shaders/"};
+
 std::vector<char> Utility::ReadShaderBinaryFile( std::string const & filename )
 {
     std::ifstream file(filename, std::ios::ate | std::ios::binary);
