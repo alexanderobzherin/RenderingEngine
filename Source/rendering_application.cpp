@@ -664,7 +664,7 @@ void RenderingApplication::CreateRenderPass()
 
 void RenderingApplication::CreateGraphicsPipeline()
 {
-    boost::filesystem::path fullShaderPath = boost::filesystem::current_path();
+    boost::filesystem::path fullShaderPath = boost::filesystem::path(Utility::sApplicationPath);
     boost::filesystem::path shaderBinRelativePath(Utility::sDefaultShadersBinaryPath);
 
     fullShaderPath /= shaderBinRelativePath;

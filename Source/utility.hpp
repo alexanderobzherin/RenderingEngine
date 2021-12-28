@@ -20,6 +20,7 @@ class Utility
 
 	public:
 		static std::string const sDefaultShadersBinaryPath;
+		static std::string sApplicationPath;
 
 };
 }

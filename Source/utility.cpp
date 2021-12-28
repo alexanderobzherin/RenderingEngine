@@ -4,6 +4,7 @@
 namespace rendering_engine
 {
 std::string const Utility::sDefaultShadersBinaryPath = {"/Intermediate/Shaders/"};
+std::string Utility::sApplicationPath;
 
 std::vector<char> Utility::ReadShaderBinaryFile( std::string const & filename )
 {
