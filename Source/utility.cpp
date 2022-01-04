@@ -1,10 +1,19 @@
 #include "utility.hpp"
-#include "boost/filesystem.hpp"
 
 namespace rendering_engine
 {
-std::string const Utility::sDefaultShadersBinaryPath = {"/Intermediate/Shaders/"};
-std::string Utility::sApplicationPath;
+boost::filesystem::path const Utility::sDefaultShadersBinaryRelativePath = {"/Intermediate/Shaders/"};
+boost::filesystem::path Utility::sShadersBinaryPath;
+boost::filesystem::path Utility::sApplicationPath;
+boost::filesystem::path Utility::sBuildPath;
+
+void Utility::InitializePaths(int argc, char* argv[])
+{
+	sApplicationPath = boost::filesystem::path(argv[0]);
+
+	sBuildPath = FindPath( "Build" );
+	sShadersBinaryPath = sBuildPath += sDefaultShadersBinaryRelativePath;
+}
 
 std::vector<char> Utility::ReadShaderBinaryFile( std::string const & filename )
 {
@@ -41,7 +50,6 @@ std::vector<std::string> Utility::GetListOfFilesInDirectory( std::string directo
 			{
 				for( boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator( pathToDirectory ) )
 				{
-					//std::string lookingExtension{ "jpg" };
 					size_t dot = x.path().string().find_last_of( "." );
 
 					if( std::string{ "spv" } == x.path().string().substr( dot + 1 ) )
@@ -60,4 +68,34 @@ std::vector<std::string> Utility::GetListOfFilesInDirectory( std::string directo
 
 	return shaderFileNames;
 }
+
+boost::filesystem::path Utility::GetApplicationPath()
+{
+	return sApplicationPath;
+}
+
+boost::filesystem::path Utility::GetBuildPath()
+{
+	return sBuildPath;
+}
+
+boost::filesystem::path Utility::GetShadersBinaryPath()
+{
+	return sShadersBinaryPath;
+}
+
+
+boost::filesystem::path Utility::FindPath(std::string fileOrFolderName, std::string searchingFrom)
+{
+	boost::filesystem::path result;
+	for( boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(searchingFrom) )
+	{
+		if( x.path().filename().string() == fileOrFolderName )
+		{
+			result = x.path().generic_path();
+		}
+	}
+	return result;
+}
+
 }

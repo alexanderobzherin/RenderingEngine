@@ -664,13 +664,9 @@ void RenderingApplication::CreateRenderPass()
 
 void RenderingApplication::CreateGraphicsPipeline()
 {
-    boost::filesystem::path fullShaderPath = boost::filesystem::path(Utility::sApplicationPath);
-    boost::filesystem::path shaderBinRelativePath(Utility::sDefaultShadersBinaryPath);
-
-    fullShaderPath /= shaderBinRelativePath;
-    
-    auto vertShaderCode = Utility::ReadShaderBinaryFile(fullShaderPath.string() + "basic_shader_vert.spv");
-    auto fragShaderCode = Utility::ReadShaderBinaryFile(fullShaderPath.string() + "basic_shader_frag.spv");
+    std::string const shadersBinaryPath = Utility::GetShadersBinaryPath().string();
+    auto vertShaderCode = Utility::ReadShaderBinaryFile(shadersBinaryPath + "basic_shader_vert.spv");
+    auto fragShaderCode = Utility::ReadShaderBinaryFile(shadersBinaryPath + "basic_shader_frag.spv");
 
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);

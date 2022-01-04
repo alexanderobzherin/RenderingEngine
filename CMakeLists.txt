@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 #set the project name
 project(VulkanProject)
 
-#specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 
 #set header files
@@ -63,6 +61,19 @@ find_package(Boost 1.36.0 REQUIRED COMPONENTS filesystem)
 
 #add the executable
 add_executable(VulkanProject ${HEADER_FILES} ${SRC_FILES})
+#specify the compiling properties
+set_target_properties(VulkanProject PROPERTIES
+	CXX_STANDARD 17
+	CXX_STANDARD_REQUIRED ON
+)
+if(NOT WIN32)
+set_target_properties(VulkanProject PROPERTIES
+	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
+)
+else(
+	COMPILE_OPTIONS "-Wall;-Wextra"
+)
+endif()
 
 target_link_libraries(VulkanProject 
     PUBLIC
@@ -71,3 +82,10 @@ target_link_libraries(VulkanProject
     glm::glm
 	Boost::filesystem
 )
+
+if(WIN32)
+add_custom_command(
+	TARGET VulkanProject PRE_BUILD
+	COMMAND cmd /c ${CMAKE_CURRENT_SOURCE_DIR}/windows_compile_shaders.bat
+)
+endif()
