@@ -16,8 +16,16 @@ namespace rendering_engine
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
+RenderingApplication::RenderingApplication(char const* title)
+    :
+    mIsFullScreen(true),
+    mTitle(title)
+{
+}
+
 RenderingApplication::RenderingApplication( int const width, int const height, char const* title  )
     :
+    mIsFullScreen(false),
     mWidth( width ),
     mHeight( height ),
     mTitle( title )
@@ -71,8 +79,20 @@ void RenderingApplication::InitializeWindow()
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    
+    if( mIsFullScreen )
+    {
+        const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-    mWindow = glfwCreateWindow(mWidth, mHeight, mTitle, nullptr/* Full screen view glfwGetPrimaryMonitor()*/, nullptr);
+        mWidth = mode->width;
+        mHeight = mode->height;
+        mWindow = glfwCreateWindow(mWidth, mHeight, mTitle, glfwGetPrimaryMonitor(), nullptr);
+    }
+    else
+    {
+        mWindow = glfwCreateWindow(mWidth, mHeight, mTitle, nullptr, nullptr);
+    }
+    
     glfwSetWindowUserPointer(mWindow, this);
     glfwSetFramebufferSizeCallback(mWindow, FramebufferResizeCallback);
 }
