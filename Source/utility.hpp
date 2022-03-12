@@ -24,7 +24,7 @@ class Utility final
 		Utility( const Utility& rhs );
 		Utility& operator=( const Utility& rhs );
 
-		static boost::filesystem::path FindPath( std::string fileOrFolderName, std::string searchingFrom = "../" );
+		static boost::filesystem::path FindPath( std::string fileOrFolderName, std::string searchingFrom = "../../" );
 
 	private:
 		static boost::filesystem::path sApplicationPath;

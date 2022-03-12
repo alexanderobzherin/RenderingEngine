@@ -664,9 +664,8 @@ void RenderingApplication::CreateRenderPass()
 
 void RenderingApplication::CreateGraphicsPipeline()
 {
-    std::string const shadersBinaryPath = Utility::GetShadersBinaryPath().string();
-    auto vertShaderCode = Utility::ReadShaderBinaryFile(shadersBinaryPath + "basic_shader_vert.spv");
-    auto fragShaderCode = Utility::ReadShaderBinaryFile(shadersBinaryPath + "basic_shader_frag.spv");
+    auto vertShaderCode = Utility::ReadShaderBinaryFile("./Intermediate/Shaders/basic_shader_vert.spv");
+    auto fragShaderCode = Utility::ReadShaderBinaryFile("./Intermediate/Shaders/basic_shader_frag.spv");
 
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
