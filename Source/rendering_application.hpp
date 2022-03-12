@@ -38,6 +38,7 @@ namespace rendering_engine
     {
         public:
         //Public constructor
+        RenderingApplication(char const* title);
         RenderingApplication( int const width, int const height, char const* title );
         virtual ~RenderingApplication();
 
@@ -96,8 +97,9 @@ namespace rendering_engine
         static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
 
         protected:
-        int const mWidth;
-        int const mHeight;
+        bool mIsFullScreen;
+        unsigned int mWidth;
+        unsigned int mHeight;
         char const* mTitle;
 
         VkSurfaceKHR mSurface;

@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {
 	std::cout << "Vulkan App is running..." << std::endl;
     Utility::InitializePaths(argc, argv);
-    std::unique_ptr<RenderingApplication> app = std::make_unique<RenderingApplication>( 800, 600, "Vulkan Application" );
+    std::unique_ptr<RenderingApplication> app = std::make_unique<RenderingApplication>( "Vulkan Application" );
     try
     {
         app->Run();
