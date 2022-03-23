@@ -9,6 +9,7 @@ set(CMAKE_BUILD_TYPE Debug)
 set(HEADER_FILES
 	Source/rendering_application.hpp
 	Source/utility.hpp
+	Source/vertex_declarations.hpp
 )
 
 #set source files
