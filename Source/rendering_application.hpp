@@ -90,6 +90,10 @@ namespace rendering_engine
 
         void CreateCommandPool();
         void CreateCommandBuffers();
+        void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+
+        void CreateVertexBuffer();
+        uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
         void Draw();
 
@@ -139,5 +143,14 @@ namespace rendering_engine
         std::vector<VkFence> mImagesInFlight;
         size_t mCurrentFrame = 0;
         bool mFramebufferResized = false;
+
+        VkBuffer mVertexBuffer;
+        VkDeviceMemory mVertexBufferMemory;
+
+        std::vector<Vertex> const mVertices = {
+                                                {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+                                                {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+                                                {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+                                             };
     };  
 }
