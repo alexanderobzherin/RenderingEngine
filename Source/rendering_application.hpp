@@ -92,6 +92,8 @@ namespace rendering_engine
         void CreateCommandBuffers();
         void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
+        void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+        void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         void CreateVertexBuffer();
         uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
@@ -148,7 +150,7 @@ namespace rendering_engine
         VkDeviceMemory mVertexBufferMemory;
 
         std::vector<Vertex> const mVertices = {
-                                                {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+                                                {{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
                                                 {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
                                                 {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
                                              };
