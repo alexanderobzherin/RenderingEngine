@@ -95,6 +95,8 @@ namespace rendering_engine
         void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         void CreateVertexBuffer();
+        void CreateIndexBuffer();
+
         uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
         void Draw();
@@ -148,11 +150,17 @@ namespace rendering_engine
 
         VkBuffer mVertexBuffer;
         VkDeviceMemory mVertexBufferMemory;
+        VkBuffer mIndexBuffer;
+        VkDeviceMemory mIndexBufferMemory;
 
         std::vector<Vertex> const mVertices = {
-                                                {{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
-                                                {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-                                                {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+                                                {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+                                                {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+                                                {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+                                                {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
                                              };
     };  
+        std::vector<uint16_t> const mIndices = {
+                                            0, 1, 2, 2, 3, 0
+        };
 }
