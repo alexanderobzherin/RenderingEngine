@@ -15,6 +15,12 @@
 #include <glm/mat4x4.hpp>
 #include "vertex_declarations.hpp"
 
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <chrono>
+
 namespace rendering_engine
 {
     struct QueueFamilyIndices 
@@ -96,14 +102,18 @@ namespace rendering_engine
         void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         void CreateVertexBuffer();
         void CreateIndexBuffer();
+        void CreateUniformBuffers();
+
+        void CreateDescriptorSetLayout();
 
         uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
         void Draw();
-
+        void UpdateUniformBuffer(uint32_t currentImage);
         void CreateSyncObjects();
 
         static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
+
 
         protected:
         bool mIsFullScreen;
@@ -152,6 +162,10 @@ namespace rendering_engine
         VkDeviceMemory mVertexBufferMemory;
         VkBuffer mIndexBuffer;
         VkDeviceMemory mIndexBufferMemory;
+        std::vector<VkBuffer> mUniformBuffers;
+        std::vector<VkDeviceMemory> mUniformBuffersMemory;
+
+        VkDescriptorSetLayout mDescriptorSetLayout;
 
         std::vector<Vertex> const mVertices = {
                                                 {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
