@@ -16,6 +16,7 @@
 #include "vertex_declarations.hpp"
 
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -103,6 +104,8 @@ namespace rendering_engine
         void CreateVertexBuffer();
         void CreateIndexBuffer();
         void CreateUniformBuffers();
+        void CreateDescriptorPool();
+        void CreateDescriptorSets();
 
         void CreateDescriptorSetLayout();
 
@@ -164,6 +167,8 @@ namespace rendering_engine
         VkDeviceMemory mIndexBufferMemory;
         std::vector<VkBuffer> mUniformBuffers;
         std::vector<VkDeviceMemory> mUniformBuffersMemory;
+        VkDescriptorPool mDescriptorPool;
+        std::vector<VkDescriptorSet> mDescriptorSets;
 
         VkDescriptorSetLayout mDescriptorSetLayout;
 

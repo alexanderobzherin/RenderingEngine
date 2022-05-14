@@ -59,6 +59,9 @@ void RenderingApplication::Shutdown()
         vkDestroyBuffer(mLogicalDevice, mUniformBuffers[i], nullptr);
         vkFreeMemory(mLogicalDevice, mUniformBuffersMemory[i], nullptr);
     }
+
+    vkDestroyDescriptorPool(mLogicalDevice, mDescriptorPool, nullptr);
+
     vkDestroyDescriptorSetLayout(mLogicalDevice, mDescriptorSetLayout, nullptr);
 
     vkDestroyBuffer(mLogicalDevice, mIndexBuffer, nullptr);
@@ -121,11 +124,15 @@ void RenderingApplication::InitializeVulkan()
     CreateSwapChain();
     CreateImageView();
     CreateRenderPass();
+    CreateDescriptorSetLayout();
     CreateGraphicsPipeline();
     CreateFramebuffers();
     CreateCommandPool();
     CreateVertexBuffer();
     CreateIndexBuffer();
+    CreateUniformBuffers();
+    CreateDescriptorPool();
+    CreateDescriptorSets();
     CreateCommandBuffers();
     CreateSyncObjects();
 }
@@ -763,7 +770,7 @@ void RenderingApplication::CreateGraphicsPipeline()
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f; // Optional
     rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -942,6 +949,8 @@ void RenderingApplication::RecordCommandBuffer(VkCommandBuffer commandBuffer, ui
 
     vkCmdBindIndexBuffer(commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipelineLayout, 0, 1, &mDescriptorSets[mCurrentFrame], 0, nullptr);
+
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(mIndices.size()), 1, 0, 0, 0);
 
     vkCmdEndRenderPass(commandBuffer);
@@ -1074,6 +1083,64 @@ void RenderingApplication::CreateUniformBuffers()
     }   
 }
 
+void RenderingApplication::CreateDescriptorPool()
+{
+    VkDescriptorPoolSize poolSize{};
+    poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+    VkDescriptorPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    poolInfo.poolSizeCount = 1;
+    poolInfo.pPoolSizes = &poolSize;
+
+    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+    if (vkCreateDescriptorPool(mLogicalDevice, &poolInfo, nullptr, &mDescriptorPool) != VK_SUCCESS) 
+    {
+        throw std::runtime_error("failed to create descriptor pool!");
+    }
+}
+
+void RenderingApplication::CreateDescriptorSets()
+{
+    std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, mDescriptorSetLayout);
+    VkDescriptorSetAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = mDescriptorPool;
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+    allocInfo.pSetLayouts = layouts.data();
+
+    mDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+    if (vkAllocateDescriptorSets(mLogicalDevice, &allocInfo, mDescriptorSets.data()) != VK_SUCCESS) 
+    {
+        throw std::runtime_error("failed to allocate descriptor sets!");
+    }
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
+    {
+        VkDescriptorBufferInfo bufferInfo{};
+        bufferInfo.buffer = mUniformBuffers[i];
+        bufferInfo.offset = 0;
+        bufferInfo.range = sizeof(UniformBufferObject);
+
+        VkWriteDescriptorSet descriptorWrite{};
+        descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrite.dstSet = mDescriptorSets[i];
+        descriptorWrite.dstBinding = 0;
+        descriptorWrite.dstArrayElement = 0;
+
+        descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        descriptorWrite.descriptorCount = 1;
+
+        descriptorWrite.pBufferInfo = &bufferInfo;
+        descriptorWrite.pImageInfo = nullptr; // Optional
+        descriptorWrite.pTexelBufferView = nullptr; // Optional
+
+        vkUpdateDescriptorSets(mLogicalDevice, 1, &descriptorWrite, 0, nullptr);
+    }
+}
+
 void RenderingApplication::CreateDescriptorSetLayout()
 {
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
@@ -1137,7 +1204,7 @@ void RenderingApplication::Draw()
     vkResetCommandBuffer(mCommandBuffers[mCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
     RecordCommandBuffer(mCommandBuffers[mCurrentFrame], imageIndex);
 
-    UpdateUniformBuffer(imageIndex);
+    UpdateUniformBuffer(mCurrentFrame);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -1206,7 +1273,7 @@ void RenderingApplication::UpdateUniformBuffer(uint32_t currentImage)
     void* data;
     vkMapMemory(mLogicalDevice, mUniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
     memcpy(data, &ubo, sizeof(ubo));
-    vkUnmapMemory(mLogicalDevice, mUniformBuffersMemory[currentImage]);
+    vkUnmapMemory(mLogicalDevice, mUniformBuffersMemory[currentImage]); 
 }
 
 void RenderingApplication::CreateSyncObjects()
