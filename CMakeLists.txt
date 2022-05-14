@@ -7,6 +7,8 @@ set(CMAKE_BUILD_TYPE Debug)
 
 #set header files
 set(HEADER_FILES
+	Shaders/basic_shader.frag
+	Shaders/basic_shader.vert
 	Source/rendering_application.hpp
 	Source/utility.hpp
 	Source/vertex_declarations.hpp
@@ -19,6 +21,7 @@ Source/rendering_application.cpp
 Source/utility.cpp
 )
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Shaders/)
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
@@ -83,7 +86,11 @@ target_link_libraries(VulkanProject
     glm::glm
 	Boost::filesystem
 )
-
+target_include_directories(VulkanProject PUBLIC
+${CMAKE_CURRENT_SOURCE_DIR}/Shaders
+)
+set (SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Shaders)
+add_custom_target (${TARGET} DEPENDS ${SHADERS_DIR}/frag.spv ${SHADERS_DIR}/vert.spv)
 if(WIN32)
 add_custom_command(
 	TARGET VulkanProject PRE_BUILD
