@@ -19,7 +19,7 @@ TEST(InitialTest, InitialTest01)
 int main(int argc, char** argv) 
 {
     InitGoogleTest(&argc, argv);
-    UnitTest& unit_test = *UnitTest::GetInstance();
+    //UnitTest& unit_test = *UnitTest::GetInstance();
 
     return RUN_ALL_TESTS();;
 }

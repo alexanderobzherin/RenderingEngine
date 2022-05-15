@@ -706,8 +706,8 @@ void RenderingApplication::CreateRenderPass()
 
 void RenderingApplication::CreateGraphicsPipeline()
 {
-    auto vertShaderCode = Utility::ReadShaderBinaryFile("./Intermediate/Shaders/basic_shader_vert.spv");
-    auto fragShaderCode = Utility::ReadShaderBinaryFile("./Intermediate/Shaders/basic_shader_frag.spv");
+    auto vertShaderCode = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/basic_shader_vert.spv");
+    auto fragShaderCode = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/basic_shader_frag.spv");
 
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);

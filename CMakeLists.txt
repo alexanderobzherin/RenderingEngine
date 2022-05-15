@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 #set the project name
 project(VulkanProject)
-
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
@@ -44,21 +44,7 @@ find_package(glm CONFIG REQUIRED)
 
 find_package(Boost 1.36.0 REQUIRED COMPONENTS filesystem)
 
-find_package(GTest CONFIG REQUIRED)
-
-#specify the compiling properties
-#set_target_properties(VulkanProject PROPERTIES
-#	CXX_STANDARD 17
-#	CXX_STANDARD_REQUIRED ON
-#)
-if(NOT WIN32)
-set_target_properties(VulkanProject PROPERTIES
-	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
-)
-else(
-	COMPILE_OPTIONS "-Wall;-Wextra"
-)
-endif()
+find_package(GTest REQUIRED)
 
 add_subdirectory(Source)
 add_subdirectory(Tests)

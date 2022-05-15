@@ -26,6 +26,20 @@ endif()
 #add the executable
 add_executable(VulkanProject ${HEADER_FILES} ${SRC_FILES})
 
+#specify the compiling properties
+set_target_properties(VulkanProject PROPERTIES
+	CXX_STANDARD 17
+	CXX_STANDARD_REQUIRED ON
+)
+if(NOT WIN32)
+set_target_properties(VulkanProject PROPERTIES
+	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
+)
+else(
+	COMPILE_OPTIONS "-Wall;-Wextra"
+)
+endif()
+
 target_link_libraries(VulkanProject 
     PUBLIC
     ${Vulkan_LIBRARY}
