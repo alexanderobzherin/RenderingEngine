@@ -3,25 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 #set the project name
 project(VulkanProject)
 
-set(CMAKE_BUILD_TYPE Debug)
-
-#set header files
-set(HEADER_FILES
-	Shaders/basic_shader.frag
-	Shaders/basic_shader.vert
-	Source/rendering_application.hpp
-	Source/utility.hpp
-	Source/vertex_declarations.hpp
-)
-
-#set source files
-set(SRC_FILES
-Source/main.cpp
-Source/rendering_application.cpp
-Source/utility.cpp
-)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Shaders/)
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
@@ -63,13 +44,13 @@ find_package(glm CONFIG REQUIRED)
 
 find_package(Boost 1.36.0 REQUIRED COMPONENTS filesystem)
 
-#add the executable
-add_executable(VulkanProject ${HEADER_FILES} ${SRC_FILES})
+find_package(GTest CONFIG REQUIRED)
+
 #specify the compiling properties
-set_target_properties(VulkanProject PROPERTIES
-	CXX_STANDARD 17
-	CXX_STANDARD_REQUIRED ON
-)
+#set_target_properties(VulkanProject PROPERTIES
+#	CXX_STANDARD 17
+#	CXX_STANDARD_REQUIRED ON
+#)
 if(NOT WIN32)
 set_target_properties(VulkanProject PROPERTIES
 	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
@@ -79,21 +60,5 @@ else(
 )
 endif()
 
-target_link_libraries(VulkanProject 
-    PUBLIC
-    ${Vulkan_LIBRARY}
-    glfw
-    glm::glm
-	Boost::filesystem
-)
-target_include_directories(VulkanProject PUBLIC
-${CMAKE_CURRENT_SOURCE_DIR}/Shaders
-)
-set (SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Shaders)
-add_custom_target (${TARGET} DEPENDS ${SHADERS_DIR}/frag.spv ${SHADERS_DIR}/vert.spv)
-if(WIN32)
-add_custom_command(
-	TARGET VulkanProject PRE_BUILD
-	COMMAND cmd /c ${CMAKE_CURRENT_SOURCE_DIR}/windows_compile_shaders.bat
-)
-endif()
+add_subdirectory(Source)
+add_subdirectory(Tests)

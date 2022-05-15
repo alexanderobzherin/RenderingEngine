@@ -4,6 +4,7 @@ VulkanSDK
 GLFW
 GLM
 Boost::filesystem
+gtest
 
 **********Windows installing.**********
 It might be possible to use vcpkg package manager
@@ -24,6 +25,9 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 .\vcpkg.exe install boost-filesystem
 .\vcpkg.exe install boost-filesystem:x64-windows
+
+.\vcpgg.exe install gtest
+.\vcpgg.exe install gtest:x64-windows
 
 Set environment variable glslc.
 Example:
