@@ -50,11 +50,27 @@ target_link_libraries(VulkanProject
 target_include_directories(VulkanProject PUBLIC
 ${CMAKE_CURRENT_SOURCE_DIR}/Shaders
 )
-set (SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Shaders)
-add_custom_target (${TARGET} DEPENDS ${SHADERS_DIR}/frag.spv ${SHADERS_DIR}/vert.spv)
+
+#Set path to shaders
+set(shader_vert_source_origin "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.vert")
+cmake_path(CONVERT ${shader_vert_source_origin} TO_NATIVE_PATH_LIST shader_vert_source NORMALIZE)
+
+set(shader_vert_spv_origin "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_vert.spv")
+cmake_path(CONVERT ${shader_vert_spv_origin} TO_NATIVE_PATH_LIST shader_vert_spv NORMALIZE)
+
+set(shader_frag_source_origin "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.frag")
+cmake_path(CONVERT ${shader_frag_source_origin} TO_NATIVE_PATH_LIST shader_frag_source NORMALIZE)
+
+set(shader_frag_spv_origin "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_frag.spv")
+cmake_path(CONVERT ${shader_frag_spv_origin} TO_NATIVE_PATH_LIST shader_frag_spv NORMALIZE)
+
 if(WIN32)
 add_custom_command(
 	TARGET VulkanProject PRE_BUILD
-	COMMAND cmd /c ${PROJECT_SOURCE_DIR}/windows_compile_shaders.bat
+	COMMAND cmd /c "${SHADER_COMPILER} ${shader_vert_source} -o ${shader_vert_spv}" 
+	COMMAND cmd /c "${SHADER_COMPILER} ${shader_frag_source} -o ${shader_frag_spv}"
+	COMMENT "Shaders compiling..."
 )
 endif()
+
+
