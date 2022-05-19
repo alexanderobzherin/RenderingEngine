@@ -36,7 +36,11 @@ set_target_properties(VulkanProject PROPERTIES
 	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 else(
+set_target_properties(VulkanProject PROPERTIES
 	COMPILE_OPTIONS "-Wall;-Wextra"
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+	set_target_properties( VulkanProject PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin" )
+)
 )
 endif()
 
@@ -52,17 +56,10 @@ ${CMAKE_CURRENT_SOURCE_DIR}/Shaders
 )
 
 #Set path to shaders
-set(shader_vert_source_origin "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.vert")
-cmake_path(CONVERT ${shader_vert_source_origin} TO_NATIVE_PATH_LIST shader_vert_source NORMALIZE)
-
-set(shader_vert_spv_origin "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_vert.spv")
-cmake_path(CONVERT ${shader_vert_spv_origin} TO_NATIVE_PATH_LIST shader_vert_spv NORMALIZE)
-
-set(shader_frag_source_origin "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.frag")
-cmake_path(CONVERT ${shader_frag_source_origin} TO_NATIVE_PATH_LIST shader_frag_source NORMALIZE)
-
-set(shader_frag_spv_origin "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_frag.spv")
-cmake_path(CONVERT ${shader_frag_spv_origin} TO_NATIVE_PATH_LIST shader_frag_spv NORMALIZE)
+set(shader_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.vert")
+set(shader_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_vert.spv")
+set(shader_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.frag")
+set(shader_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_frag.spv")
 
 if(WIN32)
 add_custom_command(
