@@ -3,12 +3,13 @@ cmake_minimum_required(VERSION 3.10)
 #set the project name
 project(VulkanProject)
 #Set path to outbut binaries
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(PATH_TO_SOURCE_SHADER_PATH "${PROJECT_SOURCE_DIR}/Shaders")
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/Intermediate/Shaders)
-set(PATH_TO_COMPILED_SHADER_PATH "${CMAKE_BINARY_DIR}/bin/Intermediate/Shaders")
+if(WIN32)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders)
+set(PATH_TO_COMPILED_SHADER_PATH "${CMAKE_BINARY_DIR}/Intermediate/Shaders")
 set(SHADER_COMPILER $ENV{glslc})
-
+endif()
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()

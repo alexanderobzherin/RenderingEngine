@@ -38,8 +38,8 @@ set_target_properties(VulkanProject PROPERTIES
 else(
 set_target_properties(VulkanProject PROPERTIES
 	COMPILE_OPTIONS "-Wall;-Wextra"
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-	set_target_properties( VulkanProject PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin" )
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+	set_target_properties( VulkanProject PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}" )
 )
 )
 endif()
@@ -63,10 +63,10 @@ set(shader_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_frag.spv")
 
 if(WIN32)
 add_custom_command(
-	TARGET VulkanProject PRE_BUILD
-	COMMAND cmd /c "${SHADER_COMPILER} ${shader_vert_source} -o ${shader_vert_spv}" 
-	COMMAND cmd /c "${SHADER_COMPILER} ${shader_frag_source} -o ${shader_frag_spv}"
-	COMMENT "Shaders compiling..."
+	TARGET VulkanProject 
+	PRE_BUILD
+	COMMAND cmd /c ${SHADER_COMPILER} ${shader_vert_source} -o ${shader_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${shader_frag_source} -o ${shader_frag_spv}
 )
 endif()
 
