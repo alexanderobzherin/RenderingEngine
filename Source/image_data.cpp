@@ -78,18 +78,18 @@ void ImageData::SetPixel( unsigned int x, unsigned int y, Color color )
 	}
 }
 
-const Color * ImageData::GetPixel( unsigned int x, unsigned int y ) const
+const Color ImageData::GetPixel( unsigned int x, unsigned int y ) const
 {
 	if( x < mWidth && y < mHeight )
 	{
-		return &(mData[x][y]);
+		return (mData[x][y]);
 	}
 	else
 	{
 		throw("Inapropriate access to data");
 	}
 
-	return nullptr;
+	//return nullptr;
 }
 
 void ImageData::AllocateMemory( unsigned int width, unsigned int height )

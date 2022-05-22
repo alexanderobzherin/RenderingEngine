@@ -26,6 +26,11 @@ struct Color
 		b( iB ),
 		a( iA )
 	{}
+	inline bool operator==(Color const& rhs)
+	{
+		return (this->r == rhs.r) && (this->g == rhs.g) && (this->b == rhs.b) && (this->a == rhs.a);
+	}
+
 	uint8_t r = 0;
 	uint8_t g = 0;
 	uint8_t b = 0;
@@ -54,7 +59,7 @@ public:
 
 	void Fill( Color color );
 	void SetPixel( unsigned int x, unsigned int y, Color color );
-	const Color* GetPixel( unsigned int x, unsigned int y ) const;
+	const Color GetPixel( unsigned int x, unsigned int y ) const;
 
 protected:
 	//Allocate memory for image data
@@ -63,8 +68,8 @@ protected:
 	void CleanAllocatedMemory();
 
 private:
-	const unsigned int mWidth;
-	const unsigned int mHeight;
+	unsigned int mWidth;
+	unsigned int mHeight;
 
 	Color** mData;
 };

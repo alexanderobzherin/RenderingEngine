@@ -12,10 +12,39 @@ using ::testing::TestPartResult;
 using ::testing::TestSuite;
 using ::testing::UnitTest;
 
-TEST(ImageDataTests, ImageDataTest01) 
+using namespace rendering_engine;
+
+TEST(ImageDataTests, PixelAssignment) 
 {
-  rendering_engine::ImageData image2(3, 3);
-  rendering_engine::ImageData image1(image2);
-  rendering_engine::ImageData image3 = image1;
-  EXPECT_EQ(0, 0);
+  Color pixel1(1,2,3, 50);
+  Color pixel2 = pixel1;
+
+  EXPECT_EQ(pixel1.a, pixel2.a);
+  EXPECT_EQ(pixel1.r, pixel2.r);
+  EXPECT_EQ(pixel1.g, pixel2.g);
+  EXPECT_EQ(pixel1.b, pixel2.b);
+}
+
+TEST(ImageDataTests, ImageDataAssignment)
+{
+  ImageData image1(3U, 3U);
+  Color const testColor(115U, 100U, 10U, 150U);
+  image1.Fill(testColor);
+
+  ImageData image2;
+  image2 = image1;
+
+  ASSERT_EQ(image2.GetHeight(), image1.GetHeight());
+  ASSERT_EQ(image2.GetWidth(), image1.GetWidth());
+  /*
+  for( uint y = 0; y < image1.GetHeight(); ++y )
+  {
+    for( uint x = 0; x < image1.GetWidth(); ++x )
+    {
+      //EXPECT_EQ(*image1.GetPixel(x, y), *image2.GetPixel(x, y));
+      auto const testPixel = image1.GetPixel(x, y);
+      std::cout << " r: " << testPixel.r << " g: " << testPixel.g << " b: " << testPixel.b << " a: " << testPixel.a << std::endl;
+    }    
+  }
+  */
 }
