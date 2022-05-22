@@ -8,10 +8,17 @@ set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 
 find_package(Threads REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
+set(TESTES_SOURCE_FILES
+    ${CMAKE_SOURCE_DIR}/Source/image_data.hpp
+    ${CMAKE_SOURCE_DIR}/Source/image_data.cpp
+)
+include_directories(${GTEST_INCLUDE_DIRS}
+)
 #set source files
 set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/main.cpp
+    ${PROJECT_SOURCE_DIR}/image_data_tests.cpp
+    ${TESTES_SOURCE_FILES}
 )
 
 #add the executable
