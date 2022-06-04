@@ -26,7 +26,7 @@ struct Color
 		b( iB ),
 		a( iA )
 	{}
-	inline bool operator==(Color const& rhs)
+	inline bool operator==(Color const& rhs) const
 	{
 		return (this->r == rhs.r) && (this->g == rhs.g) && (this->b == rhs.b) && (this->a == rhs.a);
 	}

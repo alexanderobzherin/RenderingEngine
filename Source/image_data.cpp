@@ -94,6 +94,8 @@ const Color ImageData::GetPixel( unsigned int x, unsigned int y ) const
 
 void ImageData::AllocateMemory( unsigned int width, unsigned int height )
 {
+	mWidth = width;
+	mHeight = height;
 	mData = new Color*[mWidth];
 
 	for( unsigned int x = 0; x < mWidth; x++ )

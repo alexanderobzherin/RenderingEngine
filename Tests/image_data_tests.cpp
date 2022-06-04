@@ -31,20 +31,17 @@ TEST(ImageDataTests, ImageDataAssignment)
   Color const testColor(115U, 100U, 10U, 150U);
   image1.Fill(testColor);
 
-  ImageData image2;
+  ImageData image2(1, 1);
   image2 = image1;
 
   ASSERT_EQ(image2.GetHeight(), image1.GetHeight());
   ASSERT_EQ(image2.GetWidth(), image1.GetWidth());
-  /*
+  
   for( uint y = 0; y < image1.GetHeight(); ++y )
   {
     for( uint x = 0; x < image1.GetWidth(); ++x )
     {
-      //EXPECT_EQ(*image1.GetPixel(x, y), *image2.GetPixel(x, y));
-      auto const testPixel = image1.GetPixel(x, y);
-      std::cout << " r: " << testPixel.r << " g: " << testPixel.g << " b: " << testPixel.b << " a: " << testPixel.a << std::endl;
+      EXPECT_EQ(image1.GetPixel(x, y), image2.GetPixel(x, y));
     }    
   }
-  */
 }
