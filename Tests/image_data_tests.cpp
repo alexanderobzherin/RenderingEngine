@@ -37,9 +37,9 @@ TEST(ImageDataTests, ImageDataAssignment)
   ASSERT_EQ(image2.GetHeight(), image1.GetHeight());
   ASSERT_EQ(image2.GetWidth(), image1.GetWidth());
   
-  for( uint y = 0; y < image1.GetHeight(); ++y )
+  for( unsigned int y = 0; y < image1.GetHeight(); ++y )
   {
-    for( uint x = 0; x < image1.GetWidth(); ++x )
+    for( unsigned int x = 0; x < image1.GetWidth(); ++x )
     {
       EXPECT_EQ(image1.GetPixel(x, y), image2.GetPixel(x, y));
     }    
