@@ -1,6 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
+#include <vector>
+#include <algorithm>
 
 namespace rendering_engine
 {
@@ -8,23 +11,18 @@ struct Color
 {
 	Color()
 		:
-		r( 0U ),
-		g( 0U ),
-		b( 0U ),
-		a( 255U )
+	Color( uint8_t{0U}, uint8_t{0U}, uint8_t{0U}, uint8_t{255U} )
 	{}
 	Color( uint8_t iR, uint8_t iG, uint8_t iB )
 		:
-		r( iR ),
-		g( iG ),
-		b( iB )
+	Color( iR, iG, iB, uint8_t{255U} )
 	{}
 	Color( uint8_t iR, uint8_t iG, uint8_t iB, uint8_t iA )
 		:
-		r( iR ),
-		g( iG ),
-		b( iB ),
-		a( iA )
+		r(std::clamp(iR, uint8_t{0U},  uint8_t{255U})),
+		g(std::clamp(iG, uint8_t{0U},  uint8_t{255U})),
+		b(std::clamp(iB, uint8_t{0U},  uint8_t{255U})),
+		a(std::clamp(iA, uint8_t{0U},  uint8_t{255U}))
 	{}
 	inline bool operator==(Color const& rhs) const
 	{
@@ -60,6 +58,9 @@ public:
 	void Fill( Color color );
 	void SetPixel( unsigned int x, unsigned int y, Color color );
 	const Color GetPixel( unsigned int x, unsigned int y ) const;
+
+	void LoadImageData(std::vector<unsigned int> const & pixels);
+	std::vector<uint8_t> GetImageDataRGBA() const;
 
 protected:
 	//Allocate memory for image data

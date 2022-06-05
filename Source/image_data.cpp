@@ -1,5 +1,5 @@
 #include "image_data.hpp"
-#include <exception>
+#include <stdexcept>
 
 namespace rendering_engine
 {
@@ -8,6 +8,7 @@ ImageData::ImageData()
 	mWidth( 0U ),
 	mHeight( 0U )
 {
+	AllocateMemory( mWidth, mHeight );
 }
 
 ImageData::ImageData( unsigned int width, unsigned int height )
@@ -15,7 +16,7 @@ ImageData::ImageData( unsigned int width, unsigned int height )
 	mWidth( width ),
 	mHeight( height )
 {
-	AllocateMemory( width, height );
+	AllocateMemory( mWidth, mHeight );
 }
 
 ImageData::~ImageData()
@@ -86,10 +87,55 @@ const Color ImageData::GetPixel( unsigned int x, unsigned int y ) const
 	}
 	else
 	{
-		throw("Inapropriate access to data");
+		throw std::runtime_error("Inapropriate access to data");
+	}
+}
+
+void ImageData::LoadImageData(std::vector<unsigned int> const & pixels)
+{
+	//Check for data numbers matching
+	if((GetHeight() * GetWidth() * 4) != pixels.size())
+	{
+		throw std::runtime_error("Array data size doesn't match image dimension.");
+	}
+	auto it = pixels.begin();
+	for( unsigned int y = 0; y < GetHeight(); y++ )
+	{
+		for( unsigned int x = 0; x < GetWidth(); x++ )
+		{
+			uint8_t const r = *it;
+			++it;
+			uint8_t const g = *it;
+			++it;
+			uint8_t const b = *it;
+			++it;
+			uint8_t const a = *it;
+			++it;
+			Color const color(r, g, b, a);
+			SetPixel(x, y, color);
+		}
+	}
+}
+
+std::vector<uint8_t> ImageData::GetImageDataRGBA() const
+{
+	std::vector<uint8_t> result;
+	if(GetHeight() == 0 && GetWidth() == 0)
+	{
+		return result;
 	}
 
-	//return nullptr;
+	for( unsigned int y = 0; y < mHeight; y++ )
+	{
+		for( unsigned int x = 0; x < mWidth; x++ )
+		{
+			result.push_back(GetPixel(x, y).r);
+			result.push_back(GetPixel(x, y).g);
+			result.push_back(GetPixel(x, y).b);
+			result.push_back(GetPixel(x, y).a);
+		}
+	}
+	return result;
 }
 
 void ImageData::AllocateMemory( unsigned int width, unsigned int height )
