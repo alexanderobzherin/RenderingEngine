@@ -56,5 +56,7 @@ find_package(Boost 1.36.0 REQUIRED COMPONENTS filesystem)
 
 find_package(GTest REQUIRED)
 
+find_package(JPEG REQUIRED)
+
 add_subdirectory(Source)
 add_subdirectory(Tests)

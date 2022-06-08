@@ -1,4 +1,5 @@
 #include "image_data.hpp"
+#include "image_codec_jpeg.hpp"
 #include <stdexcept>
 
 namespace rendering_engine
@@ -137,6 +138,12 @@ std::vector<uint8_t> ImageData::GetImageDataRGBA() const
 	}
 	return result;
 }
+
+void ImageData::WriteTextureJpegFile(char* filename)
+{
+	SaveTextureFileJpeg();
+}
+
 
 void ImageData::AllocateMemory( unsigned int width, unsigned int height )
 {

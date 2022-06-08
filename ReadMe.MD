@@ -5,6 +5,7 @@ GLFW
 GLM
 Boost::filesystem
 gtest
+libjpeg-turbo
 
 **********Windows installing.**********
 It might be possible to use vcpkg package manager
@@ -28,6 +29,9 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 .\vcpgg.exe install gtest
 .\vcpgg.exe install gtest:x64-windows
+
+.\vcpgg.exe install libjpeg-turbo
+.\vcpgg.exe install libjpeg-turbo:x64-windows
 
 Set environment variable glslc.
 Example:
