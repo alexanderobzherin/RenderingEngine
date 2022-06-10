@@ -1,5 +1,5 @@
 #include "image_data.hpp"
-#include "image_codec_jpeg.hpp"
+#include "image_codec_jpeg.cpp"
 #include <stdexcept>
 
 namespace rendering_engine
@@ -139,9 +139,9 @@ std::vector<uint8_t> ImageData::GetImageDataRGBA() const
 	return result;
 }
 
-void ImageData::WriteTextureJpegFile(char* filename)
+void ImageData::WriteTextureJpegFile(ImageData const& imageData, char* filename)
 {
-	SaveTextureFileJpeg();
+	SaveTextureFileJpeg(imageData, filename);
 }
 
 

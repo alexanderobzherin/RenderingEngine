@@ -54,7 +54,6 @@ target_link_libraries(VulkanProject
     glfw
     glm::glm
 	Boost::filesystem
-	jpeg
 	${JPEG_LIBRARIES}
 )
 target_include_directories(VulkanProject PUBLIC

@@ -62,7 +62,7 @@ public:
 	void LoadImageData(std::vector<unsigned int> const & pixels);
 	std::vector<uint8_t> GetImageDataRGBA() const;
 
-	void WriteTextureJpegFile(char* filename);
+	void WriteTextureJpegFile(ImageData const& imageData, char* filename);
 
 protected:
 	//Allocate memory for image data

@@ -32,6 +32,7 @@ target_link_libraries(VulkanProject_gtests
         glm::glm
         Boost::filesystem
         Threads::Threads
+        ${JPEG_LIBRARIES}
     PRIVATE 
         #GTest::gmock 
         #GTest::gtest 

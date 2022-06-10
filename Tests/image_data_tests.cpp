@@ -95,7 +95,7 @@ TEST(ImageDataTests, TransitImageData)
 
   ImageData image(3, 3);
   image.LoadImageData(testPixels);
-
+  image.WriteTextureJpegFile(image, "asd");
   auto correspondingPixels = image.GetImageDataRGBA();
 
   ASSERT_EQ(testPixels.size(), correspondingPixels.size());
