@@ -95,7 +95,6 @@ TEST(ImageDataTests, TransitImageData)
 
   ImageData image(3, 3);
   image.LoadImageData(testPixels);
-  image.WriteTextureJpegFile(image, "asd");
   auto correspondingPixels = image.GetImageDataRGBA();
 
   ASSERT_EQ(testPixels.size(), correspondingPixels.size());
@@ -106,4 +105,13 @@ TEST(ImageDataTests, TransitImageData)
       EXPECT_EQ(testPixel, (int)(*correspondingPixel)); 
       ++correspondingPixel;
   }
+}
+
+TEST(ImageDataTests, SaveTextureFile)
+{
+    ImageData image(3, 3);
+    image.Fill(Color(0, 0, 255));
+
+    image.WriteTextureJpegFile("newTextureFile.jpg");
+
 }

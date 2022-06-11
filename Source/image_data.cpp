@@ -139,9 +139,29 @@ std::vector<uint8_t> ImageData::GetImageDataRGBA() const
 	return result;
 }
 
-void ImageData::WriteTextureJpegFile(ImageData const& imageData, char* filename)
+std::vector<uint8_t> ImageData::GetImageDataRGB() const
 {
-	SaveTextureFileJpeg(imageData, filename);
+	std::vector<uint8_t> result;
+	if( GetHeight() == 0 && GetWidth() == 0 )
+	{
+		return result;
+	}
+
+	for( unsigned int y = 0; y < mHeight; y++ )
+	{
+		for( unsigned int x = 0; x < mWidth; x++ )
+		{
+			result.push_back(GetPixel(x, y).r);
+			result.push_back(GetPixel(x, y).g);
+			result.push_back(GetPixel(x, y).b);
+		}
+	}
+	return result;
+}
+
+void ImageData::WriteTextureJpegFile(char* filename)
+{
+	SaveTextureFileJpeg(*this, filename);
 }
 
 
