@@ -27,11 +27,14 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake
 .\vcpkg.exe install boost-filesystem
 .\vcpkg.exe install boost-filesystem:x64-windows
 
-.\vcpgg.exe install gtest
-.\vcpgg.exe install gtest:x64-windows
+.\vcpkg.exe install gtest
+.\vcpkg.exe install gtest:x64-windows
 
-.\vcpgg.exe install libjpeg-turbo
-.\vcpgg.exe install libjpeg-turbo:x64-windows
+.\vcpkg.exe install libjpeg-turbo
+.\vcpkg.exe install libjpeg-turbo:x64-windows
+
+.\vcpkg.exe install libpng
+.\vcpkg.exe install libpng:x64-windows
 
 Set environment variable glslc.
 Example:
