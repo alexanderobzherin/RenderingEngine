@@ -1,5 +1,6 @@
 #include "image_data.hpp"
 #include "image_codec_jpeg.hpp"
+#include "image_codec_png.hpp"
 #include <stdexcept>
 
 namespace rendering_engine
@@ -157,6 +158,15 @@ bool ImageData::LoadTextureJpegFile(char* filename)
 	return result;
 }
 
+bool ImageData::LoadTexturePngFile(char* filename)
+{
+	CleanAllocatedMemory();
+	unsigned int width = 0;
+	unsigned int height = 0;
+	std::vector<unsigned int> rgbImageDataVector;
+
+	bool result = ReadPngFile(filename, width, height, rgbImageDataVector);
+}
 
 void ImageData::AllocateMemory( unsigned int width, unsigned int height )
 {

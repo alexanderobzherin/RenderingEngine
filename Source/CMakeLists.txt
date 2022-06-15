@@ -11,6 +11,7 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Source/vertex_declarations.hpp
 	${PROJECT_SOURCE_DIR}/Source/image_data.hpp
 	${PROJECT_SOURCE_DIR}/Source/image_codec_jpeg.hpp
+	${PROJECT_SOURCE_DIR}/Source/image_codec_png.hpp
 )
 
 #set source files
@@ -19,6 +20,7 @@ set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/Source/rendering_application.cpp
     ${PROJECT_SOURCE_DIR}/Source/utility.cpp
 	${PROJECT_SOURCE_DIR}/Source/image_data.cpp
+	${PROJECT_SOURCE_DIR}/Source/image_codec_png.cpp
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Shaders/)

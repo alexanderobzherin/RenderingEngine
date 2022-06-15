@@ -109,10 +109,18 @@ TEST(ImageDataTests, InappropriateAccess)
 //}
 
 //Test bellow is inconsistent and incomplete, as there is no data checking.
-TEST(ImageDataTests, SaveTextureFile)
+TEST(ImageDataTests, SaveTextureFileJpeg)
 {
     ImageData image;
     image.LoadTextureJpegFile("sourceTextureFile.jpg");
 
     image.WriteTextureJpegFile("outTextureFile.jpg");
+}
+
+TEST(ImageDataTests, SaveTextureFilePng)
+{
+    ImageData image;
+    image.LoadTexturePngFile("2.png");
+
+    //image.WriteTextureJpegFile("outPngTextureFile.png");
 }

@@ -66,6 +66,8 @@ public:
 	void WriteTextureJpegFile(char* filename);
 	bool LoadTextureJpegFile(char * filename);
 
+	bool LoadTexturePngFile(char* filename);
+
 protected:
 	//Allocate memory for image data
 	void AllocateMemory( unsigned int width, unsigned int height );
