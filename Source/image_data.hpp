@@ -59,17 +59,20 @@ public:
 	void SetPixel( unsigned int x, unsigned int y, Color color );
 	const Color GetPixel( unsigned int x, unsigned int y ) const;
 
-	void LoadImageData(std::vector<unsigned int> const & pixels);
+
 	std::vector<uint8_t> GetImageDataRGBA() const;
 	std::vector<uint8_t> GetImageDataRGB() const;
 
 	void WriteTextureJpegFile(char* filename);
+	bool LoadTextureJpegFile(char * filename);
 
 protected:
 	//Allocate memory for image data
 	void AllocateMemory( unsigned int width, unsigned int height );
 	//Clean allocated memory for Color Array Data
 	void CleanAllocatedMemory();
+	void LoadImageDataRGBA(std::vector<unsigned int> const& pixels);
+	void LoadImageDataRGB(std::vector<unsigned int> const& pixels);
 
 private:
 	unsigned int mWidth;

@@ -1,5 +1,5 @@
 #include "image_data.hpp"
-#include "image_codec_jpeg.cpp"
+#include "image_codec_jpeg.hpp"
 #include <stdexcept>
 
 namespace rendering_engine
@@ -92,32 +92,6 @@ const Color ImageData::GetPixel( unsigned int x, unsigned int y ) const
 	}
 }
 
-void ImageData::LoadImageData(std::vector<unsigned int> const & pixels)
-{
-	//Check for data numbers matching
-	if((GetHeight() * GetWidth() * 4) != pixels.size())
-	{
-		throw std::runtime_error("Array data size doesn't match image dimension.");
-	}
-	auto it = pixels.begin();
-	for( unsigned int y = 0; y < GetHeight(); y++ )
-	{
-		for( unsigned int x = 0; x < GetWidth(); x++ )
-		{
-			uint8_t const r = *it;
-			++it;
-			uint8_t const g = *it;
-			++it;
-			uint8_t const b = *it;
-			++it;
-			uint8_t const a = *it;
-			++it;
-			Color const color(r, g, b, a);
-			SetPixel(x, y, color);
-		}
-	}
-}
-
 std::vector<uint8_t> ImageData::GetImageDataRGBA() const
 {
 	std::vector<uint8_t> result;
@@ -164,6 +138,25 @@ void ImageData::WriteTextureJpegFile(char* filename)
 	SaveTextureFileJpeg(*this, filename);
 }
 
+bool ImageData::LoadTextureJpegFile(char* filename)
+{
+	CleanAllocatedMemory();
+	unsigned int width = 0;
+	unsigned int height = 0;
+	std::vector<unsigned int> rgbImageDataVector;
+
+	bool result = ReadJpegFile(filename, width, height, rgbImageDataVector);
+	if(result && (rgbImageDataVector.size() == (3U * width * height)))
+	{
+		mWidth = width;
+		mHeight = height;
+		AllocateMemory(width, height);
+		LoadImageDataRGB(rgbImageDataVector);
+	}
+
+	return result;
+}
+
 
 void ImageData::AllocateMemory( unsigned int width, unsigned int height )
 {
@@ -190,6 +183,61 @@ void ImageData::CleanAllocatedMemory()
 	{
 		delete[] mData;
 	}
+
+	mWidth = 0U;
+	mHeight = 0U;
 }
+
+void ImageData::LoadImageDataRGBA(std::vector<unsigned int> const& pixels)
+{
+	//Check for data numbers matching
+	if( (GetHeight() * GetWidth() * 4) != pixels.size() )
+	{
+		throw std::runtime_error("Array data size doesn't match image dimension.");
+	}
+	auto it = pixels.begin();
+	for( unsigned int y = 0; y < GetHeight(); y++ )
+	{
+		for( unsigned int x = 0; x < GetWidth(); x++ )
+		{
+			uint8_t const r = *it;
+			++it;
+			uint8_t const g = *it;
+			++it;
+			uint8_t const b = *it;
+			++it;
+			uint8_t const a = *it;
+			++it;
+			Color const color(r, g, b, a);
+			SetPixel(x, y, color);
+		}
+	}
+}
+
+void ImageData::LoadImageDataRGB(std::vector<unsigned int> const& pixels)
+{
+	//Check for data numbers matching
+	if( (GetHeight() * GetWidth() * 3) != pixels.size() )
+	{
+		throw std::runtime_error("Array data size doesn't match image dimension.");
+	}
+	auto it = pixels.begin();
+	for( unsigned int y = 0; y < GetHeight(); y++ )
+	{
+		for( unsigned int x = 0; x < GetWidth(); x++ )
+		{
+			uint8_t const r = static_cast<uint8_t>(*it);
+			++it;
+			uint8_t const g = static_cast<uint8_t>(*it);
+			++it;
+			uint8_t const b = static_cast<uint8_t>(*it);
+			++it;
+
+			Color const color(r, g, b);
+			SetPixel(x, y, color);
+		}
+	}
+}
+
 
 } //namespace rendering_engine
