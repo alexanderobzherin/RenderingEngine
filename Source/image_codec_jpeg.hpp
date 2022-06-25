@@ -88,14 +88,14 @@ codec_error_exit(j_common_ptr cinfo)
 
 static bool
 DoReadJpegFile(struct jpeg_decompress_struct* cinfo,
-	char* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector);
+	char const* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector);
 
 /*
  * Sample routine for JPEG decompression.  We assume that the source file name
  * is passed in.  We want to return 1 on success, 0 on error.
  */
 
-static bool ReadJpegFile(char* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector)
+static bool ReadJpegFile(char const* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector)
 {
 	/* This struct contains the JPEG decompression parameters and pointers to
 	 * working space (which is allocated as needed by the JPEG library).
@@ -114,7 +114,7 @@ static bool ReadJpegFile(char* filename, unsigned int& width, unsigned int& heig
  */
 
 bool
-DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector)
+DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char const* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector)
 {
 	/* We use our private extension JPEG error handler.
 	 * Note that this struct must live as long as the main JPEG parameter

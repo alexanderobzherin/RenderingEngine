@@ -1,16 +1,15 @@
 #include "image_data.hpp"
 #include "image_codec_jpeg.hpp"
 #include "image_codec_png.hpp"
+#include <boost/filesystem.hpp>
 #include <stdexcept>
 
 namespace rendering_engine
 {
 ImageData::ImageData()
 	:
-	mWidth( 0U ),
-	mHeight( 0U )
+	ImageData::ImageData(0U, 0U)
 {
-	AllocateMemory( mWidth, mHeight );
 }
 
 ImageData::ImageData( unsigned int width, unsigned int height )
@@ -19,6 +18,40 @@ ImageData::ImageData( unsigned int width, unsigned int height )
 	mHeight( height )
 {
 	AllocateMemory( mWidth, mHeight );
+}
+
+ImageData::ImageData(std::string filepath)
+	:
+	ImageData::ImageData()
+{
+	auto const pathToTexture = boost::filesystem::path(filepath);
+	if( boost::filesystem::exists(pathToTexture) && boost::filesystem::is_regular_file(pathToTexture) )
+	{
+		boost::filesystem::path const pathToTexture = boost::filesystem::path(filepath);
+		
+		size_t const dot = pathToTexture.string().find_last_of(".");
+		std::string const fileExtension = pathToTexture.string().substr(dot + 1);
+
+		if( std::string{ "jpg" } == fileExtension )
+		{
+			LoadTextureJpegFile(pathToTexture.string().c_str());
+		}
+		else
+		{
+			if( std::string{ "png" } == fileExtension )
+			{
+				LoadTexturePngFile(pathToTexture.string().c_str());
+			}
+			else
+			{
+				throw std::runtime_error("Unsupported texture file format!");
+			}
+		}
+	}
+	else
+	{
+		throw std::runtime_error("Path to texture file is incorrect.");
+	}
 }
 
 ImageData::~ImageData()
@@ -134,12 +167,12 @@ std::vector<uint8_t> ImageData::GetImageDataRGB() const
 	return result;
 }
 
-void ImageData::WriteTextureJpegFile(char* filename)
+void ImageData::WriteJpegFile(char const* filename)
 {
 	SaveTextureFileJpeg(*this, filename);
 }
 
-bool ImageData::LoadTextureJpegFile(char* filename)
+bool ImageData::LoadTextureJpegFile(char const* filename)
 {
 	CleanAllocatedMemory();
 	unsigned int width = 0;
@@ -158,14 +191,28 @@ bool ImageData::LoadTextureJpegFile(char* filename)
 	return result;
 }
 
-bool ImageData::LoadTexturePngFile(char* filename)
+void ImageData::WritePngFile(char const* filename)
+{
+	SaveTextureFilePng(*this, filename);
+}
+
+bool ImageData::LoadTexturePngFile(char const* filename)
 {
 	CleanAllocatedMemory();
 	unsigned int width = 0;
 	unsigned int height = 0;
-	std::vector<unsigned int> rgbImageDataVector;
+	std::vector<unsigned int> rgbaImageDataVector;
 
-	bool result = ReadPngFile(filename, width, height, rgbImageDataVector);
+	bool result = ReadPngFile(filename, width, height, rgbaImageDataVector);
+
+	if( result && (rgbaImageDataVector.size() == (4U * width * height)) )
+	{
+		mWidth = width;
+		mHeight = height;
+		AllocateMemory(width, height);
+		LoadImageDataRGBA(rgbaImageDataVector);
+	}
+	return true;
 }
 
 void ImageData::AllocateMemory( unsigned int width, unsigned int height )

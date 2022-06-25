@@ -2,7 +2,7 @@
 #include <cstdint>
 #include "gtest/gtest.h"
 #include "../Source/image_data.hpp"
-#include "../Source/image_codec_jpeg.hpp"
+
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;
 using ::testing::Test;
@@ -63,64 +63,37 @@ TEST(ImageDataTests, InappropriateAccess)
   EXPECT_THROW(image.GetPixel(4, 4), std::runtime_error);
 }
 
-// Test is deprecated as LoadImageData became private method 
-//TEST(ImageDataTests, ArrayDoesntMatchDimension)
-//{
-//  /*Load Pixels RGBA matrix 3x3
-//  115 110 105 100 | 190 185 180 175 | 200 195 190 185
-//  215 210 205 200 | 250 245 240 235 | 260 255 250 245
-//  300 295 290 285 | 350 345 340 335 | 400 395 390 385 500
-//  */
-//  //Load vector of test pixels
-//  std::vector<unsigned int> testPixels{ 115, 110, 105, 100, 190, 185, 180, 175, 200, 195, 190, 185,
-//                                        215, 210, 205, 200, 250, 245, 240, 235, 260, 255, 250, 245,
-//                                        300, 295, 290, 285, 350, 345, 340, 335, 400, 395, 390, 385, 500
-//  };
-//
-//  ImageData image(3, 3);
-//  //EXPECT_THROW(image.LoadImageData(testPixels), std::runtime_error);
-//}
-
-//TEST(ImageDataTests, TransitImageData)
-//{
-//  /*Load Pixels RGBA matrix 3x3
-//  115 110 105 100 | 190 185 180 175 | 200 195 190 185
-//  215 210 205 200 | 250 245 240 235 | 210 255 250 245
-//  120 145 140 135 | 111 101 98  76  | 30  123 145 255
-//  */
-//  //Load vector of test pixels
-//  std::vector<unsigned int> testPixels{ 115, 110, 105, 100, 190, 185, 180, 175, 200, 195, 190, 185,
-//                                        215, 210, 205, 200, 250, 245, 240, 235, 210, 255, 250, 245,
-//                                        120, 145, 140, 135, 111, 101, 98,  76,  30,  123, 145, 255
-//  };
-//
-//  ImageData image(3, 3);
-//  image.LoadImageDataRGBA(testPixels);
-//  auto correspondingPixels = image.GetImageDataRGBA();
-//
-//  ASSERT_EQ(testPixels.size(), correspondingPixels.size());
-//
-//  auto correspondingPixel = correspondingPixels.begin();
-//  for(auto testPixel : testPixels)
-//  {
-//      EXPECT_EQ(testPixel, (int)(*correspondingPixel)); 
-//      ++correspondingPixel;
-//  }
-//}
-
-//Test bellow is inconsistent and incomplete, as there is no data checking.
-TEST(ImageDataTests, SaveTextureFileJpeg)
+TEST(ImageDataTest, SaveLoadTextureJpg)
 {
-    ImageData image;
-    image.LoadTextureJpegFile("sourceTextureFile.jpg");
+    std::string const filepath{"test_jpeg_texture_file.jpg"};
+    ImageData image1(10U, 10U);
+    image1.Fill(Color(255, 0, 0, 255));
+    image1.WriteJpegFile(filepath.c_str());
+    
+    ImageData image2("test_jpeg_texture_file.jpg");
 
-    image.WriteTextureJpegFile("outTextureFile.jpg");
+    EXPECT_EQ( image1.GetHeight(), image2.GetHeight() );
+    EXPECT_EQ( image1.GetWidth(), image2.GetWidth() );
+    //Pixels in the output jpeg file don't match completely to source pixels, because the compression algorithm in jpeg might slightly change values.
 }
 
-TEST(ImageDataTests, SaveTextureFilePng)
+TEST(ImageDataTest, SaveLoadTexturePng)
 {
-    ImageData image;
-    image.LoadTexturePngFile("2.png");
+    std::string const filepath{ "test_png_texture_file.png" };
+    ImageData image1(10U, 10U);
+    image1.Fill(Color(255, 0, 0, 255));
+    image1.WritePngFile(filepath.c_str());
 
-    //image.WriteTextureJpegFile("outPngTextureFile.png");
+    ImageData image2("test_png_texture_file.png");
+
+    EXPECT_EQ(image1.GetHeight(), image2.GetHeight());
+    EXPECT_EQ(image1.GetWidth(), image2.GetWidth());
+    EXPECT_EQ(image1.GetImageDataRGBA(), image2.GetImageDataRGBA());
+}
+
+TEST(ImageDataTest, IncorrectTextureFilepath)
+{
+    std::string const filepath{ "missing_texture_file.png" };
+
+    EXPECT_THROW(ImageData image(filepath), std::runtime_error);
 }

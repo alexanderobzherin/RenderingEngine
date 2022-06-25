@@ -40,6 +40,7 @@ class ImageData
 public:
 	ImageData();
 	ImageData( unsigned int width, unsigned int height );
+	ImageData( std::string filepath );
 
 	~ImageData();
 
@@ -59,14 +60,11 @@ public:
 	void SetPixel( unsigned int x, unsigned int y, Color color );
 	const Color GetPixel( unsigned int x, unsigned int y ) const;
 
-
 	std::vector<uint8_t> GetImageDataRGBA() const;
 	std::vector<uint8_t> GetImageDataRGB() const;
 
-	void WriteTextureJpegFile(char* filename);
-	bool LoadTextureJpegFile(char * filename);
-
-	bool LoadTexturePngFile(char* filename);
+	void WriteJpegFile(char const* filename);
+	void WritePngFile(char const* filename);
 
 protected:
 	//Allocate memory for image data
@@ -75,6 +73,9 @@ protected:
 	void CleanAllocatedMemory();
 	void LoadImageDataRGBA(std::vector<unsigned int> const& pixels);
 	void LoadImageDataRGB(std::vector<unsigned int> const& pixels);
+
+	bool LoadTexturePngFile(char const* filename);
+	bool LoadTextureJpegFile(char const* filename);
 
 private:
 	unsigned int mWidth;

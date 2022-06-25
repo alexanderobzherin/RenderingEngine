@@ -33,6 +33,7 @@ target_link_libraries(VulkanProject_gtests
         Boost::filesystem
         Threads::Threads
         ${JPEG_LIBRARIES}
+        PNG::PNG
     PRIVATE 
         #GTest::gmock 
         #GTest::gtest 

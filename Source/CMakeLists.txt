@@ -20,7 +20,7 @@ set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/Source/rendering_application.cpp
     ${PROJECT_SOURCE_DIR}/Source/utility.cpp
 	${PROJECT_SOURCE_DIR}/Source/image_data.cpp
-	${PROJECT_SOURCE_DIR}/Source/image_codec_png.cpp
+
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Shaders/)
