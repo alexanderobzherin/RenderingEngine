@@ -24,162 +24,172 @@
 
 namespace rendering_engine
 {
-    struct QueueFamilyIndices 
+struct QueueFamilyIndices 
+{
+    std::optional<uint32_t> graphicsFamily;
+    std::optional<uint32_t> presentFamily;
+
+    bool IsComplete()
     {
-        std::optional<uint32_t> graphicsFamily;
-        std::optional<uint32_t> presentFamily;
+        return graphicsFamily.has_value() && presentFamily.has_value();
+    }
+};
 
-        bool IsComplete()
-        {
-            return graphicsFamily.has_value() && presentFamily.has_value();
-        }
-    };
+struct SwapChainSupportDetails
+{
+    VkSurfaceCapabilitiesKHR capabilities;
+    std::vector<VkSurfaceFormatKHR> formats;
+    std::vector<VkPresentModeKHR> presentModes;
+};
 
-    struct SwapChainSupportDetails
-    {
-        VkSurfaceCapabilitiesKHR capabilities;
-        std::vector<VkSurfaceFormatKHR> formats;
-        std::vector<VkPresentModeKHR> presentModes;
-    };
+class RenderingApplication
+{
+public:
+    //Public constructor
+    RenderingApplication(char const* title);
+    RenderingApplication( int const width, int const height, char const* title );
+    virtual ~RenderingApplication();
 
-    class RenderingApplication
-    {
-        public:
-        //Public constructor
-        RenderingApplication(char const* title);
-        RenderingApplication( int const width, int const height, char const* title );
-        virtual ~RenderingApplication();
+    //Interface to run rendering application
+    virtual void Run();
 
-        //Interface to run rendering application
-        virtual void Run();
-
-        protected:
-        void Shutdown();
-        void InitializeWindow();
-        void InitializeVulkan();
+    protected:
+    void Shutdown();
+    void InitializeWindow();
+    void InitializeVulkan();
         
-        void CreateInstance();
-        bool CheckValidationLayerSupport();
+    void CreateInstance();
+    bool CheckValidationLayerSupport();
 
-        std::vector<const char*> GetRequiredExtensions();
-        static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-                                                            VkDebugUtilsMessageTypeFlagsEXT messageType,
-                                                            const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-                                                            void* pUserData);
-        void SetupDebugMessenger();
-        VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT const* pCreateInfo, 
-                                              VkAllocationCallbacks const* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
-        static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
-        void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+    std::vector<const char*> GetRequiredExtensions();
+    static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                        VkDebugUtilsMessageTypeFlagsEXT messageType,
+                                                        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                                                        void* pUserData);
+    void SetupDebugMessenger();
+    VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerCreateInfoEXT const* pCreateInfo, 
+                                            VkAllocationCallbacks const* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+    static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
+    void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
                 
-        void PickPhysicalDevice();
-        bool IsDeviceSuitable(VkPhysicalDevice device);
-        QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
+    void PickPhysicalDevice();
+    bool IsDeviceSuitable(VkPhysicalDevice device);
+    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
-        void CreateLogicalDevice();
-        void CreateSurface();
-        bool CheckDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
+    void CreateLogicalDevice();
+    void CreateSurface();
+    bool CheckDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
 
-        void CreateSwapChain();
-        void CleanupSwapChain();
-        void RecreateSwapChain();
-        SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
-        VkSurfaceFormatKHR ChooseSwapSurfaceFormat(std::vector<VkSurfaceFormatKHR> const & availableFormats);
-        VkPresentModeKHR ChooseSwapPresentMode(std::vector<VkPresentModeKHR>const & availablePresentModes);
-        VkExtent2D ChooseSwapExtent( VkSurfaceCapabilitiesKHR const & capabilities );
+    void CreateSwapChain();
+    void CleanupSwapChain();
+    void RecreateSwapChain();
+    SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+    VkSurfaceFormatKHR ChooseSwapSurfaceFormat(std::vector<VkSurfaceFormatKHR> const & availableFormats);
+    VkPresentModeKHR ChooseSwapPresentMode(std::vector<VkPresentModeKHR>const & availablePresentModes);
+    VkExtent2D ChooseSwapExtent( VkSurfaceCapabilitiesKHR const & capabilities );
 
-        void CreateImageView();
-        void CreateRenderPass();
-        void CreateGraphicsPipeline();
-        void CreateFramebuffers();
+    void CreateImageView();
+    void CreateRenderPass();
+    void CreateGraphicsPipeline();
+    void CreateFramebuffers();
 
-        VkShaderModule CreateShaderModule(std::vector<char>& code);
+    VkShaderModule CreateShaderModule(std::vector<char>& code);
 
-        void CreateCommandPool();
-        void CreateCommandBuffers();
-        void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+    void CreateCommandPool();
+    void CreateVulkanImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+                           VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+    void CreateTextureImage();
+    void CreateCommandBuffers();
+    void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
-        void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-        void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-        void CreateVertexBuffer();
-        void CreateIndexBuffer();
-        void CreateUniformBuffers();
-        void CreateDescriptorPool();
-        void CreateDescriptorSets();
+    void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+    VkCommandBuffer BeginSingleTimeCommand();
+    void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
+    void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+    void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+    void CreateVertexBuffer();
+    void CreateIndexBuffer();
+    void CreateUniformBuffers();
+    void CreateDescriptorPool();
+    void CreateDescriptorSets();
 
-        void CreateDescriptorSetLayout();
+    void CreateDescriptorSetLayout();
 
-        uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
-        void Draw();
-        void UpdateUniformBuffer(uint32_t currentImage);
-        void CreateSyncObjects();
+    void Draw();
+    void UpdateUniformBuffer(uint32_t currentImage);
+    void CreateSyncObjects();
 
-        static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
+    static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 
-        protected:
-        bool mIsFullScreen;
-        unsigned int mWidth;
-        unsigned int mHeight;
-        char const* mTitle;
+ protected:
+    bool mIsFullScreen;
+    unsigned int mWidth;
+    unsigned int mHeight;
+    char const* mTitle;
 
-        VkSurfaceKHR mSurface;
-        GLFWwindow* mWindow;
-        VkInstance mInstance;
+    VkSurfaceKHR mSurface;
+    GLFWwindow* mWindow;
+    VkInstance mInstance;
 
-        VkQueue mGraphicsQueue;
-        VkQueue mPresentQueue;
+    VkQueue mGraphicsQueue;
+    VkQueue mPresentQueue;
 
-        VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
-        VkDevice mLogicalDevice;
+    VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
+    VkDevice mLogicalDevice;
 
-        std::vector<const char*> const mValidationLayers = {"VK_LAYER_KHRONOS_validation"};
-        VkDebugUtilsMessengerEXT mDebugMessenger;
+    std::vector<const char*> const mValidationLayers = {"VK_LAYER_KHRONOS_validation"};
+    VkDebugUtilsMessengerEXT mDebugMessenger;
 
-        std::vector<const char*> const mDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    std::vector<const char*> const mDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-        VkSwapchainKHR mSwapChain;
-        std::vector<VkImage> mSwapChainImages;
-        VkFormat mSwapChainImageFormat;
-        VkExtent2D mSwapChainExtent;
+    VkSwapchainKHR mSwapChain;
+    std::vector<VkImage> mSwapChainImages;
+    VkFormat mSwapChainImageFormat;
+    VkExtent2D mSwapChainExtent;
 
-        std::vector<VkImageView> mSwapChainImageViews;
-        std::vector<VkFramebuffer> mSwapChainFramebuffers;
+    std::vector<VkImageView> mSwapChainImageViews;
+    std::vector<VkFramebuffer> mSwapChainFramebuffers;
 
-        VkRenderPass mRenderPass;
-        VkPipelineLayout mPipelineLayout;
-        VkPipeline mGraphicsPipeline;
+    VkRenderPass mRenderPass;
+    VkPipelineLayout mPipelineLayout;
+    VkPipeline mGraphicsPipeline;
 
-        VkCommandPool mCommandPool;
-        std::vector<VkCommandBuffer> mCommandBuffers;
+    VkCommandPool mCommandPool;
+    std::vector<VkCommandBuffer> mCommandBuffers;
 
-        std::vector<VkSemaphore> mImageAvailableSemaphores;
-        std::vector<VkSemaphore> mRenderFinishedSemaphores;
-        std::vector<VkFence> mInFlightFences;
-        std::vector<VkFence> mImagesInFlight;
-        size_t mCurrentFrame = 0;
-        bool mFramebufferResized = false;
+    VkImage mTextureImage;
+    VkDeviceMemory mTextureImageMemory;
 
-        VkBuffer mVertexBuffer;
-        VkDeviceMemory mVertexBufferMemory;
-        VkBuffer mIndexBuffer;
-        VkDeviceMemory mIndexBufferMemory;
-        std::vector<VkBuffer> mUniformBuffers;
-        std::vector<VkDeviceMemory> mUniformBuffersMemory;
-        VkDescriptorPool mDescriptorPool;
-        std::vector<VkDescriptorSet> mDescriptorSets;
+    std::vector<VkSemaphore> mImageAvailableSemaphores;
+    std::vector<VkSemaphore> mRenderFinishedSemaphores;
+    std::vector<VkFence> mInFlightFences;
+    std::vector<VkFence> mImagesInFlight;
+    size_t mCurrentFrame = 0;
+    bool mFramebufferResized = false;
 
-        VkDescriptorSetLayout mDescriptorSetLayout;
+    VkBuffer mVertexBuffer;
+    VkDeviceMemory mVertexBufferMemory;
+    VkBuffer mIndexBuffer;
+    VkDeviceMemory mIndexBufferMemory;
+    std::vector<VkBuffer> mUniformBuffers;
+    std::vector<VkDeviceMemory> mUniformBuffersMemory;
+    VkDescriptorPool mDescriptorPool;
+    std::vector<VkDescriptorSet> mDescriptorSets;
 
-        std::vector<Vertex> const mVertices = {
-                                                {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-                                                {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-                                                {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-                                                {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-                                             };
-    };  
-        std::vector<uint16_t> const mIndices = {
-                                            0, 1, 2, 2, 3, 0
-        };
+    VkDescriptorSetLayout mDescriptorSetLayout;
+
+    std::vector<Vertex> const mVertices = {
+                                            {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+                                            {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+                                            {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+                                            {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+                                            };
+};  
+    std::vector<uint16_t> const mIndices = {
+                                        0, 1, 2, 2, 3, 0
+    };
 }

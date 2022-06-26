@@ -6,6 +6,7 @@ GLM
 Boost::filesystem
 gtest
 libjpeg-turbo
+libpng
 
 **********Windows installing.**********
 It might be possible to use vcpkg package manager
