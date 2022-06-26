@@ -20,7 +20,12 @@ CompileShaders()
 {
     echo "Shaders compilation..."
     cd $PATH_TO_BUILD
-    mkdir Intermediate
+    if [ -d "Intermediate" ]
+    then
+        echo "Intermediate folder exists."
+    else
+        mkdir Intermediate
+    fi
     cd Intermediate
     mkdir Shaders
     cd Shaders
