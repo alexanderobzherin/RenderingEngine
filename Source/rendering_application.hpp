@@ -88,7 +88,8 @@ public:
     VkPresentModeKHR ChooseSwapPresentMode(std::vector<VkPresentModeKHR>const & availablePresentModes);
     VkExtent2D ChooseSwapExtent( VkSurfaceCapabilitiesKHR const & capabilities );
 
-    void CreateImageView();
+    VkImageView CreateImageView(VkImage image, VkFormat format);
+    void CreateImageViews();
     void CreateRenderPass();
     void CreateGraphicsPipeline();
     void CreateFramebuffers();
@@ -99,6 +100,8 @@ public:
     void CreateVulkanImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
                            VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
     void CreateTextureImage();
+    void CreateTextureImageView();
+    void CreateTextureSampler();
     void CreateCommandBuffers();
     void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
@@ -163,6 +166,8 @@ public:
 
     VkImage mTextureImage;
     VkDeviceMemory mTextureImageMemory;
+    VkImageView mTextureImageView;
+    VkSampler mTextureSampler;
 
     std::vector<VkSemaphore> mImageAvailableSemaphores;
     std::vector<VkSemaphore> mRenderFinishedSemaphores;
