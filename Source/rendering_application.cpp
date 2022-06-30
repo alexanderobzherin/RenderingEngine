@@ -311,6 +311,7 @@ void RenderingApplication::PickPhysicalDevice()
     {
         if (IsDeviceSuitable(device)) {
             mPhysicalDevice = device;
+            vkGetPhysicalDeviceFeatures(mPhysicalDevice, &mPhysDevSupportedFeatures);
             break;
         }
     }
@@ -328,8 +329,8 @@ bool RenderingApplication::IsDeviceSuitable(VkPhysicalDevice device)
     //VkPhysicalDeviceProperties deviceProperties;
     //vkGetPhysicalDeviceProperties(device, &deviceProperties);
 
-    VkPhysicalDeviceFeatures supportedFeatures;
-    vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+    // VkPhysicalDeviceFeatures supportedFeatures;
+    // vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
 
     //return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
     //       deviceFeatures.geometryShader;
@@ -344,7 +345,7 @@ bool RenderingApplication::IsDeviceSuitable(VkPhysicalDevice device)
         auto const swapChainSupport = QuerySwapChainSupport(device);
         swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
     }
-    return indices.IsComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
+    return indices.IsComplete() && extensionsSupported && swapChainAdequate;
 }
 
 QueueFamilyIndices RenderingApplication::FindQueueFamilies(VkPhysicalDevice device)
@@ -407,7 +408,15 @@ void RenderingApplication::CreateLogicalDevice()
     queueCreateInfo.pQueuePriorities = &queuePriority;
 
     VkPhysicalDeviceFeatures deviceFeatures{};
-    deviceFeatures.samplerAnisotropy = VK_TRUE;
+    if(mPhysDevSupportedFeatures.samplerAnisotropy)
+    {
+        deviceFeatures.samplerAnisotropy = VK_TRUE;
+    }
+    else
+    {
+        deviceFeatures.samplerAnisotropy = VK_FALSE;
+    }
+
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
@@ -1011,8 +1020,16 @@ void RenderingApplication::CreateTextureSampler()
     samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
-    samplerInfo.anisotropyEnable = VK_TRUE;
-    samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+    if(mPhysDevSupportedFeatures.samplerAnisotropy)
+    {
+        samplerInfo.anisotropyEnable = VK_TRUE;
+        samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+    }
+    else
+    {
+        samplerInfo.anisotropyEnable = VK_FALSE;
+        samplerInfo.maxAnisotropy = 1.0f;
+    }
 
     samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
     samplerInfo.unnormalizedCoordinates = VK_FALSE;

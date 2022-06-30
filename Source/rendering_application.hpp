@@ -148,6 +148,7 @@ public:
     VkDebugUtilsMessengerEXT mDebugMessenger;
 
     std::vector<const char*> const mDeviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    VkPhysicalDeviceFeatures mPhysDevSupportedFeatures;
 
     VkSwapchainKHR mSwapChain;
     std::vector<VkImage> mSwapChainImages;
