@@ -12,6 +12,9 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Source/image_data.hpp
 	${PROJECT_SOURCE_DIR}/Source/image_codec_jpeg.hpp
 	${PROJECT_SOURCE_DIR}/Source/image_codec_png.hpp
+	${PROJECT_SOURCE_DIR}/Source/mesh.hpp
+	${PROJECT_SOURCE_DIR}/Source/model.hpp
+	${PROJECT_SOURCE_DIR}/Source/model_material.hpp
 )
 
 #set source files
@@ -20,7 +23,9 @@ set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/Source/rendering_application.cpp
     ${PROJECT_SOURCE_DIR}/Source/utility.cpp
 	${PROJECT_SOURCE_DIR}/Source/image_data.cpp
-
+	${PROJECT_SOURCE_DIR}/Source/mesh.cpp
+	${PROJECT_SOURCE_DIR}/Source/model.cpp
+	${PROJECT_SOURCE_DIR}/Source/model_material.cpp
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Shaders/)
@@ -57,6 +62,7 @@ target_link_libraries(VulkanProject
 	Boost::filesystem
 	${JPEG_LIBRARIES}
 	PNG::PNG
+	assimp::assimp
 )
 target_include_directories(VulkanProject PUBLIC
 ${CMAKE_CURRENT_SOURCE_DIR}/Shaders

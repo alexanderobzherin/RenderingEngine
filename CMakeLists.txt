@@ -62,5 +62,7 @@ find_package(JPEG REQUIRED)
 
 find_package(PNG REQUIRED)
 
+find_package(assimp CONFIG REQUIRED)
+
 add_subdirectory(Source)
 add_subdirectory(Tests)

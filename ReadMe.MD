@@ -5,8 +5,9 @@ GLFW
 GLM
 Boost::filesystem
 gtest
-libjpeg-turbo
+libjpeg
 libpng
+assimp
 
 **********Windows installing.**********
 It might be possible to use vcpkg package manager
@@ -36,6 +37,9 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 .\vcpkg.exe install libpng
 .\vcpkg.exe install libpng:x64-windows
+
+.\vcpkg.exe install assimp
+.\vcpkg.exe install assimp:x64-windows
 
 Set environment variable glslc.
 Example:
