@@ -1198,7 +1198,7 @@ void RenderingApplication::LoadModel()
 {
     std::string const modelFilepath{ "./Intermediate/Models/TestCube/test_cube.fbx" };
 
-    Model model(modelFilepath);
+    Model model(modelFilepath, true);
     auto const vertices = model.Meshes().at(0)->Vertices();
     auto const indices = model.Meshes().at(0)->Indices();
     auto const texCoord = model.Meshes().at(0)->TextureCoordinates();
@@ -1208,7 +1208,7 @@ void RenderingApplication::LoadModel()
         Vertex vertex{};
 
         vertex.pos = vertices[i];
-        vertex.texCoord = glm::vec3{ texCoord[0].at(i).x, 1.0f - texCoord[0].at(i).y, texCoord[0].at(i).z};
+        vertex.texCoord = glm::vec3{ texCoord[0].at(i).x, texCoord[0].at(i).y, texCoord[0].at(i).z};
         vertex.color = { 1.0f, 1.0f, 1.0f };
 
         mVertices.push_back(vertex);
