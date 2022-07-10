@@ -140,7 +140,7 @@ void RenderingApplication::InitializeVulkan()
     CreateFramebuffers();
     CreateTextureImageView();
     CreateTextureSampler();
-    //LoadModel();
+    LoadModel();
     CreateVertexBuffer();
     CreateIndexBuffer();
     CreateUniformBuffers();
@@ -1180,7 +1180,7 @@ void RenderingApplication::RecordCommandBuffer(VkCommandBuffer commandBuffer, ui
 
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdBindIndexBuffer(commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipelineLayout, 0, 1, &mDescriptorSets[mCurrentFrame], 0, nullptr);
 
@@ -1196,24 +1196,25 @@ void RenderingApplication::RecordCommandBuffer(VkCommandBuffer commandBuffer, ui
 
 void RenderingApplication::LoadModel()
 {
-    //std::string const modelFilepath{ "./Intermediate/Models/TestCube/test_cube.fbx" };
-    //std::string const textureFilepath{ "./Intermediate/Models/TestCube/test_cube_color.png" };
+    std::string const modelFilepath{ "./Intermediate/Models/TestCube/test_cube.fbx" };
 
-    //Model model(modelFilepath);
-    //auto const vertices = model.Meshes().at(0)->Vertices();
-    //auto const indices = model.Meshes().at(0)->Indices();
-    //auto const texCoord = model.Meshes().at(0)->TextureCoordinates();
+    Model model(modelFilepath);
+    auto const vertices = model.Meshes().at(0)->Vertices();
+    auto const indices = model.Meshes().at(0)->Indices();
+    auto const texCoord = model.Meshes().at(0)->TextureCoordinates();
 
-    //for( int i = 0; i < vertices.size(); ++i )
-    //{
-    //    mVertices.push_back(Vertex{});
-    //    mVertices[i].pos = vertices[i];
-    //    mVertices[i].texCoord = glm::vec3{ texCoord[0].at(i).x, texCoord[0].at(i).y, texCoord[0].at(i).z};
-    //    mIndices.push_back(indices.size());
-    //}
+    for( int i = 0; i < vertices.size(); ++i )
+    {
+        Vertex vertex{};
 
-   // mIndices = indices;
+        vertex.pos = vertices[i];
+        vertex.texCoord = glm::vec3{ texCoord[0].at(i).x, 1.0f - texCoord[0].at(i).y, texCoord[0].at(i).z};
+        vertex.color = { 1.0f, 1.0f, 1.0f };
 
+        mVertices.push_back(vertex);
+    }
+
+    mIndices = indices;
 }
 
 void RenderingApplication::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -1658,7 +1659,7 @@ void RenderingApplication::UpdateUniformBuffer(uint32_t currentImage)
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
     UniformBufferObject ubo{};
-    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 1.0f));
     ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.proj = glm::perspective(glm::radians(45.0f), mSwapChainExtent.width / (float) mSwapChainExtent.height, 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;
