@@ -5,6 +5,8 @@
 #include "utility.hpp"
 #include "boost/filesystem.hpp"
 #include "image_data.hpp"
+#include "model.hpp"
+#include "mesh.hpp"
 
 namespace rendering_engine
 {
@@ -138,6 +140,7 @@ void RenderingApplication::InitializeVulkan()
     CreateFramebuffers();
     CreateTextureImageView();
     CreateTextureSampler();
+    //LoadModel();
     CreateVertexBuffer();
     CreateIndexBuffer();
     CreateUniformBuffers();
@@ -534,6 +537,9 @@ void RenderingApplication::CreateSwapChain()
 
 void RenderingApplication::CleanupSwapChain()
 {
+    vkDestroyImageView(mLogicalDevice, mDepthImageView, nullptr);
+    vkDestroyImage(mLogicalDevice, mDepthImage, nullptr);
+    vkFreeMemory(mLogicalDevice, mDepthImageMemory, nullptr);
     for (auto framebuffer : mSwapChainFramebuffers) 
     {
         vkDestroyFramebuffer(mLogicalDevice, framebuffer, nullptr);
@@ -1039,7 +1045,7 @@ void RenderingApplication::CreateVulkanImage(uint32_t width, uint32_t height, Vk
 
 void RenderingApplication::CreateTextureImage()
 {
-    ImageData imageData("./Intermediate/Textures/PNG_transparency_demonstration_1.png");
+    ImageData imageData("./Intermediate/Models/TestCube/test_cube_color.png");
     int width = imageData.GetWidth();
     int height = imageData.GetHeight();
     auto const pixelVector = imageData.GetImageDataRGBA();
@@ -1186,6 +1192,28 @@ void RenderingApplication::RecordCommandBuffer(VkCommandBuffer commandBuffer, ui
     {
         throw std::runtime_error("failed to record command buffer!");
     }
+}
+
+void RenderingApplication::LoadModel()
+{
+    //std::string const modelFilepath{ "./Intermediate/Models/TestCube/test_cube.fbx" };
+    //std::string const textureFilepath{ "./Intermediate/Models/TestCube/test_cube_color.png" };
+
+    //Model model(modelFilepath);
+    //auto const vertices = model.Meshes().at(0)->Vertices();
+    //auto const indices = model.Meshes().at(0)->Indices();
+    //auto const texCoord = model.Meshes().at(0)->TextureCoordinates();
+
+    //for( int i = 0; i < vertices.size(); ++i )
+    //{
+    //    mVertices.push_back(Vertex{});
+    //    mVertices[i].pos = vertices[i];
+    //    mVertices[i].texCoord = glm::vec3{ texCoord[0].at(i).x, texCoord[0].at(i).y, texCoord[0].at(i).z};
+    //    mIndices.push_back(indices.size());
+    //}
+
+   // mIndices = indices;
+
 }
 
 void RenderingApplication::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)

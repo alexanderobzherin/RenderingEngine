@@ -115,5 +115,6 @@ TEST(ImageDataTest, ModelsLoading)
     auto const vertices = model.Meshes().at(0)->Vertices();
     auto const indices = model.Meshes().at(0)->Indices();
     auto const normals = model.Meshes().at(0)->Normals();
+    auto const texCoord = model.Meshes().at(0)->TextureCoordinates();
     EXPECT_NE(0, vertices.size());
 }
