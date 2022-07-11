@@ -562,7 +562,7 @@ void RenderingApplication::RecreateSwapChain()
 {
     int width = 0;
     int height = 0;
-    glfwGetFramebufferSize(mWindow, &width, &height);
+
     while (width == 0 || height == 0) 
     {
         glfwGetFramebufferSize(mWindow, &width, &height);
@@ -571,11 +571,11 @@ void RenderingApplication::RecreateSwapChain()
     vkDeviceWaitIdle(mLogicalDevice);
 
     CleanupSwapChain();
-
     CreateSwapChain();
     CreateImageViews();
     CreateRenderPass();
     CreateGraphicsPipeline();
+    CreateDepthResources();
     CreateFramebuffers();
     CreateCommandBuffers();
 }
