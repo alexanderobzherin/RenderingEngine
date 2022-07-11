@@ -9,7 +9,9 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(PATH_TO_SOURCE_SHADER_PATH "${PROJECT_SOURCE_DIR}/Shaders")
 set(PATH_TO_SOURCE_TEXTURES "${PROJECT_SOURCE_DIR}/Textures")
+set(PATH_TO_SOURCE_MODELS "${PROJECT_SOURCE_DIR}/Models")
 file(COPY ${PATH_TO_SOURCE_TEXTURES} DESTINATION "${CMAKE_BINARY_DIR}/Intermediate")
+file(COPY ${PATH_TO_SOURCE_MODELS} DESTINATION "${CMAKE_BINARY_DIR}/Intermediate")
 if(WIN32)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders)
 set(PATH_TO_COMPILED_SHADER_PATH "${CMAKE_BINARY_DIR}/Intermediate/Shaders")
@@ -61,6 +63,8 @@ find_package(GTest REQUIRED)
 find_package(JPEG REQUIRED)
 
 find_package(PNG REQUIRED)
+
+find_package(assimp CONFIG REQUIRED)
 
 add_subdirectory(Source)
 add_subdirectory(Tests)

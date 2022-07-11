@@ -5,6 +5,8 @@
 #include "utility.hpp"
 #include "boost/filesystem.hpp"
 #include "image_data.hpp"
+#include "model.hpp"
+#include "mesh.hpp"
 
 namespace rendering_engine
 {
@@ -138,6 +140,7 @@ void RenderingApplication::InitializeVulkan()
     CreateFramebuffers();
     CreateTextureImageView();
     CreateTextureSampler();
+    LoadModel();
     CreateVertexBuffer();
     CreateIndexBuffer();
     CreateUniformBuffers();
@@ -534,6 +537,9 @@ void RenderingApplication::CreateSwapChain()
 
 void RenderingApplication::CleanupSwapChain()
 {
+    vkDestroyImageView(mLogicalDevice, mDepthImageView, nullptr);
+    vkDestroyImage(mLogicalDevice, mDepthImage, nullptr);
+    vkFreeMemory(mLogicalDevice, mDepthImageMemory, nullptr);
     for (auto framebuffer : mSwapChainFramebuffers) 
     {
         vkDestroyFramebuffer(mLogicalDevice, framebuffer, nullptr);
@@ -556,7 +562,7 @@ void RenderingApplication::RecreateSwapChain()
 {
     int width = 0;
     int height = 0;
-    glfwGetFramebufferSize(mWindow, &width, &height);
+
     while (width == 0 || height == 0) 
     {
         glfwGetFramebufferSize(mWindow, &width, &height);
@@ -565,11 +571,11 @@ void RenderingApplication::RecreateSwapChain()
     vkDeviceWaitIdle(mLogicalDevice);
 
     CleanupSwapChain();
-
     CreateSwapChain();
     CreateImageViews();
     CreateRenderPass();
     CreateGraphicsPipeline();
+    CreateDepthResources();
     CreateFramebuffers();
     CreateCommandBuffers();
 }
@@ -1039,7 +1045,7 @@ void RenderingApplication::CreateVulkanImage(uint32_t width, uint32_t height, Vk
 
 void RenderingApplication::CreateTextureImage()
 {
-    ImageData imageData("./Intermediate/Textures/PNG_transparency_demonstration_1.png");
+    ImageData imageData("./Intermediate/Models/TestCube/test_cube_color.png");
     int width = imageData.GetWidth();
     int height = imageData.GetHeight();
     auto const pixelVector = imageData.GetImageDataRGBA();
@@ -1174,7 +1180,7 @@ void RenderingApplication::RecordCommandBuffer(VkCommandBuffer commandBuffer, ui
 
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdBindIndexBuffer(commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffer, mIndexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipelineLayout, 0, 1, &mDescriptorSets[mCurrentFrame], 0, nullptr);
 
@@ -1186,6 +1192,29 @@ void RenderingApplication::RecordCommandBuffer(VkCommandBuffer commandBuffer, ui
     {
         throw std::runtime_error("failed to record command buffer!");
     }
+}
+
+void RenderingApplication::LoadModel()
+{
+    std::string const modelFilepath{ "./Intermediate/Models/TestCube/test_cube.fbx" };
+
+    Model model(modelFilepath, true);
+    auto const vertices = model.Meshes().at(0)->Vertices();
+    auto const indices = model.Meshes().at(0)->Indices();
+    auto const texCoord = model.Meshes().at(0)->TextureCoordinates();
+
+    for( int i = 0; i < vertices.size(); ++i )
+    {
+        Vertex vertex{};
+
+        vertex.pos = vertices[i];
+        vertex.texCoord = glm::vec3{ texCoord[0].at(i).x, texCoord[0].at(i).y, texCoord[0].at(i).z};
+        vertex.color = { 1.0f, 1.0f, 1.0f };
+
+        mVertices.push_back(vertex);
+    }
+
+    mIndices = indices;
 }
 
 void RenderingApplication::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -1630,7 +1659,7 @@ void RenderingApplication::UpdateUniformBuffer(uint32_t currentImage)
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
     UniformBufferObject ubo{};
-    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 1.0f));
     ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.proj = glm::perspective(glm::radians(45.0f), mSwapChainExtent.width / (float) mSwapChainExtent.height, 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;

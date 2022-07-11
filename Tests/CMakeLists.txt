@@ -11,6 +11,12 @@ find_package(Threads REQUIRED)
 set(TESTES_SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/Source/image_data.hpp
     ${CMAKE_SOURCE_DIR}/Source/image_data.cpp
+    ${CMAKE_SOURCE_DIR}/Source/model.hpp
+    ${CMAKE_SOURCE_DIR}/Source/model.cpp
+    ${CMAKE_SOURCE_DIR}/Source/model_material.hpp
+    ${CMAKE_SOURCE_DIR}/Source/model_material.cpp
+    ${CMAKE_SOURCE_DIR}/Source/mesh.hpp
+    ${CMAKE_SOURCE_DIR}/Source/mesh.cpp
 )
 include_directories(${GTEST_INCLUDE_DIRS}
 )
@@ -34,6 +40,7 @@ target_link_libraries(VulkanProject_gtests
         Threads::Threads
         ${JPEG_LIBRARIES}
         PNG::PNG
+        assimp::assimp
     PRIVATE 
         #GTest::gmock 
         #GTest::gtest 

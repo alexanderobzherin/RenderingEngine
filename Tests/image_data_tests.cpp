@@ -2,6 +2,8 @@
 #include <cstdint>
 #include "gtest/gtest.h"
 #include "../Source/image_data.hpp"
+#include "../Source/model.hpp"
+#include "../Source/mesh.hpp"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;
@@ -96,4 +98,23 @@ TEST(ImageDataTest, IncorrectTextureFilepath)
     std::string const filepath{ "missing_texture_file.png" };
 
     EXPECT_THROW(ImageData image(filepath), std::runtime_error);
+}
+
+TEST(ImageDataTest, ModelsLoading)
+{
+    std::string const modelFilepath{ "../Intermediate/Models/TestCube/test_cube.fbx" };
+    std::string const textureFilepath{ "../Intermediate/Models/TestCube/test_cube_color.png" };
+
+    ImageData textureImageData(textureFilepath);
+    textureImageData.GetHeight();
+
+    Model model(modelFilepath);
+    ASSERT_TRUE(model.HasMeshes());
+
+    auto const meshName = model.Meshes().at(0)->Name();
+    auto const vertices = model.Meshes().at(0)->Vertices();
+    auto const indices = model.Meshes().at(0)->Indices();
+    auto const normals = model.Meshes().at(0)->Normals();
+    auto const texCoord = model.Meshes().at(0)->TextureCoordinates();
+    EXPECT_NE(0, vertices.size());
 }
