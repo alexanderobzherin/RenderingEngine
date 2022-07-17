@@ -88,7 +88,7 @@ protected:
     VkPresentModeKHR ChooseSwapPresentMode(std::vector<VkPresentModeKHR>const & availablePresentModes);
     VkExtent2D ChooseSwapExtent( VkSurfaceCapabilitiesKHR const & capabilities );
 
-    VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+    VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, std::uint32_t mipmapLevels);
     void CreateImageViews();
     void CreateRenderPass();
     void CreateGraphicsPipeline();
@@ -101,11 +101,12 @@ protected:
     VkShaderModule CreateShaderModule(std::vector<char>& code);
 
     void CreateCommandPool();
-    void CreateVulkanImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+    void CreateVulkanImage(uint32_t width, uint32_t height, std::uint32_t mipmapLevels, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
                            VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
     void CreateTextureImage();
     void CreateTextureImageView();
     void CreateTextureSampler();
+    void GenerateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
     void CreateCommandBuffers();
     void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
     void LoadModel();
@@ -114,7 +115,7 @@ protected:
     void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
     VkCommandBuffer BeginSingleTimeCommand();
     void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
-    void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+    void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, std::uint32_t mipmapLevels);
     void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
     void CreateVertexBuffer();
     void CreateIndexBuffer();
@@ -170,6 +171,7 @@ protected:
     VkCommandPool mCommandPool;
     std::vector<VkCommandBuffer> mCommandBuffers;
 
+    std::uint32_t mMipmapLevels;
     VkImage mTextureImage;
     VkDeviceMemory mTextureImageMemory;
     VkImageView mTextureImageView;
