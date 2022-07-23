@@ -24,6 +24,8 @@ enum TextureType
 	End = LightMap
 };
 
+class Model;
+
 class ModelMaterial
 {
 	friend class Model;
