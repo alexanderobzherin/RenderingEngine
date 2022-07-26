@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 
 #set the project name
-project(VulkanProject)
+project(RenderingEngineProject)
 
 set(CMAKE_CXX_STANDARD 17)
-
-#Set path to outbut binaries
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_BUILD_TYPE Debug)
+#Set path to output binaries
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(PATH_TO_SOURCE_SHADER_PATH "${PROJECT_SOURCE_DIR}/Shaders")
 set(PATH_TO_SOURCE_TEXTURES "${PROJECT_SOURCE_DIR}/Textures")
 set(PATH_TO_SOURCE_MODELS "${PROJECT_SOURCE_DIR}/Models")
@@ -66,5 +67,6 @@ find_package(PNG REQUIRED)
 
 find_package(assimp CONFIG REQUIRED)
 
-add_subdirectory(Source)
+add_subdirectory(RenderingEngine)
 add_subdirectory(Tests)
+add_subdirectory(DemoApplication)

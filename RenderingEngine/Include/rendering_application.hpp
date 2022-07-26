@@ -101,9 +101,8 @@ protected:
     VkShaderModule CreateShaderModule(std::vector<char>& code);
 
     void CreateCommandPool();
-    void CreateVulkanImage(uint32_t width, uint32_t height, std::uint32_t mipmapLevels, VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+    void CreateVulkanImage(uint32_t width, uint32_t height, std::uint32_t mipmapLevels, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
                            VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-    void CreateColorResources();
     void CreateTextureImage();
     void CreateTextureImageView();
     void CreateTextureSampler();
@@ -134,7 +133,6 @@ protected:
 
     static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
 
-    VkSampleCountFlagBits GetMaxUsableSampleCount();
 
  protected:
     bool mIsFullScreen;
@@ -179,10 +177,6 @@ protected:
     VkImageView mTextureImageView;
     VkSampler mTextureSampler;
 
-    VkImage mColorImage;
-    VkDeviceMemory mColorImageMemory;
-    VkImageView mColorImageView;
-
     VkImage mDepthImage;
     VkDeviceMemory mDepthImageMemory;
     VkImageView mDepthImageView;
@@ -204,8 +198,6 @@ protected:
     std::vector<VkDescriptorSet> mDescriptorSets;
 
     VkDescriptorSetLayout mDescriptorSetLayout;
-
-    VkSampleCountFlagBits mMSAASamples;
 
     std::vector<Vertex> mVertices;
     std::vector<uint32_t> mIndices;

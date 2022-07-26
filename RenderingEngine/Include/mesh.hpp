@@ -11,8 +11,8 @@ struct aiMesh;
 
 namespace rendering_engine
 {
-class Model;
 class ModelMaterial;
+class Model;
 
 class Mesh
 {

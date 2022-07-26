@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "jpeglib.h"
 #include <setjmp.h>
-#include "../Source/image_data.hpp">
+#include "image_data.hpp"
 
 static void SaveTextureFileJpeg(rendering_engine::ImageData const& imageData, char const* filename)
 {

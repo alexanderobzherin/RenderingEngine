@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <cstdint>
 #include "gtest/gtest.h"
-#include "../Source/image_data.hpp"
-#include "../Source/model.hpp"
-#include "../Source/mesh.hpp"
+#include "../RenderingEngine/Include/image_data.hpp"
+#include "../RenderingEngine/Include/model.hpp"
+#include "../RenderingEngine/Include/mesh.hpp"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;

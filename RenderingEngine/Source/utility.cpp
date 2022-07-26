@@ -21,7 +21,7 @@ std::vector<char> Utility::ReadShaderBinaryFile( std::string const & filename )
 
     if (!file.is_open()) 
     {
-        throw std::runtime_error("failed to open shader file!");
+        throw std::runtime_error("failed to open file!");
     }
 
     size_t fileSize = (size_t) file.tellg();
