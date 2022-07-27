@@ -27,14 +27,16 @@ set_target_properties(DemoApplication PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 )
 if(NOT WIN32)
-set_target_properties(RenderingEngine PROPERTIES
+set_target_properties(DemoApplication PROPERTIES
+	POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
 	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 else(
-set_target_properties(RenderingEngine PROPERTIES
+set_target_properties(DemoApplication PROPERTIES
+	POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
 	COMPILE_OPTIONS "-Wall;-Wextra"
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-	set_target_properties( VulkanProject PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}" )
+	#RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+	#set_target_properties( VulkanProject PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}" )
 )
 )
 endif()
@@ -48,7 +50,7 @@ target_link_libraries(DemoApplication
 		glfw
 		glm::glm
 		Boost::filesystem
-		Threads::Threads
+		#Threads::Threads
 		${JPEG_LIBRARIES}
 		PNG::PNG
 		assimp::assimp
@@ -63,13 +65,6 @@ set(shader_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_vert.spv")
 set(shader_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.frag")
 set(shader_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_frag.spv")
 
-if(WIN32)
-add_custom_command(
-	TARGET RenderingEngine 
-	PRE_BUILD
-	COMMAND cmd /c ${SHADER_COMPILER} ${shader_vert_source} -o ${shader_vert_spv}
-	COMMAND cmd /c ${SHADER_COMPILER} ${shader_frag_source} -o ${shader_frag_spv}
-)
-endif()
+
 
 

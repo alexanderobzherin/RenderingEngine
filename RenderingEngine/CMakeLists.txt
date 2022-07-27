@@ -1,10 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
-#set the project name
-#project(RenderingEngine)
-
 #set header files
 include_directories(${PROJECT_SOURCE_DIR}/RenderingEngine/Include/)
+include_directories(${PATH_TO_SOURCE_SHADER_PATH}/)
 
 set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Shaders/basic_shader.frag
@@ -20,6 +18,17 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/model_material.hpp
 )
 
+#set files used as engine API
+set(API_HEADER_FILES
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/mesh.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/model.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/model_material.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/rendering_application.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/utility.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vertex_declarations.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/image_data.hpp
+)
+
 #set source files
 set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/RenderingEngine/Source/rendering_application.cpp
@@ -30,13 +39,13 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/model_material.cpp
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Shaders/)
+
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
 #add shared library
-add_library(RenderingEngine SHARED ${HEADER_FILES} ${SRC_FILES})
+add_library(RenderingEngine STATIC ${HEADER_FILES} ${SRC_FILES})
 
 #specify the compiling properties
 set_target_properties(RenderingEngine PROPERTIES
@@ -44,15 +53,15 @@ set_target_properties(RenderingEngine PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 )
 if(NOT WIN32)
-set_target_properties(RenderingEngine PROPERTIES
-	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
+	set_target_properties(RenderingEngine PROPERTIES
+		COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 else(
-set_target_properties(RenderingEngine PROPERTIES
-	COMPILE_OPTIONS "-Wall;-Wextra"
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-	set_target_properties( VulkanProject PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}" )
-)
+	set_target_properties(RenderingEngine PROPERTIES
+		COMPILE_OPTIONS "-Wall;-Wextra"
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+		RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}"
+	)
 )
 endif()
 
@@ -84,5 +93,3 @@ add_custom_command(
 	COMMAND cmd /c ${SHADER_COMPILER} ${shader_frag_source} -o ${shader_frag_spv}
 )
 endif()
-
-
