@@ -28,12 +28,10 @@ set_target_properties(DemoApplication PROPERTIES
 )
 if(NOT WIN32)
 set_target_properties(DemoApplication PROPERTIES
-	POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
 	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 else(
 set_target_properties(DemoApplication PROPERTIES
-	POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
 	COMPILE_OPTIONS "-Wall;-Wextra"
 	#RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 	#set_target_properties( VulkanProject PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}" )
