@@ -429,7 +429,7 @@ void RenderingApplication::CreateLogicalDevice()
 
     createInfo.pEnabledFeatures = &deviceFeatures;
 
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(mDeviceExtensions.size());;
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(mDeviceExtensions.size());
     createInfo.ppEnabledExtensionNames = mDeviceExtensions.data();
 
     if (enableValidationLayers)
