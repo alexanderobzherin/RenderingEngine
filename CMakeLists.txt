@@ -67,6 +67,8 @@ find_package(PNG REQUIRED)
 
 find_package(assimp CONFIG REQUIRED)
 
+find_package(freetype CONFIG REQUIRED)
+
 add_subdirectory(RenderingEngine)
 add_subdirectory(Tests)
 add_subdirectory(DemoApplication)

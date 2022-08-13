@@ -74,6 +74,7 @@ target_link_libraries(RenderingEngine
 	${JPEG_LIBRARIES}
 	PNG::PNG
 	assimp::assimp
+	freetype
 )
 target_include_directories(RenderingEngine PUBLIC
 ${CMAKE_CURRENT_SOURCE_DIR}/Shaders

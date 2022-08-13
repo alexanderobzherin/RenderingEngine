@@ -41,6 +41,9 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake
 .\vcpkg.exe install assimp
 .\vcpkg.exe install assimp:x64-windows
 
+.\vcpkg.exe install freetype
+.\vcpkg.exe install freetype:x64-windows
+
 Set environment variable glslc.
 Example:
 Variable name: glslc
