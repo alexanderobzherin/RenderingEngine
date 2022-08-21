@@ -144,16 +144,27 @@ TEST(ImageDataTest, CreateGlyphBitmap)
 
 }
 
-TEST(ImageDataTest, CreateTextBitmap)
+TEST(ImageDataTest, CreateTextBitmap1)
 {
-    std::string const pathToFont{ "../Intermediate/Fonts/Exo/Exo-Medium.otf" };
+    std::string const pathToFont{ "../Intermediate/Fonts/Pirulen/pirulen_rg.otf" };
 
     TextRenderer textRenderer( pathToFont, 48 );
 
-    std::string testText{"This is a test text string"};
+    std::string testText{"This is Pirulen font test text 123 string"};
     auto imageData = textRenderer.CreateStringBitmap(testText);
-    imageData.WritePngFile("testTextString.png");
+    imageData.WritePngFile("testPirulenFontTextString.png");
 
+}
+
+TEST(ImageDataTest, CreateTextBitmap2)
+{
+    std::string const pathToFont{ "../Intermediate/Fonts/DigitalDream/DIGITALDREAM.ttf" };
+
+    TextRenderer textRenderer(pathToFont, 48);
+
+    std::string testText{ "This_is_DIGITAL-DREAM_font_test_text_123_string" };
+    auto imageData = textRenderer.CreateStringBitmap(testText);
+    imageData.WritePngFile("testDigitalDreamFontTextString.png");
 }
 
 TEST(ImageDataTest, TextureAtlasMaker)
