@@ -41,6 +41,7 @@ public:
 	ImageData();
 	ImageData( unsigned int width, unsigned int height );
 	ImageData( std::string filepath );
+	ImageData( unsigned int width, unsigned int height, std::vector<unsigned int> const& pixelsRGBA );
 
 	~ImageData();
 
@@ -59,6 +60,7 @@ public:
 	void Fill( Color color );
 	void SetPixel( unsigned int x, unsigned int y, Color color );
 	const Color GetPixel( unsigned int x, unsigned int y ) const;
+	static void DrawImageOnImageAtPos(unsigned int const x, unsigned int const y, ImageData& toImage, ImageData& fromImage);
 
 	std::vector<uint8_t> GetImageDataRGBA() const;
 	std::vector<uint8_t> GetImageDataRGB() const;

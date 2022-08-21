@@ -16,6 +16,8 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/mesh.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/model.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/model_material.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/text_renderer.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/texture_atlas_maker.hpp
 )
 
 #set files used as engine API
@@ -27,6 +29,8 @@ set(API_HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/utility.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vertex_declarations.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/image_data.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/text_renderer.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/texture_atlas_maker.hpp
 )
 
 #set source files
@@ -37,6 +41,8 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/mesh.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/model.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/model_material.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/text_renderer.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/texture_atlas_maker.cpp
 )
 
 

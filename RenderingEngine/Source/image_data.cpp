@@ -54,6 +54,14 @@ ImageData::ImageData(std::string filepath)
 	}
 }
 
+ImageData::ImageData(unsigned int width, unsigned int height, std::vector<unsigned int> const& pixelsRGBA)
+	:
+ImageData::ImageData(width, height)
+{
+	Fill(Color(255, 255, 255, 255));
+	LoadImageDataRGBA( pixelsRGBA );
+}
+
 ImageData::~ImageData()
 {
 	CleanAllocatedMemory();
@@ -123,6 +131,48 @@ const Color ImageData::GetPixel( unsigned int x, unsigned int y ) const
 	else
 	{
 		throw std::runtime_error("Inapropriate access to data");
+	}
+}
+
+void ImageData::DrawImageOnImageAtPos(unsigned int const x, unsigned int const y, ImageData& toImage, ImageData& fromImage)
+{
+	//If fromImage can not be placed entirely, it will be cropped on right and bottom side
+
+	//Source image draw from top left pixel
+
+	//At first check if point pos is inside toImage
+	if( !(x >= 0 && y >= 0 && x < toImage.GetWidth() && y < toImage.GetHeight()) )
+	{
+		return;
+	}
+
+	//Crop
+	int left;
+	if( (toImage.GetWidth() - x) < fromImage.GetWidth() )
+	{
+		left = toImage.GetWidth() - x;
+	}
+	else
+	{
+		left = fromImage.GetWidth();
+	}
+
+	int bottom;
+	if( (toImage.GetHeight() - y) < fromImage.GetHeight() )
+	{
+		bottom = toImage.GetHeight() - y;
+	}
+	else
+	{
+		bottom = fromImage.GetHeight();
+	}
+
+	for( int deltaY = 0; deltaY < bottom; deltaY++ )
+	{
+		for( int deltaX = 0; deltaX < left; deltaX++ )
+		{
+			toImage.SetPixel(x + deltaX, y + deltaY, fromImage.GetPixel(deltaX, deltaY));
+		}
 	}
 }
 

@@ -34,6 +34,7 @@ target_link_libraries(RenderingEngine_gtests
         ${JPEG_LIBRARIES}
         PNG::PNG
         assimp::assimp
+        freetype
         #GTest::gmock 
         #GTest::gtest 
         #GTest::gmock_main 

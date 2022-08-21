@@ -4,6 +4,8 @@
 #include "../RenderingEngine/Include/image_data.hpp"
 #include "../RenderingEngine/Include/model.hpp"
 #include "../RenderingEngine/Include/mesh.hpp"
+#include "../RenderingEngine/Include/text_renderer.hpp"
+#include "../RenderingEngine/Include/texture_atlas_maker.hpp"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;
@@ -117,4 +119,70 @@ TEST(ImageDataTest, ModelsLoading)
     auto const normals = model.Meshes().at(0)->Normals();
     auto const texCoord = model.Meshes().at(0)->TextureCoordinates();
     EXPECT_NE(0, vertices.size());
+}
+
+TEST(ImageDataTest, RenderTextStatic)
+{
+    std::string const pathToFont{ "../Intermediate/Fonts/Exo/Exo-Medium.otf" };
+
+    auto imageData = TextRenderer::CreateGlyphBitmap(pathToFont, '7' );
+    imageData.WritePngFile("testGlyphStatic.png");
+
+    std::cout << "Char A in unicode is:" << std::to_string((std::uint16_t)('A')) << std::endl;
+    //std::cout << "String ABC12% in unicode is:" << std::to_string((std::uint16_t)('ABC12%')) << std::endl;
+
+}
+
+TEST(ImageDataTest, CreateGlyphBitmap)
+{
+    std::string const pathToFont{ "../Intermediate/Fonts/Exo/Exo-Medium.otf" };
+
+    TextRenderer textRenderer(pathToFont, 14);
+
+    auto imageData = textRenderer.CreateGlyphBitmap('4');
+    imageData.WritePngFile("testGlyphBitmap.png");
+
+}
+
+TEST(ImageDataTest, CreateTextBitmap)
+{
+    std::string const pathToFont{ "../Intermediate/Fonts/Exo/Exo-Medium.otf" };
+
+    TextRenderer textRenderer( pathToFont, 48 );
+
+    std::string testText{"This is a test text string"};
+    auto imageData = textRenderer.CreateStringBitmap(testText);
+    imageData.WritePngFile("testTextString.png");
+
+}
+
+TEST(ImageDataTest, TextureAtlasMaker)
+{
+    ImageData image1(10U, 10U);
+    image1.Fill(Color(255, 0, 0, 255));
+
+    ImageData image2(5U, 5U);
+    image2.Fill(Color(0, 255, 0, 255));
+
+    ImageData image3(2U, 2U);
+    image3.Fill(Color(0, 0, 255, 255));
+
+    std::map<char, ImageData> imageCollection;
+
+    imageCollection.emplace('A', image1);
+    imageCollection.emplace('B', image2);
+    imageCollection.emplace('C', image3);
+
+    TextureAtlasMaker texAtlasMaker( imageCollection );
+
+    ImageData atlasImage;
+    std::map<char, std::pair<unsigned int, unsigned int>> texAtlasData;
+
+    bool const result = texAtlasMaker.CreateTextureAtlas(texAtlasData, atlasImage);
+    if( result )
+    {
+        atlasImage.WritePngFile("TestTextureAtlas.png");
+    }
+
+    EXPECT_TRUE(result);
 }

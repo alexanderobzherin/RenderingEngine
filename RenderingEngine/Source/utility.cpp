@@ -98,4 +98,37 @@ boost::filesystem::path Utility::FindPath(std::string fileOrFolderName, std::str
 	return result;
 }
 
+std::vector<std::string> Utility::GetListOfFileNamesInDirectory(const char* directory, std::string extToSearch)
+{
+	std::vector<std::string> imageFileNames;
+
+	try
+	{
+		//check if parameter string is directory
+		if( boost::filesystem::exists(boost::filesystem::path(directory)) && boost::filesystem::is_directory(boost::filesystem::path(directory)) )
+		{
+			boost::filesystem::path pathToDirectory = boost::filesystem::path(directory);
+
+			if( boost::filesystem::is_directory(pathToDirectory) )
+			{
+				for( boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(pathToDirectory) )
+				{
+					size_t dot = x.path().string().find_last_of(".");
+
+					if( extToSearch == x.path().string().substr(dot + 1) )
+					{
+						imageFileNames.push_back(x.path().string());
+					}
+				}
+			}
+		}
+	}
+	catch( const boost::filesystem::filesystem_error& ex )
+	{
+		std::cout << ex.what() << '\n';
+	}
+
+	return imageFileNames;
+}
+
 }

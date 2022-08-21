@@ -18,6 +18,7 @@ class Utility final
 	static boost::filesystem::path GetApplicationPath();
 	static boost::filesystem::path GetBuildPath();
 	static boost::filesystem::path GetShadersBinaryPath();
+	static std::vector<std::string> GetListOfFileNamesInDirectory(const char* directory, std::string extToSearch);
 
 	private:
 		Utility();
