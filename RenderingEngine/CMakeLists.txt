@@ -82,7 +82,9 @@ target_link_libraries(RenderingEngine
 	assimp::assimp
 	freetype
 )
+
 target_include_directories(RenderingEngine PUBLIC
+${freetype2_INCLUDE_DIRS}
 ${CMAKE_CURRENT_SOURCE_DIR}/Shaders
 )
 

@@ -69,7 +69,17 @@ find_package(PNG REQUIRED)
 
 find_package(assimp CONFIG REQUIRED)
 
+if(WIN32)
 find_package(freetype CONFIG REQUIRED)
+else()
+find_package(PkgConfig)
+pkg_check_modules(freetype2 REQUIRED freetype2)
+include_directories(${FREETYPE2_INCLUDE_DIRS})
+message(STATUS "freetype2: found ${freetype2_FOUND}")
+message(STATUS "freetype2 DIR:  ${freetype2_INCLUDE_DIRS}")
+message(STATUS "freetype2 LIBRARIES:  ${freetype2_LIBRARIES}")
+message(STATUS "freetype2 LINK LIBRARIES:  ${freetype2_LINK_LIBRARIES}")
+endif()
 
 add_subdirectory(RenderingEngine)
 add_subdirectory(Tests)

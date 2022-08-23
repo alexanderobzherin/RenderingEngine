@@ -1,4 +1,5 @@
 #include "texture_atlas_maker.hpp"
+#include <cmath>
 
 namespace rendering_engine
 {
