@@ -12,11 +12,13 @@ TextRenderer::TextRenderer( std::string const pathToFont, unsigned int const siz
 {
     boost::filesystem::path path{ pathToFont };
     if( boost::filesystem::is_regular_file(pathToFont) )
-    {
-        std::cout << "Exo-Medium.otf" << std::endl;
+    {   
+        //Debug level
+        std::cout << "Font file found." << std::endl;
     }
     else
     {
+        //Error level
         std::cout << "Font file not found." << std::endl;
     }
 
@@ -37,7 +39,6 @@ TextRenderer::TextRenderer( std::string const pathToFont, unsigned int const siz
     {
         throw std::runtime_error{ "Failed to set char size!" };
     }
-
 
     for( int i = 32; i < 128; i++ )
     {
@@ -121,7 +122,7 @@ ImageData TextRenderer::CreateGlyphBitmap( std::string const pathToFont, char co
     boost::filesystem::path path{ pathToFont };
     if( boost::filesystem::is_regular_file(pathToFont) )
     {
-        std::cout << "Exo-Medium.otf" << std::endl;
+        std::cout << "Font file found." << std::endl;
     }
     else
     {

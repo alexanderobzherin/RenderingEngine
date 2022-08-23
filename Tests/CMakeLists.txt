@@ -16,6 +16,9 @@ include_directories(${GTEST_INCLUDE_DIRS}
 set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/main.cpp
     ${PROJECT_SOURCE_DIR}/image_data_tests.cpp
+    ${PROJECT_SOURCE_DIR}/model_tests.cpp
+    ${PROJECT_SOURCE_DIR}/text_renderer_tests.cpp
+    ${PROJECT_SOURCE_DIR}/texture_atlas_maker_tests.cpp
 )
 
 #add the executable
