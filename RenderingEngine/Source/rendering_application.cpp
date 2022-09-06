@@ -133,17 +133,17 @@ void RenderingApplication::InitializeVulkan()
     CreateImageViews();
     CreateRenderPass();
     CreateDescriptorSetLayout();
-    CreateGraphicsPipeline(); //Shader
+    CreateGraphicsPipeline(); //Object specific
     CreateCommandPool();
     CreateColorResources();
     CreateDepthResources();
     CreateFramebuffers();
-    CreateTextureImage();
-    CreateTextureImageView();
+    CreateTextureImage(); //Object specific
+    CreateTextureImageView(); //Object specific
     CreateTextureSampler();
-    LoadModel();
-    CreateVertexBuffer();
-    CreateIndexBuffer();
+    LoadModel(); //Object specific
+    CreateVertexBuffer(); //Object specific
+    CreateIndexBuffer(); //Object specific
     CreateUniformBuffers();
     CreateDescriptorPool();
     CreateDescriptorSets();

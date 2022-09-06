@@ -167,17 +167,17 @@ protected:
     std::vector<VkFramebuffer> mSwapChainFramebuffers;
 
     VkRenderPass mRenderPass;
-    VkPipelineLayout mPipelineLayout;
-    VkPipeline mGraphicsPipeline;
+    VkPipelineLayout mPipelineLayout; //Object specific
+    VkPipeline mGraphicsPipeline; //Object specific
 
     VkCommandPool mCommandPool;
     std::vector<VkCommandBuffer> mCommandBuffers;
 
     std::uint32_t mMipmapLevels; //Object specific
-    VkImage mTextureImage;
-    VkDeviceMemory mTextureImageMemory;
-    VkImageView mTextureImageView;
-    VkSampler mTextureSampler;
+    VkImage mTextureImage; //Object specific
+    VkDeviceMemory mTextureImageMemory; //Object specific
+    VkImageView mTextureImageView; //Object specific
+    VkSampler mTextureSampler; 
 
     VkImage mColorImage;
     VkDeviceMemory mColorImageMemory;
