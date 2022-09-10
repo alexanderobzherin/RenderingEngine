@@ -19,6 +19,7 @@ set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/model_tests.cpp
     ${PROJECT_SOURCE_DIR}/text_renderer_tests.cpp
     ${PROJECT_SOURCE_DIR}/texture_atlas_maker_tests.cpp
+    ${PROJECT_SOURCE_DIR}/app_clock_tests.cpp
 )
 
 #add the executable

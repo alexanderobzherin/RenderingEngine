@@ -7,6 +7,7 @@
 #include "image_data.hpp"
 #include "model.hpp"
 #include "mesh.hpp"
+#include "app_clock.hpp"
 
 namespace rendering_engine
 {
@@ -43,10 +44,17 @@ void RenderingApplication::Run()
     InitializeWindow();
     InitializeVulkan();
 
+    AppClock appClock;
+    appClock.Reset();
+
     while(!glfwWindowShouldClose(mWindow)) 
-    {
-        glfwPollEvents();
+    {   
+        appClock.UpdateAppTime( mAppTime );
+        
+        Update(mAppTime.ElapsedAppTimeMilliseconds());
         Draw();
+        
+        glfwPollEvents();
     }
     vkDeviceWaitIdle(mLogicalDevice);
 
@@ -133,18 +141,19 @@ void RenderingApplication::InitializeVulkan()
     CreateImageViews();
     CreateRenderPass();
     CreateDescriptorSetLayout();
-    CreateGraphicsPipeline(); //Object specific
+
     CreateCommandPool();
     CreateColorResources();
     CreateDepthResources();
     CreateFramebuffers();
+    CreateGraphicsPipeline(); //Object specific
     CreateTextureImage(); //Object specific
     CreateTextureImageView(); //Object specific
-    CreateTextureSampler();
     LoadModel(); //Object specific
     CreateVertexBuffer(); //Object specific
     CreateIndexBuffer(); //Object specific
-    CreateUniformBuffers();
+    CreateUniformBuffers(); // ?
+    CreateTextureSampler();
     CreateDescriptorPool();
     CreateDescriptorSets();
     CreateCommandBuffers();
@@ -1705,6 +1714,10 @@ uint32_t RenderingApplication::FindMemoryType(uint32_t typeFilter, VkMemoryPrope
     }
 
     throw std::runtime_error("failed to find suitable memory type!");
+}
+
+void RenderingApplication::Update(float const delta)
+{
 }
 
 void RenderingApplication::Draw()

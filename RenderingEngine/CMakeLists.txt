@@ -18,6 +18,8 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/model_material.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/text_renderer.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/texture_atlas_maker.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_time.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_clock.hpp
 )
 
 #set files used as engine API
@@ -31,6 +33,8 @@ set(API_HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/image_data.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/text_renderer.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/texture_atlas_maker.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_time.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_clock.hpp
 )
 
 #set source files
@@ -43,6 +47,8 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/model_material.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/text_renderer.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/texture_atlas_maker.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/app_time.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/app_clock.cpp
 )
 
 

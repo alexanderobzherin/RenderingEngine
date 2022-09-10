@@ -14,6 +14,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include "vertex_declarations.hpp"
+#include "app_time.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -24,6 +25,9 @@
 
 namespace rendering_engine
 {
+
+
+
 struct QueueFamilyIndices 
 {
     std::optional<uint32_t> graphicsFamily;
@@ -129,6 +133,7 @@ protected:
 
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
+    void Update( float const delta );
     void Draw();
     void UpdateUniformBuffer(uint32_t currentImage);
     void CreateSyncObjects();
@@ -209,5 +214,7 @@ protected:
 
     std::vector<Vertex> mVertices;
     std::vector<uint32_t> mIndices;
+
+    AppTime mAppTime;
 };
 }
