@@ -56,13 +56,14 @@ void RenderingApplication::Run()
         
         glfwPollEvents();
     }
-    vkDeviceWaitIdle(mLogicalDevice);
 
     Shutdown();
 }
 
 void RenderingApplication::Shutdown()
 {
+    vkDeviceWaitIdle(mLogicalDevice);
+
     CleanupSwapChain();
 
     vkDestroySampler(mLogicalDevice, mTextureSampler, nullptr);
@@ -132,32 +133,49 @@ void RenderingApplication::InitializeWindow()
 
 void RenderingApplication::InitializeVulkan()
 {
+    //Initialize renderer
+    // 
     CreateInstance();
     SetupDebugMessenger();
     CreateSurface();
     PickPhysicalDevice();
     CreateLogicalDevice();
+
     CreateSwapChain();
     CreateImageViews();
     CreateRenderPass();
     CreateDescriptorSetLayout();
 
     CreateCommandPool();
+
     CreateColorResources();
     CreateDepthResources();
+
     CreateFramebuffers();
+
+    CreateDescriptorPool();
+
+    CreateCommandBuffers();
+    CreateSyncObjects();
+
+    // Initialize drawable object
     CreateGraphicsPipeline(); //Object specific
     CreateTextureImage(); //Object specific
     CreateTextureImageView(); //Object specific
+    CreateTextureSampler();
     LoadModel(); //Object specific
     CreateVertexBuffer(); //Object specific
     CreateIndexBuffer(); //Object specific
     CreateUniformBuffers(); // ?
-    CreateTextureSampler();
-    CreateDescriptorPool();
+
+    //Initialize renderer
+
+
+    //Must be called after creation of the uniform buffers, object's images, texture samples and so on.
     CreateDescriptorSets();
-    CreateCommandBuffers();
-    CreateSyncObjects();
+
+
+
 }
 
 void RenderingApplication::CreateInstance()
@@ -790,8 +808,8 @@ void RenderingApplication::CreateRenderPass()
 
 void RenderingApplication::CreateGraphicsPipeline()
 {
-    auto vertShaderCode = Utility::ReadShaderBinaryFile("./Intermediate/Shaders/basic_shader_vert.spv");
-    auto fragShaderCode = Utility::ReadShaderBinaryFile("./Intermediate/Shaders/basic_shader_frag.spv");
+    auto vertShaderCode = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/basic_shader_vert.spv");
+    auto fragShaderCode = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/basic_shader_frag.spv");
 
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
@@ -1016,7 +1034,7 @@ VkShaderModule RenderingApplication::CreateShaderModule(std::vector<char>& code)
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
     VkShaderModule shaderModule;
-    if (vkCreateShaderModule(mLogicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) 
+    if( vkCreateShaderModule(mLogicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS )
     {
         throw std::runtime_error("failed to create shader module!");
     }
@@ -1095,7 +1113,7 @@ void RenderingApplication::CreateColorResources()
 
 void RenderingApplication::CreateTextureImage()
 {
-    ImageData imageData("./Intermediate/Models/TestCube/test_cube_color.png");
+    ImageData imageData("../Intermediate/Models/TestCube/test_cube_color.png");
     unsigned int const width = imageData.GetWidth();
     unsigned int const height = imageData.GetHeight();
 
@@ -1339,7 +1357,7 @@ void RenderingApplication::RecordCommandBuffer(VkCommandBuffer commandBuffer, ui
 
 void RenderingApplication::LoadModel()
 {
-    std::string const modelFilepath{ "./Intermediate/Models/TestCube/test_cube.fbx" };
+    std::string const modelFilepath{ "../Intermediate/Models/TestCube/test_cube.fbx" };
 
     Model model(modelFilepath, true);
     auto const vertices = model.Meshes().at(0)->Vertices();

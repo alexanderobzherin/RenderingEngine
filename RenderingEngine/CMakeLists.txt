@@ -20,6 +20,11 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/texture_atlas_maker.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_time.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_clock.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/drawable_component.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_renderer.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/renderer_base.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_image_data.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_drawable_component.hpp
 )
 
 #set files used as engine API
@@ -35,6 +40,10 @@ set(API_HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/texture_atlas_maker.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_time.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_clock.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/drawable_component.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_renderer.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/renderer_base.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_drawable_component.hpp
 )
 
 #set source files
@@ -49,6 +58,11 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/texture_atlas_maker.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/app_time.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/app_clock.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/drawable_component.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/vulkan_renderer.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/vulkan_image_data.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/renderer_base.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/vulkan_drawable_component.cpp
 )
 
 

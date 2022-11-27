@@ -4,15 +4,18 @@
 #include <stdexcept>
 #include "boost/filesystem.hpp"
 #include "rendering_application.hpp"
+#include "vulkan_renderer.hpp"
 #include "utility.hpp"
 
 using namespace rendering_engine;
+using namespace vulkan_renderer;
 
 int main(int argc, char *argv[])
 {
 	std::cout << "Vulkan App is running..." << std::endl;
     Utility::InitializePaths(argc, argv);
-    std::unique_ptr<RenderingApplication> app = std::make_unique<RenderingApplication>( 800, 600, "Vulkan Application" );
+
+    std::unique_ptr<VulkanRenderer> app = std::make_unique<VulkanRenderer>(800, 600, "Vulkan Application");
     try
     {
         app->Run();

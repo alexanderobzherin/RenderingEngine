@@ -26,25 +26,23 @@
 namespace rendering_engine
 {
 
-
-
-struct QueueFamilyIndices 
-{
-    std::optional<uint32_t> graphicsFamily;
-    std::optional<uint32_t> presentFamily;
-
-    bool IsComplete()
+    struct QueueFamilyIndices
     {
-        return graphicsFamily.has_value() && presentFamily.has_value();
-    }
-};
+        std::optional<uint32_t> graphicsFamily;
+        std::optional<uint32_t> presentFamily;
 
-struct SwapChainSupportDetails
-{
-    VkSurfaceCapabilitiesKHR capabilities;
-    std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
-};
+        bool IsComplete()
+        {
+            return graphicsFamily.has_value() && presentFamily.has_value();
+        }
+    };
+
+    struct SwapChainSupportDetails
+    {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
+    };
 
 class RenderingApplication
 {
@@ -95,6 +93,7 @@ protected:
     VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, std::uint32_t mipmapLevels);
     void CreateImageViews();
     void CreateRenderPass();
+    
     void CreateGraphicsPipeline();
     void CreateFramebuffers();
     void CreateDepthResources();
@@ -182,7 +181,7 @@ protected:
     VkImage mTextureImage; //Object specific
     VkDeviceMemory mTextureImageMemory; //Object specific
     VkImageView mTextureImageView; //Object specific
-    VkSampler mTextureSampler; 
+    VkSampler mTextureSampler; //Object specific
 
     VkImage mColorImage;
     VkDeviceMemory mColorImageMemory;
@@ -199,21 +198,21 @@ protected:
     size_t mCurrentFrame = 0;
     bool mFramebufferResized = false;
 
-    VkBuffer mVertexBuffer;
-    VkDeviceMemory mVertexBufferMemory;
-    VkBuffer mIndexBuffer;
-    VkDeviceMemory mIndexBufferMemory;
-    std::vector<VkBuffer> mUniformBuffers;
-    std::vector<VkDeviceMemory> mUniformBuffersMemory;
+    VkBuffer mVertexBuffer; //Object specific
+    VkDeviceMemory mVertexBufferMemory; //Object specific
+    VkBuffer mIndexBuffer; //Object specific
+    VkDeviceMemory mIndexBufferMemory; //Object specific
+    std::vector<VkBuffer> mUniformBuffers; //Object specific
+    std::vector<VkDeviceMemory> mUniformBuffersMemory; //Object specific
     VkDescriptorPool mDescriptorPool;
-    std::vector<VkDescriptorSet> mDescriptorSets;
+    std::vector<VkDescriptorSet> mDescriptorSets; //Object specific
 
     VkDescriptorSetLayout mDescriptorSetLayout;
 
-    VkSampleCountFlagBits mMSAASamples;
+    VkSampleCountFlagBits mMSAASamples; //Object specific
 
-    std::vector<Vertex> mVertices;
-    std::vector<uint32_t> mIndices;
+    std::vector<Vertex> mVertices; //Object specific
+    std::vector<uint32_t> mIndices; //Object specific
 
     AppTime mAppTime;
 };
