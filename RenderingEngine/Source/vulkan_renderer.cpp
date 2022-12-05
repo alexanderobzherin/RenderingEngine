@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "vulkan_drawable_component.hpp"
 #include "utility.hpp"
+#include "scene_component.hpp"
 
 namespace rendering_engine
 {
@@ -86,7 +87,8 @@ void VulkanRenderer::InitializeRenderer()
 
     CreateFramebuffers();
 
-    CreateDescriptorPool();
+    unsigned int const numberOfDrawableComponent = 2;
+    CreateDescriptorPool(numberOfDrawableComponent);
     CreateCommandBuffers();
     CreateSyncObjects();
 
@@ -96,10 +98,12 @@ void VulkanRenderer::InitializeRenderer()
     CreateGraphicsPipeline(vertShaderCode, fragShaderCode);
 
     mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
-    for( auto& object : mDrawableObjects )
-    {
-        object->Initialize();
-    }
+    mDrawableObjects.back()->Initialize();
+    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(2.0f, 0.0f, 0.0f));
+
+    mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
+    mDrawableObjects.back()->Initialize();
+    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(-2.0f, 0.0f, 0.0f));
 }
 
 void VulkanRenderer::Update(float const delta)
@@ -181,6 +185,11 @@ void VulkanRenderer::Draw()
     }
 
     mCurrentFrame = (mCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+float VulkanRenderer::GetAspectRation()
+{
+    return (float)(GetSwapChainExtent().width) / (float)(GetSwapChainExtent()).height;
 }
 
 void VulkanRenderer::CreateGraphicsPipeline(std::vector<char>& const spvVertShaderCode, std::vector<char>& const spvFragShaderCode)
@@ -453,19 +462,26 @@ bool VulkanRenderer::HasStencilComponent(VkFormat format)
     return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-void VulkanRenderer::CreateDescriptorPool()
+void VulkanRenderer::CreateDescriptorPool(unsigned int const numberOfDrawableComponents)
 {
-    std::array<VkDescriptorPoolSize, 2> poolSizes{};
-    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-    poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+    std::vector<VkDescriptorPoolSize> poolSizes;
+    
+    for( unsigned int i = 0; i < numberOfDrawableComponents; ++i )
+    {
+        std::array<VkDescriptorPoolSize, 2> poolSizesComponent{};
+        poolSizesComponent[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        poolSizesComponent[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+        poolSizesComponent[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizesComponent[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+        std::copy(poolSizesComponent.begin(), poolSizesComponent.end(), std::back_inserter(poolSizes));
+    }
 
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
     poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * numberOfDrawableComponents);
 
     if( vkCreateDescriptorPool(mLogicalDevice, &poolInfo, nullptr, &mDescriptorPool) != VK_SUCCESS )
     {

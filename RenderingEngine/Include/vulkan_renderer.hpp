@@ -63,6 +63,8 @@ public:
     void Update(float const delta) override;
     void Draw() override;
 
+    float GetAspectRation() override;
+
     void CreateGraphicsPipeline(std::vector<char>& const spvVertShaderCode, std::vector<char>& const spvFragShaderCode);
 
     VkPipelineLayout GetPipelineLayout();
@@ -148,7 +150,7 @@ protected:
     void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
     bool HasStencilComponent(VkFormat format);
 
-    void CreateDescriptorPool();
+    void CreateDescriptorPool(unsigned int const numberOfDrawableComponents);
     void CreateCommandBuffers();
 
     void CreateSyncObjects();

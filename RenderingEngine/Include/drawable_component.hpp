@@ -20,22 +20,31 @@
 
 namespace rendering_engine
 {
-
+class Actor;
+class SceneComponent;
+// Class contains needed renderer specific instrumentation to interact with renderer itself.
+// For example, create renderer specific vertex buffer to make it usable for drawing.
 class DrawableComponent
 {
 public:
-	DrawableComponent() = default;
-	virtual ~DrawableComponent() = default;
+	DrawableComponent();
+	virtual ~DrawableComponent();
 
-	virtual void Initialize() = 0;
-	virtual void Update(float delta) = 0;
+	virtual void Initialize();
+	virtual void Update(float delta);
 	virtual void Draw() = 0;
 
 	virtual void Shutdown() = 0;
 
+	std::shared_ptr<SceneComponent> GetSceneComponent();
+
 private:
 	DrawableComponent(const DrawableComponent& rhs);
 	DrawableComponent& operator=(const DrawableComponent& rhs);
+
+protected:
+	std::shared_ptr<SceneComponent> mSceneComponent;
+
 };
 
 } //rendering_engine

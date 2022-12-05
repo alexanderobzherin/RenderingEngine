@@ -1,6 +1,7 @@
 #include "renderer_base.hpp"
 #include "app_clock.hpp"
 #include "app_time.hpp"
+#include "camera.hpp"
 
 namespace rendering_engine
 {
@@ -81,10 +82,17 @@ void RendererBase::InitializeWindow()
 
 void RendererBase::Initialize()
 {
+    mCamera = std::make_shared<Camera>(this);
+    mCamera->Initialize();
 }
 
 void RendererBase::Update(float const delta)
 {
+    if( mCamera )
+    {
+        mCamera->Update(delta);
+    }
+
     for( auto& object : mDrawableObjects )
     {
         if( object )
@@ -105,10 +113,20 @@ void RendererBase::Draw()
     }
 }
 
+std::shared_ptr<Camera> RendererBase::GetCamera()
+{
+    return mCamera;
+}
+
 void RendererBase::FramebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
     auto app = reinterpret_cast<RendererBase*>(glfwGetWindowUserPointer(window));
     app->mFramebufferResized = true;
+}
+
+float RendererBase::GetAspectRation()
+{
+    return static_cast<float>(mWidth / mHeight);
 }
 
 } //rendering_engine

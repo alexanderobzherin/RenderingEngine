@@ -64,6 +64,8 @@ protected:
 	std::vector<VkBuffer> mUniformBuffers;
 	std::vector<VkDeviceMemory> mUniformBuffersMemory;
 	std::vector<VkDescriptorSet> mDescriptorSets;
+	UniformBufferObject mUbo;
+
 };
 
 } // vulkan_renderer

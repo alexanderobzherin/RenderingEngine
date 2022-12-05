@@ -5,7 +5,8 @@
 #include "model.hpp"
 #include "mesh.hpp"
 #include "app_time.hpp"
-
+#include "scene_component.hpp"
+#include "camera.hpp"
 
 namespace rendering_engine
 {
@@ -23,6 +24,8 @@ VulkanDrawableComponent::~VulkanDrawableComponent()
 
 void VulkanDrawableComponent::Initialize()
 {
+    DrawableComponent::Initialize();
+
     mColorTexture->Initialize();
     LoadModel();
     CreateVertexBuffer();
@@ -54,11 +57,26 @@ void VulkanDrawableComponent::Shutdown()
 
 void VulkanDrawableComponent::Update(float delta)
 {
-    UpdateUniformBuffer();
+    DrawableComponent::Update(delta);
+
+    static auto startTime = std::chrono::high_resolution_clock::now();
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+    mUbo.model = mSceneComponent->GetWorldMatrix();
+    mUbo.view = mRenderer->GetCamera()->ViewMatrix();
+    mUbo.proj = mRenderer->GetCamera()->ProjectionMatrix();
+    mUbo.proj[1][1] *= -1;
 }
 
 void VulkanDrawableComponent::Draw()
 {
+    void* data;
+    vkMapMemory(mRenderer->GetLogicalDevice(), mUniformBuffersMemory[mRenderer->GetCurrentFrame()], 0, sizeof(mUbo), 0, &data);
+    memcpy(data, &mUbo, sizeof(mUbo));
+    vkUnmapMemory(mRenderer->GetLogicalDevice(), mUniformBuffersMemory[mRenderer->GetCurrentFrame()]);
+
     auto commandBuffersRef = mRenderer->GetComandBuffers();
     auto currentFrame = mRenderer->GetCurrentFrame();
 
@@ -166,7 +184,7 @@ void VulkanDrawableComponent::UpdateUniformBuffer()
     UniformBufferObject ubo{};
     ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 1.0f));
     ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.proj = glm::perspective(glm::radians(45.0f), (float)(mRenderer->GetSwapChainExtent().width) / (float)(mRenderer->GetSwapChainExtent()).height, 0.1f, 10.0f);
+    ubo.proj = glm::perspective(glm::radians(45.0f), mRenderer->GetAspectRation(), 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;
 
     void* data;
@@ -185,9 +203,10 @@ void VulkanDrawableComponent::CreateDescriptorSet(VkDescriptorPool descriptorPoo
     allocInfo.pSetLayouts = layouts.data();
 
     mDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-    if( vkAllocateDescriptorSets(mRenderer->GetLogicalDevice(), &allocInfo, mDescriptorSets.data()) != VK_SUCCESS )
+    VkResult result = vkAllocateDescriptorSets(mRenderer->GetLogicalDevice(), &allocInfo, mDescriptorSets.data());
+    if( result != VK_SUCCESS )
     {
-        throw std::runtime_error("failed to allocate descriptor sets!");
+        throw std::runtime_error("failed to allocate descriptor sets! Error: " + std::to_string(result));
     }
 
     for( size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++ )

@@ -25,6 +25,9 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/renderer_base.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_image_data.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_drawable_component.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/camera.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/scene_component.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/actor.hpp
 )
 
 #set files used as engine API
@@ -44,6 +47,9 @@ set(API_HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_renderer.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/renderer_base.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_drawable_component.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/camera.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/scene_component.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/actor.hpp
 )
 
 #set source files
@@ -63,6 +69,9 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/vulkan_image_data.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/renderer_base.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/vulkan_drawable_component.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/camera.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/scene_component.cpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/actor.cpp
 )
 
 

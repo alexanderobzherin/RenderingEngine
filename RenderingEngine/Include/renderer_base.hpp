@@ -8,6 +8,7 @@
 namespace rendering_engine
 {
 class AppTime;
+class Camera;
 
 class RendererBase
 {
@@ -18,6 +19,8 @@ public:
 
     virtual void Run();
 
+    virtual float GetAspectRation();
+    std::shared_ptr<Camera> GetCamera();
 protected:
     virtual void Shutdown();
     virtual void InitializeWindow();
@@ -39,6 +42,7 @@ protected:
 
     GLFWwindow* mWindow;
     std::shared_ptr<AppTime> mAppTime;
+    std::shared_ptr<Camera> mCamera;
     std::vector<std::shared_ptr<DrawableComponent>> mDrawableObjects;
 };
 
