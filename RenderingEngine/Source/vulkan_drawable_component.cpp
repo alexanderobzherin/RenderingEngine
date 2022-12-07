@@ -14,8 +14,7 @@ namespace vulkan_renderer
 {
 VulkanDrawableComponent::VulkanDrawableComponent(VulkanRenderer* renderer)
     :
-    mRenderer(renderer),
-    mColorTexture{ std::make_shared<VulkanImageData>(renderer) }
+    mRenderer(renderer)
 {}
 
 VulkanDrawableComponent::~VulkanDrawableComponent()
@@ -26,8 +25,9 @@ void VulkanDrawableComponent::Initialize()
 {
     DrawableComponent::Initialize();
 
-    mColorTexture->Initialize();
-    LoadModel();
+    mVulkanColorTexture = std::make_shared<VulkanImageData>(mRenderer, mColorTextureImageData);
+    mVulkanColorTexture->Initialize();
+
     CreateVertexBuffer();
     CreateIndexBuffer();
     CreateUniformBuffers();
@@ -39,7 +39,7 @@ void VulkanDrawableComponent::Initialize()
 
 void VulkanDrawableComponent::Shutdown()
 {
-    mColorTexture->Shutdown();
+    mVulkanColorTexture->Shutdown();
 
     auto logicalDevice = mRenderer->GetLogicalDevice();
     for( size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++ )
@@ -89,29 +89,6 @@ void VulkanDrawableComponent::Draw()
     vkCmdBindIndexBuffer(commandBuffersRef[currentFrame], mIndexBuffer, 0, VK_INDEX_TYPE_UINT32);
     vkCmdBindDescriptorSets(commandBuffersRef[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, mRenderer->GetPipelineLayout(), 0, 1, &mDescriptorSets[currentFrame], 0, nullptr);
     vkCmdDrawIndexed(commandBuffersRef[currentFrame], static_cast<uint32_t>(mIndices.size()), 1, 0, 0, 0);
-}
-
-void VulkanDrawableComponent::LoadModel()
-{
-    std::string const modelFilepath{ "../Intermediate/Models/TestCube/test_cube.fbx" };
-
-    Model model(modelFilepath, true);
-    auto const vertices = model.Meshes().at(0)->Vertices();
-    auto const indices = model.Meshes().at(0)->Indices();
-    auto const texCoord = model.Meshes().at(0)->TextureCoordinates();
-
-    for( int i = 0; i < vertices.size(); ++i )
-    {
-        Vertex vertex{};
-
-        vertex.pos = vertices[i];
-        vertex.texCoord = glm::vec3{ texCoord[0].at(i).x, texCoord[0].at(i).y, texCoord[0].at(i).z };
-        vertex.color = { 1.0f, 1.0f, 1.0f };
-
-        mVertices.push_back(vertex);
-    }
-
-    mIndices = indices;
 }
 
 void VulkanDrawableComponent::CreateVertexBuffer()
@@ -218,8 +195,8 @@ void VulkanDrawableComponent::CreateDescriptorSet(VkDescriptorPool descriptorPoo
 
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = mColorTexture->GetVulkanTextureImageView();
-        imageInfo.sampler = mColorTexture->GetTextureSampler();
+        imageInfo.imageView = mVulkanColorTexture->GetVulkanTextureImageView();
+        imageInfo.sampler = mVulkanColorTexture->GetTextureSampler();
 
         std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
 

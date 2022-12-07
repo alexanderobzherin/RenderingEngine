@@ -29,7 +29,7 @@ class VulkanRenderer;
 class VulkanImageData
 {
 public:
-	VulkanImageData(VulkanRenderer* renderer);
+	VulkanImageData(VulkanRenderer* renderer, std::shared_ptr<ImageData> colorTextureImageData);
 	virtual ~VulkanImageData();
 
 	void Initialize();

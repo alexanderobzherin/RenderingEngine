@@ -14,7 +14,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include "drawable_component.hpp"
-#include "vertex_declarations.hpp"
+#include "vulkan_vertex_declarations.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -45,7 +45,6 @@ private:
 	VulkanDrawableComponent& operator=(const VulkanDrawableComponent& rhs);
 
 protected:
-	void LoadModel();
 	void CreateVertexBuffer();
 	void CreateIndexBuffer();
 	void CreateUniformBuffers();
@@ -54,9 +53,8 @@ protected:
 
 protected:
 	VulkanRenderer* mRenderer;
-	std::shared_ptr<VulkanImageData> mColorTexture;
-	std::vector<Vertex> mVertices;
-	std::vector<uint32_t> mIndices;
+	std::shared_ptr<VulkanImageData> mVulkanColorTexture;
+
 	VkBuffer mVertexBuffer;
 	VkDeviceMemory mVertexBufferMemory;
 	VkBuffer mIndexBuffer;

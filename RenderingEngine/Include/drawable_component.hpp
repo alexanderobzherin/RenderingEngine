@@ -18,10 +18,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "vertex_declarations.hpp"
+
 namespace rendering_engine
 {
 class Actor;
 class SceneComponent;
+class ImageData;
 // Class contains needed renderer specific instrumentation to interact with renderer itself.
 // For example, create renderer specific vertex buffer to make it usable for drawing.
 class DrawableComponent
@@ -37,14 +40,26 @@ public:
 	virtual void Shutdown() = 0;
 
 	std::shared_ptr<SceneComponent> GetSceneComponent();
+	void SetColorTexture(std::string path);
+	void SetModelMesh(std::string path);
 
 private:
 	DrawableComponent(const DrawableComponent& rhs);
 	DrawableComponent& operator=(const DrawableComponent& rhs);
 
 protected:
+	void LoadModel(std::string const modelFilepath);
+
+protected:
 	std::shared_ptr<SceneComponent> mSceneComponent;
 
+	std::shared_ptr<ImageData> mColorTextureImageData;
+
+	std::string mMeshPath;
+	std::string mColorTexturePath;
+
+	std::vector<Vertex> mVertices;
+	std::vector<uint32_t> mIndices;
 };
 
 } //rendering_engine

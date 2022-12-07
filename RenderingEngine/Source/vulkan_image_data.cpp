@@ -6,9 +6,10 @@ namespace rendering_engine
 namespace vulkan_renderer
 {
 
-VulkanImageData::VulkanImageData(VulkanRenderer* renderer)
+VulkanImageData::VulkanImageData(VulkanRenderer* renderer, std::shared_ptr<ImageData> colorTextureImageData)
     :
-    mRenderer(renderer)
+    mRenderer(renderer),
+    mImageData(colorTextureImageData)
 {
 }
 
@@ -63,12 +64,16 @@ VkSampler VulkanImageData::GetTextureSampler()
 
 void VulkanImageData::CreateTextureImage()
 {
-    ImageData imageData("../Intermediate/Models/TestCube/test_cube_color.png");
-    unsigned int const width = imageData.GetWidth();
-    unsigned int const height = imageData.GetHeight();
+    if( !mImageData )
+    {
+        throw std::runtime_error("ImageData is not initialized!");
+    }
+
+    unsigned int const width = mImageData->GetWidth();
+    unsigned int const height = mImageData->GetHeight();
 
     mMipmapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(width, height)))) + 1;
-    auto const pixelVector = imageData.GetImageDataRGBA();
+    auto const pixelVector = mImageData->GetImageDataRGBA();
 
     VkDeviceSize imageSize = width * height * 4;
 

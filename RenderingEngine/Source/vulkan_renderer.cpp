@@ -87,7 +87,7 @@ void VulkanRenderer::InitializeRenderer()
 
     CreateFramebuffers();
 
-    unsigned int const numberOfDrawableComponent = 2;
+    unsigned int const numberOfDrawableComponent = 3;
     CreateDescriptorPool(numberOfDrawableComponent);
     CreateCommandBuffers();
     CreateSyncObjects();
@@ -98,12 +98,20 @@ void VulkanRenderer::InitializeRenderer()
     CreateGraphicsPipeline(vertShaderCode, fragShaderCode);
 
     mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
+    mDrawableObjects.back()->SetColorTexture("../Intermediate/Models/Dice/D4/D4FontTextureSegoeScript.png");
+    mDrawableObjects.back()->SetModelMesh("../Intermediate/Models/Dice/D4/D4.fbx");
     mDrawableObjects.back()->Initialize();
-    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(2.0f, 0.0f, 0.0f));
+    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(4.0f, 0.0f, 0.0f));
 
     mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
     mDrawableObjects.back()->Initialize();
-    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(-2.0f, 0.0f, 0.0f));
+    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+    mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
+    mDrawableObjects.back()->SetColorTexture("../Intermediate/Models/Dice/D8/D8FontTextureSegoeScript.png");
+    mDrawableObjects.back()->SetModelMesh("../Intermediate/Models/Dice/D8/D8.fbx");
+    mDrawableObjects.back()->Initialize();
+    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(-4.0f, 0.0f, 0.0f));
 }
 
 void VulkanRenderer::Update(float const delta)
@@ -215,8 +223,8 @@ void VulkanRenderer::CreateGraphicsPipeline(std::vector<char>& const spvVertShad
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-    auto bindingDescription = Vertex::GetBindingDescription();
-    auto attributeDescriptions = Vertex::GetAttributeDescriptions();
+    auto bindingDescription = GetBindingDescription();
+    auto attributeDescriptions = GetAttributeDescriptions();
 
     vertexInputInfo.vertexBindingDescriptionCount = 1;
     vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());

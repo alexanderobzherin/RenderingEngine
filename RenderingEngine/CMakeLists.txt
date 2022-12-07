@@ -7,7 +7,6 @@ include_directories(${PATH_TO_SOURCE_SHADER_PATH}/)
 set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Shaders/basic_shader.frag
 	${PROJECT_SOURCE_DIR}/Shaders/basic_shader.vert
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/rendering_application.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/utility.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vertex_declarations.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/image_data.hpp
@@ -28,6 +27,7 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/camera.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/scene_component.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/actor.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_vertex_declarations.hpp
 )
 
 #set files used as engine API
@@ -35,7 +35,6 @@ set(API_HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/mesh.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/model.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/model_material.hpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/rendering_application.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/utility.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vertex_declarations.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/image_data.hpp
@@ -50,11 +49,11 @@ set(API_HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/camera.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/scene_component.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/actor.hpp
+	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_vertex_declarations.hpp
 )
 
 #set source files
 set(SRC_FILES
-    ${PROJECT_SOURCE_DIR}/RenderingEngine/Source/rendering_application.cpp
     ${PROJECT_SOURCE_DIR}/RenderingEngine/Source/utility.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/image_data.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/mesh.cpp
