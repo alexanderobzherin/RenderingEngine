@@ -43,6 +43,8 @@ public:
 	void SetColorTexture(std::string path);
 	void SetModelMesh(std::string path);
 
+	void SetMaterial( std::string materialName );
+
 private:
 	DrawableComponent(const DrawableComponent& rhs);
 	DrawableComponent& operator=(const DrawableComponent& rhs);
@@ -60,6 +62,8 @@ protected:
 
 	std::vector<Vertex> mVertices;
 	std::vector<uint32_t> mIndices;
+
+	std::string mMaterialName;
 };
 
 } //rendering_engine

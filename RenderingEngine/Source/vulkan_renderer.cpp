@@ -92,24 +92,24 @@ void VulkanRenderer::InitializeRenderer()
     CreateCommandBuffers();
     CreateSyncObjects();
 
-    auto vertShaderCode = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/basic_shader_vert.spv");
-    auto fragShaderCode = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/basic_shader_frag.spv");
-
-    CreateGraphicsPipeline(vertShaderCode, fragShaderCode);
+    CreateBuildInGraphicsPipelines();
 
     mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
     mDrawableObjects.back()->SetColorTexture("../Intermediate/Models/Dice/D4/D4FontTextureSegoeScript.png");
     mDrawableObjects.back()->SetModelMesh("../Intermediate/Models/Dice/D4/D4.fbx");
+    mDrawableObjects.back()->SetMaterial("FlatColorFiltering");
     mDrawableObjects.back()->Initialize();
     mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(4.0f, 0.0f, 0.0f));
 
     mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
     mDrawableObjects.back()->Initialize();
+    mDrawableObjects.back()->SetMaterial("BasicTexture3D");
     mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
     mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
     mDrawableObjects.back()->SetColorTexture("../Intermediate/Models/Dice/D8/D8FontTextureSegoeScript.png");
     mDrawableObjects.back()->SetModelMesh("../Intermediate/Models/Dice/D8/D8.fbx");
+    mDrawableObjects.back()->SetMaterial("FlatColorFiltering");
     mDrawableObjects.back()->Initialize();
     mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(-4.0f, 0.0f, 0.0f));
 }
@@ -200,8 +200,11 @@ float VulkanRenderer::GetAspectRation()
     return (float)(GetSwapChainExtent().width) / (float)(GetSwapChainExtent()).height;
 }
 
-void VulkanRenderer::CreateGraphicsPipeline(std::vector<char>& const spvVertShaderCode, std::vector<char>& const spvFragShaderCode)
+void VulkanRenderer::CreateGraphicsPipeline(std::string pipelineName, std::vector<char>& const spvVertShaderCode, std::vector<char>& const spvFragShaderCode)
 {
+    VkPipelineLayout pipelineLayout;
+    VkPipeline pipeline;
+
     VkShaderModule vertShaderModule = CreateShaderModule(spvVertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(spvFragShaderCode);
 
@@ -304,7 +307,7 @@ void VulkanRenderer::CreateGraphicsPipeline(std::vector<char>& const spvVertShad
     pipelineLayoutInfo.setLayoutCount = 1;
     pipelineLayoutInfo.pSetLayouts = &mDescriptorSetLayout;
 
-    if( vkCreatePipelineLayout(mLogicalDevice, &pipelineLayoutInfo, nullptr, &mPipelineLayout) != VK_SUCCESS )
+    if( vkCreatePipelineLayout(mLogicalDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS )
     {
         throw std::runtime_error("failed to create pipeline layout!");
     }
@@ -333,30 +336,33 @@ void VulkanRenderer::CreateGraphicsPipeline(std::vector<char>& const spvVertShad
     pipelineInfo.pDepthStencilState = &depthStencil;
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.pDynamicState = nullptr; // Optional
-    pipelineInfo.layout = mPipelineLayout;
+    pipelineInfo.layout = pipelineLayout;
     pipelineInfo.renderPass = mRenderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1; // Optional
 
-    if( vkCreateGraphicsPipelines(mLogicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &mGraphicsPipeline) != VK_SUCCESS )
+    if( vkCreateGraphicsPipelines(mLogicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS )
     {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
+    mGraphicsPipelines.emplace( pipelineName, std::pair<VkPipelineLayout, VkPipeline>( pipelineLayout, pipeline ) );
     //Destroy shader modules
     vkDestroyShaderModule(mLogicalDevice, fragShaderModule, nullptr);
     vkDestroyShaderModule(mLogicalDevice, vertShaderModule, nullptr);
 }
 
-VkPipelineLayout VulkanRenderer::GetPipelineLayout()
+std::pair<VkPipelineLayout, VkPipeline>& VulkanRenderer::GetGraphicsPipeline(std::string graphicsPipelineName)
 {
-    return mPipelineLayout;
-}
-
-VkPipeline VulkanRenderer::GetGraphicsPipeline()
-{
-    return mGraphicsPipeline;
+    if( mGraphicsPipelines.find(graphicsPipelineName) != mGraphicsPipelines.end() )
+    {
+        return mGraphicsPipelines.find(graphicsPipelineName)->second;
+    }
+    else
+    {
+        throw std::runtime_error("There is no graphics pipeline " + graphicsPipelineName);
+    }
 }
 
 void VulkanRenderer::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
@@ -1064,6 +1070,28 @@ void VulkanRenderer::CreateLogicalDevice()
     vkGetDeviceQueue(mLogicalDevice, indices.presentFamily.value(), 0, &mPresentQueue);
 }
 
+void VulkanRenderer::CreateBuildInGraphicsPipelines()
+{
+    auto basicText3DvertShader = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/BasicTexture3D/basic_texture_3d_vert.spv");
+    auto basicText3DfragShader = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/BasicTexture3D/basic_texture_3d_frag.spv");
+
+    CreateGraphicsPipeline("BasicTexture3D", basicText3DvertShader, basicText3DfragShader);
+
+    auto FlatColorFilteringvertShader = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/FlatColorFiltering/flat_color_filtering_vert.spv");
+    auto FlatColorFilteringfragShader = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/FlatColorFiltering/flat_color_filtering_frag.spv");
+
+    CreateGraphicsPipeline("FlatColorFiltering", basicText3DvertShader, basicText3DfragShader);
+}
+
+void VulkanRenderer::CleanGraphicsPipeline()
+{
+    for( auto& graphicsPipeline : mGraphicsPipelines )
+    {
+        vkDestroyPipeline(mLogicalDevice, graphicsPipeline.second.second, nullptr);
+        vkDestroyPipelineLayout(mLogicalDevice, graphicsPipeline.second.first, nullptr);
+    }
+}
+
 void VulkanRenderer::CreateSwapChain()
 {
     SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(mPhysicalDevice);
@@ -1139,11 +1167,8 @@ void VulkanRenderer::RecreateSwapChain()
     CreateSwapChain();
     CreateImageViews();
     CreateRenderPass();
-    
-    auto vertShaderCode = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/basic_shader_vert.spv");
-    auto fragShaderCode = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/basic_shader_frag.spv");
 
-    CreateGraphicsPipeline(vertShaderCode, fragShaderCode);
+    CreateBuildInGraphicsPipelines();
 
     CreateColorResources();
     CreateDepthResources();
@@ -1167,8 +1192,7 @@ void VulkanRenderer::CleanupSwapChain()
 
     vkFreeCommandBuffers(mLogicalDevice, mCommandPool, static_cast<uint32_t>(mCommandBuffers.size()), mCommandBuffers.data());
 
-    vkDestroyPipeline(mLogicalDevice, mGraphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(mLogicalDevice, mPipelineLayout, nullptr);
+    CleanGraphicsPipeline();
 
     vkDestroyRenderPass(mLogicalDevice, mRenderPass, nullptr);
     for( auto imageView : mSwapChainImageViews )

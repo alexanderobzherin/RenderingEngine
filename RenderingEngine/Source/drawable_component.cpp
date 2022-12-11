@@ -41,6 +41,10 @@ void DrawableComponent::SetModelMesh(std::string path)
 {
 	mMeshPath = path;
 }
+void DrawableComponent::SetMaterial(std::string materialName)
+{
+	mMaterialName = materialName;
+}
 void DrawableComponent::LoadModel(std::string const modelFilepath)
 {
 	Model model(modelFilepath, true);

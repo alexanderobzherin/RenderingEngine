@@ -80,14 +80,14 @@ void VulkanDrawableComponent::Draw()
     auto commandBuffersRef = mRenderer->GetComandBuffers();
     auto currentFrame = mRenderer->GetCurrentFrame();
 
-    vkCmdBindPipeline(commandBuffersRef[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, mRenderer->GetGraphicsPipeline());
+    vkCmdBindPipeline(commandBuffersRef[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, mRenderer->GetGraphicsPipeline( mMaterialName ).second);
 
     VkBuffer vertexBuffers[] = { mVertexBuffer };
     VkDeviceSize offsets[] = { 0 };
 
     vkCmdBindVertexBuffers(commandBuffersRef[currentFrame], 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffersRef[currentFrame], mIndexBuffer, 0, VK_INDEX_TYPE_UINT32);
-    vkCmdBindDescriptorSets(commandBuffersRef[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, mRenderer->GetPipelineLayout(), 0, 1, &mDescriptorSets[currentFrame], 0, nullptr);
+    vkCmdBindDescriptorSets(commandBuffersRef[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, mRenderer->GetGraphicsPipeline(mMaterialName).first, 0, 1, &mDescriptorSets[currentFrame], 0, nullptr);
     vkCmdDrawIndexed(commandBuffersRef[currentFrame], static_cast<uint32_t>(mIndices.size()), 1, 0, 0, 0);
 }
 

@@ -5,8 +5,10 @@ include_directories(${PROJECT_SOURCE_DIR}/RenderingEngine/Include/)
 include_directories(${PATH_TO_SOURCE_SHADER_PATH}/)
 
 set(HEADER_FILES
-	${PROJECT_SOURCE_DIR}/Shaders/basic_shader.frag
-	${PROJECT_SOURCE_DIR}/Shaders/basic_shader.vert
+	${PROJECT_SOURCE_DIR}/Shaders/BasicTexture3D/basic_texture_3d.vert
+	${PROJECT_SOURCE_DIR}/Shaders/BasicTexture3D/basic_texture_3d.frag
+	${PROJECT_SOURCE_DIR}/Shaders/FlatColorFiltering/flat_color_filtering.vert
+	${PROJECT_SOURCE_DIR}/Shaders/FlatColorFiltering/flat_color_filtering.frag	
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/utility.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vertex_declarations.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/image_data.hpp
@@ -117,16 +119,24 @@ ${CMAKE_CURRENT_SOURCE_DIR}/Shaders
 )
 
 #Set path to shaders
-set(shader_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.vert")
-set(shader_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_vert.spv")
-set(shader_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.frag")
-set(shader_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_frag.spv")
+set(basic_texture_3d_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/BasicTexture3D/basic_texture_3d.vert")
+set(basic_texture_3d_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/BasicTexture3D/basic_texture_3d_vert.spv")
+set(basic_texture_3d_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/BasicTexture3D/basic_texture_3d.frag")
+set(basic_texture_3d_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/BasicTexture3D/basic_texture_3d_frag.spv")
+
+set(flat_color_filtering_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/FlatColorFiltering/flat_color_filtering.vert")
+set(flat_color_filtering_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/FlatColorFiltering/flat_color_filtering_vert.spv")
+set(flat_color_filtering_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/FlatColorFiltering/flat_color_filtering.frag")
+set(flat_color_filtering_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/FlatColorFiltering/flat_color_filtering_frag.spv")
 
 if(WIN32)
 add_custom_command(
 	TARGET RenderingEngine 
 	PRE_BUILD
-	COMMAND cmd /c ${SHADER_COMPILER} ${shader_vert_source} -o ${shader_vert_spv}
-	COMMAND cmd /c ${SHADER_COMPILER} ${shader_frag_source} -o ${shader_frag_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_vert_source} -o ${basic_texture_3d_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_frag_source} -o ${basic_texture_3d_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${flat_color_filtering_vert_source} -o ${flat_color_filtering_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${flat_color_filtering_frag_source} -o ${flat_color_filtering_frag_spv}
 )
 endif()

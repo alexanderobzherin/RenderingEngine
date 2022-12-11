@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdint>
 #include <vector>
+#include <unordered_map>
 #include <optional>
 #include <fstream>
 
@@ -65,10 +66,9 @@ public:
 
     float GetAspectRation() override;
 
-    void CreateGraphicsPipeline(std::vector<char>& const spvVertShaderCode, std::vector<char>& const spvFragShaderCode);
+    void CreateGraphicsPipeline(std::string pipelineName, std::vector<char>& const spvVertShaderCode, std::vector<char>& const spvFragShaderCode);
 
-    VkPipelineLayout GetPipelineLayout();
-    VkPipeline GetGraphicsPipeline();
+    std::pair<VkPipelineLayout, VkPipeline>& GetGraphicsPipeline( std::string graphicsPipelineName );
 
     void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
@@ -115,6 +115,9 @@ protected:
     VkSampleCountFlagBits CheckMaxUsableSampleCount();
 
     void CreateLogicalDevice();
+
+    void CreateBuildInGraphicsPipelines();
+    void CleanGraphicsPipeline();
 
     void CreateSwapChain();
     void RecreateSwapChain();
@@ -189,8 +192,7 @@ protected:
 
     VkDescriptorSetLayout mDescriptorSetLayout;
 
-    VkPipelineLayout mPipelineLayout; //Object specific
-    VkPipeline mGraphicsPipeline; //Object specific
+    std::unordered_map<std::string, std::pair<VkPipelineLayout, VkPipeline>> mGraphicsPipelines;
 
     VkCommandPool mCommandPool;
     std::vector<VkCommandBuffer> mCommandBuffers;
