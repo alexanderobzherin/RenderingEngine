@@ -68,6 +68,17 @@ void VulkanDrawableComponent::Update(float delta)
     mUbo.view = mRenderer->GetCamera()->ViewMatrix();
     mUbo.proj = mRenderer->GetCamera()->ProjectionMatrix();
     mUbo.proj[1][1] *= -1;
+
+    float red = glm::sin( ((mRenderer->GetAppTime()->TotalAppTimeMilliseconds()) + delta) + glm::pi<float>()/4) 
+        - glm::sin((mRenderer->GetAppTime()->TotalAppTimeMilliseconds()) + glm::pi<float>()/4) * 0.5f;
+
+    float green = glm::sin(((mRenderer->GetAppTime()->TotalAppTimeMilliseconds()) + delta) + 3 * glm::pi<float>() / 4)
+        - glm::sin((mRenderer->GetAppTime()->TotalAppTimeMilliseconds()) + 3 * glm::pi<float>() / 4) * 0.5f;
+
+    float blue = glm::sin(((mRenderer->GetAppTime()->TotalAppTimeMilliseconds()) + delta) + 3 * glm::pi<float>() / 2)
+        - glm::sin((mRenderer->GetAppTime()->TotalAppTimeMilliseconds()) + 3 * glm::pi<float>() / 2) * 0.5f;
+
+    mUbo.filteredColor = glm::vec3(red, green, blue);
 }
 
 void VulkanDrawableComponent::Draw()

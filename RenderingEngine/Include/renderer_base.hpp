@@ -21,6 +21,8 @@ public:
 
     virtual float GetAspectRation();
     std::shared_ptr<Camera> GetCamera();
+    std::shared_ptr<AppTime> GetAppTime();
+
 protected:
     virtual void Shutdown();
     virtual void InitializeWindow();

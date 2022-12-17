@@ -1077,10 +1077,10 @@ void VulkanRenderer::CreateBuildInGraphicsPipelines()
 
     CreateGraphicsPipeline("BasicTexture3D", basicText3DvertShader, basicText3DfragShader);
 
-    auto FlatColorFilteringvertShader = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/FlatColorFiltering/flat_color_filtering_vert.spv");
-    auto FlatColorFilteringfragShader = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/FlatColorFiltering/flat_color_filtering_frag.spv");
+    auto flatColorFilteringvertShader = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/FlatColorFiltering/flat_color_filtering_vert.spv");
+    auto flatColorFilteringfragShader = Utility::ReadShaderBinaryFile("../Intermediate/Shaders/FlatColorFiltering/flat_color_filtering_frag.spv");
 
-    CreateGraphicsPipeline("FlatColorFiltering", basicText3DvertShader, basicText3DfragShader);
+    CreateGraphicsPipeline("FlatColorFiltering", flatColorFilteringvertShader, flatColorFilteringfragShader);
 }
 
 void VulkanRenderer::CleanGraphicsPipeline()

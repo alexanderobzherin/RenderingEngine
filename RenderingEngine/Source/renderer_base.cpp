@@ -118,6 +118,11 @@ std::shared_ptr<Camera> RendererBase::GetCamera()
     return mCamera;
 }
 
+std::shared_ptr<AppTime> RendererBase::GetAppTime()
+{
+    return mAppTime;
+}
+
 void RendererBase::FramebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
     auto app = reinterpret_cast<RendererBase*>(glfwGetWindowUserPointer(window));

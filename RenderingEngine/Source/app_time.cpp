@@ -25,6 +25,11 @@ const std::chrono::milliseconds& AppTime::TotalAppTime() const
 	return mTotalAppTime;
 }
 
+const float AppTime::TotalAppTimeMilliseconds() const
+{
+	return std::chrono::duration_cast<std::chrono::duration<float>>(TotalAppTime()).count();
+}
+
 void AppTime::SetTotalAppTime(const std::chrono::milliseconds& totalAppTime)
 {
 	mTotalAppTime = totalAppTime;

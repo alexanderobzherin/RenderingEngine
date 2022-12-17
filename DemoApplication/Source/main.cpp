@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	std::cout << "Vulkan App is running..." << std::endl;
     Utility::InitializePaths(argc, argv);
 
-    std::unique_ptr<VulkanRenderer> app = std::make_unique<VulkanRenderer>("Vulkan Application");
+    std::unique_ptr<VulkanRenderer> app = std::make_unique<VulkanRenderer>(800, 600, "Vulkan Application");
     try
     {
         app->Run();

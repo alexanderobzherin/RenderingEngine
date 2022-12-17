@@ -14,6 +14,7 @@ public:
 	void SetCurrentTime(const std::chrono::high_resolution_clock::time_point& currentTime);
 
 	const std::chrono::milliseconds& TotalAppTime() const;
+	const float TotalAppTimeMilliseconds() const;
 	void SetTotalAppTime(const std::chrono::milliseconds& totalAppTime);
 
 	const float ElapsedAppTimeMilliseconds() const;
