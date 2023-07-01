@@ -1,4 +1,4 @@
-List of required dependencies
+# List of required dependencies
 
 VulkanSDK
 GLFW
@@ -8,6 +8,7 @@ gtest
 libjpeg
 libpng
 assimp
+freetype
 
 **********Windows installing.**********
 It might be possible to use vcpkg package manager
@@ -58,3 +59,23 @@ Install needed dependencies. See "List of required dependencies"
 Run script build_linux.sh
 cd Build
 ./VulkanProject
+
+# To run docker without sudo
+sudo groupadd docker
+sudo usermod -aG docker $USER
+
+# Build container based on Dockerfile image
+docker build -t re_env_cnr .
+
+# Run container
+docker run --name test_env_cnr -v /home/alexander/Development/rendering-engine:/rendering-engine -it re_env_cnr
+
+# If container already has been run before
+docker start -i re_env_cnr 
+
+# Stop container
+docker stop re_env_cnr
+
+# Remove unnecessary image and containers
+docker image prune -a
+docker container prune
