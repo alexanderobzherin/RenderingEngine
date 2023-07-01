@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+#include <memory>
 #include <iostream>
 #include <cstdint>
 #include <fstream>
@@ -35,7 +37,7 @@ public:
 	void Initialize();
 	void Shutdown();
 
-	std::shared_ptr<ImageData> GetImageData();
+	std::shared_ptr<rendering_engine::ImageData> GetImageData();
 	VkImage GetVulkanTextureImage();
 	VkImageView GetVulkanTextureImageView();
 	VkDeviceMemory GetVulkanTextureImageMemory();

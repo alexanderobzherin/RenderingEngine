@@ -200,7 +200,7 @@ float VulkanRenderer::GetAspectRation()
     return (float)(GetSwapChainExtent().width) / (float)(GetSwapChainExtent()).height;
 }
 
-void VulkanRenderer::CreateGraphicsPipeline(std::string pipelineName, std::vector<char>& const spvVertShaderCode, std::vector<char>& const spvFragShaderCode)
+void VulkanRenderer::CreateGraphicsPipeline(std::string pipelineName, std::vector<char>& spvVertShaderCode, std::vector<char>& spvFragShaderCode)
 {
     VkPipelineLayout pipelineLayout;
     VkPipeline pipeline;

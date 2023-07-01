@@ -32,7 +32,7 @@ void VulkanImageData::Shutdown()
     vkFreeMemory(mRenderer->GetLogicalDevice(), mTextureImageMemory, nullptr);
 }
 
-std::shared_ptr<ImageData> VulkanImageData::GetImageData()
+std::shared_ptr<rendering_engine::ImageData> VulkanImageData::GetImageData()
 {
     return  mImageData;
 }

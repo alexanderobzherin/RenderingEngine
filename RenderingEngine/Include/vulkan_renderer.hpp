@@ -66,7 +66,7 @@ public:
 
     float GetAspectRation() override;
 
-    void CreateGraphicsPipeline(std::string pipelineName, std::vector<char>& const spvVertShaderCode, std::vector<char>& const spvFragShaderCode);
+    void CreateGraphicsPipeline(std::string pipelineName, std::vector<char>& spvVertShaderCode, std::vector<char>& spvFragShaderCode);
 
     std::pair<VkPipelineLayout, VkPipeline>& GetGraphicsPipeline( std::string graphicsPipelineName );
 
