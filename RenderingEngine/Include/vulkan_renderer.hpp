@@ -61,8 +61,9 @@ public:
     void Shutdown() override;
     void InitializeRenderer() override;
 
+    void Initialize() override;
     void Update(float const delta) override;
-    void Draw() override;
+    void Draw() final;
 
     float GetAspectRation() override;
 
@@ -89,7 +90,7 @@ public:
     VkDescriptorPool& GetDescriptorPool();
     VkDescriptorSetLayout& GetDescriptorSetLayout();
 
-protected:
+private:
     void CreateInstance();
     bool CheckValidationLayerSupport();
 
@@ -153,14 +154,15 @@ protected:
     void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
     bool HasStencilComponent(VkFormat format);
 
-    void CreateDescriptorPool(unsigned int const numberOfDrawableComponents);
+    void CreateDescriptorPool();
     void CreateCommandBuffers();
 
     void CreateSyncObjects();
 
     void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);   
 
-protected:
+
+private:
     VkInstance mInstance;
 
     VkSurfaceKHR mSurface;
@@ -213,6 +215,8 @@ protected:
     std::vector<VkFence> mImagesInFlight;
 
     size_t mCurrentFrame = 0;
+
+    int mNumOfDrawObjLastFrame = 0;
 
 };
 

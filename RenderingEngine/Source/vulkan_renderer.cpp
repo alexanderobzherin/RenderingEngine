@@ -87,31 +87,16 @@ void VulkanRenderer::InitializeRenderer()
 
     CreateFramebuffers();
 
-    unsigned int const numberOfDrawableComponent = 3;
-    CreateDescriptorPool(numberOfDrawableComponent);
+    CreateDescriptorPool();
     CreateCommandBuffers();
     CreateSyncObjects();
 
     CreateBuildInGraphicsPipelines();
+}
 
-    mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
-    mDrawableObjects.back()->SetColorTexture("../Intermediate/Models/Dice/D4/D4FontTextureSegoeScript.png");
-    mDrawableObjects.back()->SetModelMesh("../Intermediate/Models/Dice/D4/D4.fbx");
-    mDrawableObjects.back()->SetMaterial("FlatColorFiltering");
-    mDrawableObjects.back()->Initialize();
-    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(4.0f, 0.0f, 0.0f));
-
-    mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
-    mDrawableObjects.back()->Initialize();
-    mDrawableObjects.back()->SetMaterial("BasicTexture3D");
-    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-
-    mDrawableObjects.push_back(std::make_shared<VulkanDrawableComponent>(this));
-    mDrawableObjects.back()->SetColorTexture("../Intermediate/Models/Dice/D8/D8FontTextureSegoeScript.png");
-    mDrawableObjects.back()->SetModelMesh("../Intermediate/Models/Dice/D8/D8.fbx");
-    mDrawableObjects.back()->SetMaterial("FlatColorFiltering");
-    mDrawableObjects.back()->Initialize();
-    mDrawableObjects.back()->GetSceneComponent()->SetPosition(glm::vec3(-4.0f, 0.0f, 0.0f));
+void VulkanRenderer::Initialize()
+{
+    RendererBase::Initialize();
 }
 
 void VulkanRenderer::Update(float const delta)
@@ -121,6 +106,12 @@ void VulkanRenderer::Update(float const delta)
 
 void VulkanRenderer::Draw()
 {
+    if (mNumOfDrawObjLastFrame != mDrawableObjects.size())
+    {
+        //Reallocate Vulkan resources
+
+    }
+
     vkWaitForFences(mLogicalDevice, 1, &mInFlightFences[mCurrentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
@@ -193,6 +184,8 @@ void VulkanRenderer::Draw()
     }
 
     mCurrentFrame = (mCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+
+    mNumOfDrawObjLastFrame = mDrawableObjects.size();
 }
 
 float VulkanRenderer::GetAspectRation()
@@ -476,8 +469,9 @@ bool VulkanRenderer::HasStencilComponent(VkFormat format)
     return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-void VulkanRenderer::CreateDescriptorPool(unsigned int const numberOfDrawableComponents)
+void VulkanRenderer::CreateDescriptorPool()
 {
+    unsigned int const numberOfDrawableComponents = 4; // mDrawableObjects.size();
     std::vector<VkDescriptorPoolSize> poolSizes;
     
     for( unsigned int i = 0; i < numberOfDrawableComponents; ++i )
@@ -1090,6 +1084,7 @@ void VulkanRenderer::CleanGraphicsPipeline()
         vkDestroyPipeline(mLogicalDevice, graphicsPipeline.second.second, nullptr);
         vkDestroyPipelineLayout(mLogicalDevice, graphicsPipeline.second.first, nullptr);
     }
+    mGraphicsPipelines.clear();
 }
 
 void VulkanRenderer::CreateSwapChain()
@@ -1164,16 +1159,31 @@ void VulkanRenderer::RecreateSwapChain()
     vkDeviceWaitIdle(mLogicalDevice);
 
     CleanupSwapChain();
+    for (auto object : mDrawableObjects)
+    {
+        if (object)
+        {
+            object->Shutdown();
+        }
+    }
+    vkDestroyDescriptorPool(mLogicalDevice, mDescriptorPool, nullptr);
+
     CreateSwapChain();
     CreateImageViews();
     CreateRenderPass();
 
+    CreateDescriptorPool();
     CreateBuildInGraphicsPipelines();
 
     CreateColorResources();
     CreateDepthResources();
     CreateFramebuffers();
     CreateCommandBuffers();
+
+    for (auto& object : mDrawableObjects)
+    {
+        object->Initialize();
+    }
 }
 
 void VulkanRenderer::CleanupSwapChain()

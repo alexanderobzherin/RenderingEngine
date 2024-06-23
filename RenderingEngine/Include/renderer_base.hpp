@@ -23,6 +23,8 @@ public:
     std::shared_ptr<Camera> GetCamera();
     std::shared_ptr<AppTime> GetAppTime();
 
+    std::vector<std::shared_ptr<DrawableComponent>>& GetDrawableObjects();
+
 protected:
     virtual void Shutdown();
     virtual void InitializeWindow();
@@ -30,7 +32,7 @@ protected:
 
     virtual void Initialize();
     virtual void Update(float const delta);
-    virtual void Draw();
+    virtual void Draw() = 0;
 
     static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
 

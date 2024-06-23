@@ -5,13 +5,16 @@ project(DemoApplication)
 
 #set header files
 set(HEADER_FILES
+	${PROJECT_SOURCE_DIR}/Include/demo_application.hpp
 )
 
 #set source files
 set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/Source/main.cpp
+	${PROJECT_SOURCE_DIR}/Source/demo_application.cpp
 )
 
+include_directories(${PROJECT_SOURCE_DIR}/Include/)
 include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/Include/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Shaders/)
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)

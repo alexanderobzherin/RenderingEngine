@@ -34,6 +34,10 @@ void RendererBase::Run()
     InitializeRenderer();
     Initialize();
 
+    for (auto& object : mDrawableObjects)
+    {
+        object->Initialize();
+    }
     AppClock appClock;
     appClock.Reset();
 
@@ -102,17 +106,6 @@ void RendererBase::Update(float const delta)
     }
 }
 
-void RendererBase::Draw()
-{
-    for( auto object : mDrawableObjects )
-    {
-        if( object )
-        {
-            object->Draw();
-        }
-    }
-}
-
 std::shared_ptr<Camera> RendererBase::GetCamera()
 {
     return mCamera;
@@ -121,6 +114,11 @@ std::shared_ptr<Camera> RendererBase::GetCamera()
 std::shared_ptr<AppTime> RendererBase::GetAppTime()
 {
     return mAppTime;
+}
+
+std::vector<std::shared_ptr<DrawableComponent>>& RendererBase::GetDrawableObjects()
+{
+    return mDrawableObjects;
 }
 
 void RendererBase::FramebufferResizeCallback(GLFWwindow* window, int width, int height)

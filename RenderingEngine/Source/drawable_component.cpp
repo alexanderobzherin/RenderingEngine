@@ -12,7 +12,8 @@ namespace rendering_engine
 DrawableComponent::DrawableComponent()
 	:
 	mMeshPath("../Intermediate/Models/TestCube/test_cube.fbx"),
-	mColorTexturePath("../Intermediate/Models/TestCube/test_cube_color.png")
+	mColorTexturePath("../Intermediate/Models/TestCube/test_cube_color.png"),
+	mSceneComponent(std::make_shared<SceneComponent>())
 {
 }
 DrawableComponent::~DrawableComponent()
@@ -20,7 +21,6 @@ DrawableComponent::~DrawableComponent()
 }
 void DrawableComponent::Initialize()
 {
-	mSceneComponent = std::make_shared<SceneComponent>();
 	mSceneComponent->Initialize();
 	mColorTextureImageData = std::make_shared<ImageData>(mColorTexturePath);
 	LoadModel(mMeshPath);
