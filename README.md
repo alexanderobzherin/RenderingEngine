@@ -102,11 +102,35 @@ cd Build/DemoApplication
 ./DemoApplication
 ```
 
-**********Linux installing.**********
-Install needed dependencies. See "List of required dependencies"
-Run script build_linux.sh
-cd Build
-./VulkanProject
+### FreeBSD
+
+1. Install dependencies:
+
+```bash
+sudo pkg install pkgconf glfw glm boost-libs libjpeg-turbo png googletest assimp freetype2 vulkan-loader vulkan-headers shaderc
+```
+Some of these packages may be built from ports, but this does not affect the build process or functionality, so you may use either pkg or make install clean under /usr/ports/...
+
+2. Build the project:
+From the root directory, run:
+```./build_unix.sh```
+
+3. Run demo application:
+```bash
+cd Build/DemoApplication
+./DemoApplication
+```
+
+## Portability notes
+This engine builds and runs successfully on:
+- Windows 10
+- Ubuntu 24.04
+- FreeBSD 14.2
+
+Note on FreeBSD:
+Vulkan validation layers are currently disabled on FreeBSD due to the inability to install them via pkg or build them from ports. Until this is resolved upstream (in the FreeBSD Ports collection), validation layers will remain disabled in the FreeBSD build of the rendering engine.
+
+
 
 # To run docker without sudo
 sudo groupadd docker
