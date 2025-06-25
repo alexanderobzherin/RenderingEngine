@@ -9,10 +9,11 @@ namespace rendering_engine
 {
 namespace vulkan_renderer
 {
-#ifdef NDEBUG
-    const bool enableValidationLayers = false;
+    
+#if defined(__FreeBSD__) || defined(NDEBUG)
+const bool enableValidationLayers = false;
 #else
-    const bool enableValidationLayers = true;
+const bool enableValidationLayers = true;
 #endif
 
 VulkanRenderer::VulkanRenderer(char const* title)

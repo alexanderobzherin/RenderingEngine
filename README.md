@@ -65,11 +65,72 @@ From the root directory, run:
 This will generate a Build directory containing the Visual Studio solution and project files, compile shaders, and build the engine.
 
 
-**********Linux installing.**********
-Install needed dependencies. See "List of required dependencies"
-Run script build_linux.sh
-cd Build
-./VulkanProject
+## Unix-like Setup
+
+### Ubuntu
+
+1. Install dependencies:
+
+```bash
+sudo apt update
+sudo apt install cmake build-essential libglfw3-dev libglm-dev libboost-filesystem-dev libgtest-dev libjpeg-dev libpng-dev libassimp-dev libfreetype6-dev pkg-config
+```
+
+2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
+Note: As of May 2025, LunarG has discontinued updating Vulkan SDK packages in the official Ubuntu repositories.
+The following approaches are now officially recommended:
+
+Option 1: Install from tarball (universal, for any Linux/Unix-like system)
+See instructions here:
+https://vulkan.lunarg.com/doc/sdk/1.4.313.0/linux/getting_started.html
+
+Option 2: Install via LunarG APT repository (recommended for Ubuntu)
+```bash
+wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
+sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-noble.list http://packages.lunarg.com/vulkan/lunarg-vulkan-noble.list
+sudo apt update
+sudo apt install vulkan-sdk
+```
+
+3. Build the project:
+From the root directory, run:
+```./build_unix.sh```
+
+4. Run demo application:
+```bash
+cd Build/DemoApplication
+./DemoApplication
+```
+
+### FreeBSD
+
+1. Install dependencies:
+
+```bash
+sudo pkg install pkgconf glfw glm boost-libs libjpeg-turbo png googletest assimp freetype2 vulkan-loader vulkan-headers shaderc
+```
+Some of these packages may be built from ports, but this does not affect the build process or functionality, so you may use either pkg or make install clean under /usr/ports/...
+
+2. Build the project:
+From the root directory, run:
+```./build_unix.sh```
+
+3. Run demo application:
+```bash
+cd Build/DemoApplication
+./DemoApplication
+```
+
+## Portability notes
+This engine builds and runs successfully on:
+- Windows 10
+- Ubuntu 24.04
+- FreeBSD 14.2
+
+Note on FreeBSD:
+Vulkan validation layers are currently disabled on FreeBSD due to the inability to install them via pkg or build them from ports. Until this is resolved upstream (in the FreeBSD Ports collection), validation layers will remain disabled in the FreeBSD build of the rendering engine.
+
+
 
 # To run docker without sudo
 sudo groupadd docker
