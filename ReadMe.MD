@@ -65,6 +65,43 @@ From the root directory, run:
 This will generate a Build directory containing the Visual Studio solution and project files, compile shaders, and build the engine.
 
 
+## Unix-like Setup
+
+### Ubuntu
+
+1. Install dependencies:
+
+```bash
+sudo apt update
+sudo apt install cmake build-essential libglfw3-dev libglm-dev libboost-filesystem-dev libgtest-dev libjpeg-dev libpng-dev libassimp-dev libfreetype6-dev pkg-config
+```
+
+2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
+Note: As of May 2025, LunarG has discontinued updating Vulkan SDK packages in the official Ubuntu repositories.
+The following approaches are now officially recommended:
+
+Option 1: Install from tarball (universal, for any Linux/Unix-like system)
+See instructions here:
+https://vulkan.lunarg.com/doc/sdk/1.4.313.0/linux/getting_started.html
+
+Option 2: Install via LunarG APT repository (recommended for Ubuntu)
+```bash
+wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
+sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-noble.list http://packages.lunarg.com/vulkan/lunarg-vulkan-noble.list
+sudo apt update
+sudo apt install vulkan-sdk
+```
+
+3. Build the project:
+From the root directory, run:
+```./build_unix.sh```
+
+4. Run demo application:
+```bash
+cd Build/DemoApplication
+./DemoApplication
+```
+
 **********Linux installing.**********
 Install needed dependencies. See "List of required dependencies"
 Run script build_linux.sh
