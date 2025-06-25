@@ -131,23 +131,36 @@ Note on FreeBSD:
 Vulkan validation layers are currently disabled on FreeBSD due to the inability to install them via pkg or build them from ports. Until this is resolved upstream (in the FreeBSD Ports collection), validation layers will remain disabled in the FreeBSD build of the rendering engine.
 
 
+## Docker (Optional)
 
-# To run docker without sudo
+1. To run docker without sudo
+```bash
 sudo groupadd docker
 sudo usermod -aG docker $USER
+```
 
-# Build container based on Dockerfile image
+2. Build container based on Dockerfile image
+```bash
 docker build -t re_env_cnr .
+```
 
-# Run container
+3. Run container
+```bash
 docker run --name test_env_cnr -v /home/alexander/Development/rendering-engine:/rendering-engine -it re_env_cnr
+```
 
-# If container already has been run before
-docker start -i re_env_cnr 
+4. If container already has been run before
+```bash
+docker start -i re_env_cnr
+```
 
-# Stop container
+5. Stop container
+```bash
 docker stop re_env_cnr
+```
 
-# Remove unnecessary image and containers
+6. Remove unnecessary image and containers
+```bash
 docker image prune -a
 docker container prune
+```
