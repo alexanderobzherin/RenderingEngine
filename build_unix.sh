@@ -29,10 +29,14 @@ CompileShaders()
     cd Intermediate
     mkdir Shaders
     cd Shaders
+    mkdir BasicTexture3D
+    mkdir FlatColorFiltering
     PATH_SHADERS_BIN=$(pwd)
 
-    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.vert -o $PATH_SHADERS_BIN/basic_shader_vert.spv
-    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/basic_shader.frag -o $PATH_SHADERS_BIN/basic_shader_frag.spv
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/BasicTexture3D/basic_texture_3d.vert -o $PATH_SHADERS_BIN/BasicTexture3D/basic_texture_3d_vert.spv
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/BasicTexture3D/basic_texture_3d.frag -o $PATH_SHADERS_BIN/BasicTexture3D/basic_texture_3d_frag.spv
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/FlatColorFiltering/flat_color_filtering.vert -o $PATH_SHADERS_BIN/FlatColorFiltering/flat_color_filtering_vert.spv
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/FlatColorFiltering/flat_color_filtering.frag -o $PATH_SHADERS_BIN/FlatColorFiltering/flat_color_filtering_frag.spv
 }
 
 echo "Finding shader compiler..."

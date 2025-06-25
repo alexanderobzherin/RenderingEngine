@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <map>
 #include <memory>
+#include <fstream>
 #include <sstream>
 #include <boost/filesystem.hpp>
 #include "image_data.hpp"

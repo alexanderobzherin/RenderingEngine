@@ -1,4 +1,4 @@
-#include "..\Include\demo_application.hpp"
+#include "../Include/demo_application.hpp"
 
 #include "app_clock.hpp"
 #include "app_time.hpp"
