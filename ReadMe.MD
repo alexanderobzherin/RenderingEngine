@@ -1,58 +1,69 @@
-# List of required dependencies
+<p align="center">
+    <img src="./Doc/Images/RE_Banner.png" alt="Rendering Engine">
+</p>
 
-VulkanSDK
-GLFW
-GLM
-Boost::filesystem
-gtest
-libjpeg
-libpng
-assimp
-freetype
+# Rendering Engine
 
-**********Windows installing.**********
-It might be possible to use vcpkg package manager
+A cross-platform rendering engine designed to be portable and backend-agnostic.  
+Currently supports Windows and Unix-like systems (Linux, FreeBSD).
 
+### Features (Work in Progress)
+
+- Support for 3D model loading and rendering (e.g., OBJ, FBX)
+- Texture loading and binding (PNG, JPEG support)
+- Customizable material and shader system (each model can use a unique shader)
+- Text rendering (under development)
+- Sprite rendering support (in progress)
+- Unit tests and demo application included
+
+## Dependencies
+
+The following libraries are required:
+
+- [Vulkan SDK](https://vulkan.lunarg.com/)
+- [GLFW](https://www.glfw.org/)
+- [GLM](https://github.com/g-truc/glm)
+- [Boost::Filesystem](https://www.boost.org/)
+- [GTest](https://github.com/google/googletest)
+- [libjpeg-turbo](https://libjpeg-turbo.org/)
+- [libpng](http://www.libpng.org/)
+- [Assimp](https://github.com/assimp/assimp)
+- [FreeType](https://freetype.org/)
+
+---
+
+## Windows Setup
+
+1. Install [vcpkg](https://github.com/microsoft/vcpkg):
+
+```bash
 git clone https://github.com/Microsoft/vcpkg.git
 cd vcpkg
 .\bootstrap-vcpkg.bat
 .\vcpkg.exe integrate install
+```
 
-Now it is needed to define DCMAKE_TOOLCHAIN_FILE with path to vcpkg and use in build_windows.bat script like this:
-cmake .. -DCMAKE_TOOLCHAIN_FILE=D:/vcpkg/scripts/buildsystems/vcpkg.cmake
+2. Install required libraries:
+```bash
+.\vcpkg.exe install glfw3 glm boost-filesystem gtest libjpeg-turbo libpng assimp freetype
+.\vcpkg.exe install glfw3:x64-windows glm:x64-windows boost-filesystem:x64-windows gtest:x64-windows libjpeg-turbo:x64-windows libpng:x64-windows assimp:x64-windows freetype:x64-windows
+```
 
-.\vcpkg.exe install vulkan-headers
-.\vcpkg.exe install vulkan-headers:x64-windows
+3. Set the VCPKG_ROOT environment variable to the folder where you cloned vcpkg:
+Variable name: ```VCPKG_ROOT```
+Variable value: ```Path\To\vcpkg```
 
-.\vcpkg.exe install ms-gsl gl3w glfw3 glm
-.\vcpkg.exe install ms-gsl:x64-windows gl3w:x64-windows glfw3:x64-windows glm:x64-windows
+4. Download and install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
 
-.\vcpkg.exe install boost-filesystem
-.\vcpkg.exe install boost-filesystem:x64-windows
+5. Set the glslc environment variable to point to the glslc.exe binary included in the SDK:
+Variable name: ```glslc```
+Variable value: ```Path\To\glslc.exe```
 
-.\vcpkg.exe install gtest
-.\vcpkg.exe install gtest:x64-windows
+6. Build the project:
+From the root directory, run:
+```.\build_windows.bat```
+This will generate a Build directory containing the Visual Studio solution and project files, compile shaders, and build the engine.
 
-.\vcpkg.exe install libjpeg-turbo
-.\vcpkg.exe install libjpeg-turbo:x64-windows
-
-.\vcpkg.exe install libpng
-.\vcpkg.exe install libpng:x64-windows
-
-.\vcpkg.exe install assimp
-.\vcpkg.exe install assimp:x64-windows
-
-.\vcpkg.exe install freetype
-.\vcpkg.exe install freetype:x64-windows
-
-Set environment variable glslc.
-Example:
-Variable name: glslc
-Variable value:  D:\VulkanSDK\1.2.189.2\Bin\glslc.exe
-
-Also for now it is needed to modify path in windows_compile_shaders.bat like this:
-E:\Development\VulkanProject\rendering-engine\Shaders\basic_shader.vert -o E:\Development\VulkanProject\rendering-engine\Build\Intermediate\Shaders\basic_shader_vert.spv
-windows_compile_shaders.bat is a script that will be employed by cmake and attached to pre-build script in Visual Studio Solution in order to compile glsl shader files into *.spv binaries.
 
 **********Linux installing.**********
 Install needed dependencies. See "List of required dependencies"
