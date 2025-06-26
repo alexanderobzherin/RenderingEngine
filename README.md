@@ -164,3 +164,11 @@ docker stop re_env_cnr
 docker image prune -a
 docker container prune
 ```
+
+## License
+
+This rendering engine is licensed under the [Zlib License](LICENSE.md).
+
+It is free to use, modify, and include in commercial or non-commercial projects, provided that the license terms are followed. You are welcome to build your own applications or systems on top of it.
+
+Please note: Platform-specific integrations (e.g., for consoles) may require additional SDKs or agreements which are not part of this repository.
