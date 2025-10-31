@@ -6,6 +6,7 @@
 #pragma once
 
 #include "i_renderer_observer.hpp"
+#include <string>
 #include <unordered_map>
 #include <memory>
 

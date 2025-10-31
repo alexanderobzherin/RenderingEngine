@@ -2168,6 +2168,96 @@ void VulkanRenderer::EndSingleTimeCommand(VkCommandBuffer commandBuffer)
     vkFreeCommandBuffers(mLogicalDevice, mCommandPool, 1, &commandBuffer);
 }
 
+template<typename T>
+VkVertexInputBindingDescription VulkanRenderer::GetBindingDescription()
+{
+    VkVertexInputBindingDescription binding{};
+    binding.binding = 0;
+    binding.stride = sizeof(T);
+    binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    return binding;
+}
 
+template<>
+std::vector<VkVertexInputAttributeDescription> VulkanRenderer::GetAttributeDescriptions<Vertex2D>()
+{
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
+    attributeDescriptions.resize(3);
+
+    attributeDescriptions[0].binding = 0;
+    attributeDescriptions[0].location = 0;
+    attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[0].offset = offsetof(Vertex2D, position);
+
+    attributeDescriptions[1].binding = 0;
+    attributeDescriptions[1].location = 1;
+    attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    attributeDescriptions[1].offset = offsetof(Vertex2D, color);
+
+    attributeDescriptions[2].binding = 0;
+    attributeDescriptions[2].location = 2;
+    attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[2].offset = offsetof(Vertex2D, textureCoordinates);
+
+    return attributeDescriptions;
+}
+
+template<>
+std::vector<VkVertexInputAttributeDescription> VulkanRenderer::GetAttributeDescriptions<VertexPositionColorTexture>()
+{
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
+    attributeDescriptions.resize(3);
+
+    attributeDescriptions[0].binding = 0;
+    attributeDescriptions[0].location = 0;
+    attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[0].offset = offsetof(VertexPositionColorTexture, position);
+
+    attributeDescriptions[1].binding = 0;
+    attributeDescriptions[1].location = 1;
+    attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    attributeDescriptions[1].offset = offsetof(VertexPositionColorTexture, color);
+
+    attributeDescriptions[2].binding = 0;
+    attributeDescriptions[2].location = 2;
+    attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[2].offset = offsetof(VertexPositionColorTexture, textureCoordinates);
+
+    return attributeDescriptions;
+}
+
+template<>
+std::vector<VkVertexInputAttributeDescription> VulkanRenderer::GetAttributeDescriptions<VertexPositionColorTextureNormalTangent>()
+{
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
+    attributeDescriptions.resize(5);
+
+    attributeDescriptions[0].binding = 0;
+    attributeDescriptions[0].location = 0;
+    attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[0].offset = offsetof(VertexPositionColorTextureNormalTangent, position);
+
+    attributeDescriptions[1].binding = 0;
+    attributeDescriptions[1].location = 1;
+    attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    attributeDescriptions[1].offset = offsetof(VertexPositionColorTextureNormalTangent, color);
+
+    attributeDescriptions[2].binding = 0;
+    attributeDescriptions[2].location = 2;
+    attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[2].offset = offsetof(VertexPositionColorTextureNormalTangent, textureCoordinates);
+
+    attributeDescriptions[3].binding = 0;
+    attributeDescriptions[3].location = 3;
+    attributeDescriptions[3].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[3].offset = offsetof(VertexPositionColorTextureNormalTangent, normal);
+
+    attributeDescriptions[4].binding = 0;
+    attributeDescriptions[4].location = 4;
+    attributeDescriptions[4].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[4].offset = offsetof(VertexPositionColorTextureNormalTangent, tangent);
+
+    return attributeDescriptions;
+}
 
 } //rendering_engine

@@ -9,12 +9,12 @@
 #include <string>
 #include "vertex_declarations.hpp"
 #include "render_resource_context.hpp"
+#include "i_render_resources.hpp"
 #include "material_types.hpp"
 
 namespace rendering_engine
 {
 class IRenderer;
-class IRenderResources;
 class Material;
 class ModelCache;
 class TextureCache;

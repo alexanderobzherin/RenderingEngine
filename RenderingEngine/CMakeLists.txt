@@ -171,9 +171,10 @@ add_library(RenderingEngine STATIC ${HEADER_FILES} ${SRC_FILES})
 
 #specify the compiling properties
 set_target_properties(RenderingEngine PROPERTIES
-	CXX_STANDARD 17
-	CXX_STANDARD_REQUIRED ON
+CXX_STANDARD 17
+CXX_STANDARD_REQUIRED ON
 )
+
 if(NOT WIN32)
 	set_target_properties(RenderingEngine PROPERTIES
 		COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
@@ -198,6 +199,7 @@ target_link_libraries(RenderingEngine
 	assimp::assimp
 	freetype
 )
+
 
 target_include_directories(RenderingEngine PUBLIC
 ${freetype2_INCLUDE_DIRS}

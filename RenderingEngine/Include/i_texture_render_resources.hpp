@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <stdint.h>
+#include <stddef.h>
+
 namespace rendering_engine
 {
 class ImageData;
