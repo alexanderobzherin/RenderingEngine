@@ -2,24 +2,25 @@
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
-#include "boost/filesystem.hpp"
 
+#include "level_register.hpp"
 #include "utility.hpp"
-#include "demo_application.hpp"
+#include "core_application.hpp"
 
 
 using namespace rendering_engine;
-using namespace demo_application;
 
 int main(int argc, char *argv[])
 {
-	std::cout << "Vulkan App is running..." << std::endl;
+	std::cout << "Demo App is running..." << std::endl;
     Utility::InitializePaths(argc, argv);
 
-    std::unique_ptr<DemoApplication> app = std::make_unique<DemoApplication>(800, 600, "Vulkan Application");
+    std::unique_ptr<CoreApplication> app = std::make_unique<CoreApplication>(800, 600, "Demo Application");
     try
     {
+        app->Initialize();
         app->Run();
+        app->Shutdown();
     }
     catch( std::exception const& exc )
     {

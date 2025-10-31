@@ -1,5 +1,14 @@
-#Build script for VulkanProject
 #Written by Alexander Obzherin
+
+# Check for --docs-only argument
+if [ "$1" == "--docs-only" ]; then
+    echo "Generating Doxygen documentation only..."
+    rm -rf Build/Docs
+    mkdir -p Build/Docs
+    cd Build/Docs
+    doxygen ../../Doxyfile
+    exit 0
+fi
 
 PROJECT_ROOT_PATH=$(pwd)
 PATH_SHADERS_SOURCE=$PROJECT_ROOT_PATH/Shaders
@@ -33,10 +42,10 @@ CompileShaders()
     mkdir FlatColorFiltering
     PATH_SHADERS_BIN=$(pwd)
 
-    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/BasicTexture3D/basic_texture_3d.vert -o $PATH_SHADERS_BIN/BasicTexture3D/basic_texture_3d_vert.spv
-    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/BasicTexture3D/basic_texture_3d.frag -o $PATH_SHADERS_BIN/BasicTexture3D/basic_texture_3d_frag.spv
-    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/FlatColorFiltering/flat_color_filtering.vert -o $PATH_SHADERS_BIN/FlatColorFiltering/flat_color_filtering_vert.spv
-    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/FlatColorFiltering/flat_color_filtering.frag -o $PATH_SHADERS_BIN/FlatColorFiltering/flat_color_filtering_frag.spv
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/BasicTexture3D/BasicTexture3D.vert -o $PATH_SHADERS_BIN/BasicTexture3D/BasicTexture3D_vert.spv
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/BasicTexture3D/BasicTexture3D.frag -o $PATH_SHADERS_BIN/BasicTexture3D/BasicTexture3D_frag.spv
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/FlatColorFiltering/FlatColorFiltering.vert -o $PATH_SHADERS_BIN/FlatColorFiltering/FlatColorFiltering_vert.spv
+    $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/FlatColorFiltering/FlatColorFiltering.frag -o $PATH_SHADERS_BIN/FlatColorFiltering/FlatColorFiltering_frag.spv
 }
 
 echo "Finding shader compiler..."
@@ -50,3 +59,8 @@ if test -f $PATH_TO_SHADER_COMPILER; then
     break
 fi
 done
+
+# Generate documentation
+mkdir -p Docs
+cd Docs
+doxygen ../../Doxyfile

@@ -1,31 +1,32 @@
 #include "actor.hpp"
-#include "scene_component.hpp"
-#include "vulkan_drawable_component.hpp"
+#include "scene.hpp"
+#include "scene_manager.hpp"
 
 namespace rendering_engine
 {
-Actor::Actor(RendererBase* renderer)
-    :
-    mRenderer(renderer)
+
+Actor::Actor(Scene& scene)
+	:
+	mScene(scene)
 {
+	mRenderContext = mScene.GetSceneManager().GetRenderResourceContext();
 }
-Actor::~Actor()
-{
-}
+
 void Actor::Initialize()
 {
 }
 
-void Actor::Update(float const delta)
+void Actor::Update(float deltaTime)
 {
 }
 
-void Actor::Draw()
+void Actor::Draw(const Camera& camera)
 {
 }
 
-void Actor::Shudtown()
+RenderResourceContext Actor::GetRenderContext() const
 {
+	return mRenderContext;
 }
 
-} //rendering_engine
+} // namespace rendering_engine

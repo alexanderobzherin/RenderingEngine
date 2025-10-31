@@ -5,13 +5,20 @@ project(DemoApplication)
 
 #set header files
 set(HEADER_FILES
+	${PROJECT_SOURCE_DIR}/Include/level_register.hpp
 	${PROJECT_SOURCE_DIR}/Include/demo_application.hpp
+	${PROJECT_SOURCE_DIR}/Include/demo_level.hpp
+	${PROJECT_SOURCE_DIR}/Include/test_cube.hpp
+	${PROJECT_SOURCE_DIR}/Include/test_sprite.hpp
 )
 
 #set source files
 set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/Source/main.cpp
 	${PROJECT_SOURCE_DIR}/Source/demo_application.cpp
+	${PROJECT_SOURCE_DIR}/Source/demo_level.cpp
+	${PROJECT_SOURCE_DIR}/Source/test_cube.cpp
+	${PROJECT_SOURCE_DIR}/Source/test_sprite.cpp
 )
 
 include_directories(${PROJECT_SOURCE_DIR}/Include/)

@@ -1,0 +1,34 @@
+#include "quad_2d.hpp"
+#include "camera_2d.hpp"
+#include "i_render_resources.hpp"
+#include "scene_component_2d.hpp"
+
+namespace rendering_engine
+{
+
+Quad2D::Quad2D(RenderResourceContext renderContext)
+	:
+	Drawable2D(renderContext)
+{}
+
+void Quad2D::Initialize()
+{
+	Drawable2D::Initialize();
+}
+
+void Quad2D::Update(float deltaTime)
+{
+	Drawable2D::Update(deltaTime);
+}
+
+void Quad2D::Draw(const Camera2D& camera)
+{
+	Transformations2D transformations;
+	transformations.model = GetTransform().GetModelMatrix();
+	transformations.view = camera.GetWorldView();
+	transformations.proj = camera.GetProjectionMatrix();
+
+	mRenderResources->SubmitResources(transformations, mMaterialParameters);
+}
+
+} // namespace rendering_engine

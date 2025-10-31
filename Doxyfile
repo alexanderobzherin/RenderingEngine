@@ -1,0 +1,49 @@
+# Doxyfile for Rendering Engine documentation
+
+# Project details
+PROJECT_NAME           = "Rendering Engine"
+PROJECT_BRIEF          = "Modular Graphics Rendering Engine"
+PROJECT_NUMBER         = "1.0"
+OUTPUT_DIRECTORY       = ../../Build/Docs
+
+# Input
+INPUT                  = ../../RenderingEngine/Source ../../RenderingEngine/Include
+FILE_PATTERNS          = *.hpp *.h *.cpp *.c
+RECURSIVE              = YES
+EXCLUDE_PATTERNS       = */external/*
+
+# Build related
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+
+# Source browsing
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = YES
+STRIP_CODE_COMMENTS    = NO
+
+# HTML output
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+
+# LaTeX output (disabled by default)
+GENERATE_LATEX         = NO
+
+# Diagrams (enable if Graphviz is installed)
+HAVE_DOT               = YES
+DOT_IMAGE_FORMAT       = svg
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+# CLASS_DIAGRAMS         = YES
+DOT_MULTI_TARGETS      = YES
+
+# Misc
+GENERATE_TREEVIEW      = YES
+FULL_PATH_NAMES        = NO
+QUIET                  = NO
+WARN_IF_UNDOCUMENTED   = YES
+WARN_NO_PARAMDOC       = YES
+
+# License
+ALIASES                += license="\\par License:\nThis file is part of a project licensed under the zlib license. See LICENSE.md."

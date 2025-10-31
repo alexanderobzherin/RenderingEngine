@@ -18,6 +18,9 @@ file(COPY ${PATH_TO_SOURCE_FONTS} DESTINATION "${CMAKE_BINARY_DIR}/Intermediate"
 if(WIN32)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/BasicTexture3D)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/FlatColorFiltering)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/TestTriangle)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/TestSprite2D)
+
 set(PATH_TO_COMPILED_SHADER_PATH "${CMAKE_BINARY_DIR}/Intermediate/Shaders")
 set(SHADER_COMPILER $ENV{glslc})
 endif()

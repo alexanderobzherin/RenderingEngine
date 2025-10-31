@@ -14,6 +14,8 @@ class Utility final
     public:
 	static void InitializePaths(int argc, char* argv[]);
     static std::vector<char> ReadShaderBinaryFile( std::string const & filename );
+
+
     static std::vector<std::string> GetListOfFilesInDirectory( std::string directory );
 	static boost::filesystem::path GetApplicationPath();
 	static boost::filesystem::path GetBuildPath();

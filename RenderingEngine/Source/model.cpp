@@ -27,7 +27,6 @@ Model::Model(const std::string& filename, bool flipUVs)
     {
         for( uint32_t i = 0; i < scene->mNumMaterials; i++ )
         {
-
             mMaterials.push_back(std::shared_ptr<ModelMaterial>(new ModelMaterial(*this, *scene->mMaterials[i])));
         }
     }

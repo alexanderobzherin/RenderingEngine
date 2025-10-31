@@ -1,70 +1,92 @@
+// This file is part of the Rendering Engine project.
+// Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+// Copyright (c) 2025 Alexander Obzherin
+// Distributed under the terms of the zlib License. See LICENSE.md for details.
+
 #pragma once
 
 #include <memory>
-#include <iostream>
-#include <cstdint>
-#include <vector>
-#include <optional>
-#include <fstream>
-
-#include <GLFW/glfw3.h>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
+#include <string>
 #include "vertex_declarations.hpp"
+#include "render_resource_context.hpp"
+#include "material_types.hpp"
 
 namespace rendering_engine
 {
-class Actor;
-class SceneComponent;
-class ImageData;
-// Class contains needed renderer specific instrumentation to interact with renderer itself.
-// For example, create renderer specific vertex buffer to make it usable for drawing.
+class IRenderer;
+class IRenderResources;
+class Material;
+class ModelCache;
+class TextureCache;
+class MaterialCache;
+class MeshDataGpu;
+
+/**
+ * @class DrawableComponent
+ * @brief Abstract base for all drawable (renderable) objects in the engine.
+ *
+ * Provides core functionality for accessing render resources (meshes, materials, textures)
+ * and defines the initialization, update, and draw lifecycle for renderable entities.
+ *
+ * Derived classes (such as Drawable2D and Drawable3D) implement type-specific behavior for
+ * spatial transforms, camera use, and render submission.
+ *
+ * @note Not copyable or assignable.
+ * @see Drawable2D, Drawable3D
+ */
 class DrawableComponent
 {
 public:
-	DrawableComponent();
-	virtual ~DrawableComponent();
+    /**
+     * @brief Constructs the DrawableComponent with a resource context.
+     * @param renderContext Rendering resource context (renderer, caches).
+     */
+    DrawableComponent(RenderResourceContext renderContext);
 
-	virtual void Initialize();
-	virtual void Update(float delta);
-	virtual void Draw() = 0;
+    /// Virtual destructor.
+    virtual ~DrawableComponent() = default;
 
-	virtual void Shutdown() = 0;
+    /**
+     * @brief Initializes render resource pointers (material, mesh, etc.).
+     *        Must be called after setting material and mesh names.
+     */
+    virtual void Initialize();
 
-	std::shared_ptr<SceneComponent> GetSceneComponent();
-	void SetColorTexture(std::string path);
-	void SetModelMesh(std::string path);
+    /**
+     * @brief Updates logic (animation, movement, etc.) for this drawable.
+     * @param deltaTime Time step (seconds).
+     */
+    virtual void Update(float deltaTime) = 0;
 
-	void SetMaterial( std::string materialName );
+    virtual void Shutdown();
 
-private:
-	DrawableComponent(const DrawableComponent& rhs);
-	DrawableComponent& operator=(const DrawableComponent& rhs);
+    DrawableComponent(const DrawableComponent&) = delete;
+    DrawableComponent& operator=(const DrawableComponent&) = delete;
 
 protected:
-	void LoadModel(std::string const modelFilepath);
+    /**
+     * @brief Sets the material to use (by name).
+     * @param materialName Name of the material.
+     */
+    void SetMaterialName(const std::string& materialName);
+
+    /**
+     * @brief Sets the mesh to use (by name).
+     * @param meshName Name of the mesh.
+     */
+    void SetMeshName(const std::string& meshName);
 
 protected:
-	std::shared_ptr<SceneComponent> mSceneComponent;
+    RenderResourceContext mRenderContext;
+    std::unique_ptr<IRenderResources> mRenderResources;
 
-	std::shared_ptr<ImageData> mColorTextureImageData;
+    std::string mMaterialName;
+    std::string mMeshName;
 
-	std::string mMeshPath;
-	std::string mColorTexturePath;
-
-	std::vector<Vertex> mVertices;
-	std::vector<uint32_t> mIndices;
-
-	std::string mMaterialName;
+    Material* mMaterial;
+    PackedMaterialData mMaterialParameters;
+    MeshDataGpu* mMeshData;
 };
 
-} //rendering_engine
+}
+

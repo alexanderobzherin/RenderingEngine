@@ -1,3 +1,5 @@
+/*
+
 #include "../Include/demo_application.hpp"
 
 #include "app_clock.hpp"
@@ -58,3 +60,6 @@ void DemoApplication::Update(float const delta)
 }
 
 } // demo_application
+
+
+*/

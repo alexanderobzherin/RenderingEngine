@@ -1,3 +1,4 @@
+/* Old architecture
 #include <iostream>
 #include <cstdint>
 #include <memory>
@@ -27,4 +28,29 @@ protected:
 	void Update(float const delta) override;
 };
 
+
 } // demo_application
+*/ // Old architecture
+
+/*
+
+#include "core_application.hpp"
+
+using namespace rendering_engine;
+
+namespace demo_application
+{
+class DemoApplication : public CoreApplication
+{
+public:
+	DemoApplication(char const* appName);
+	DemoApplication(int const width, int const height, char const* appName);
+
+	void Initialize() override;
+	virtual void Run() override;
+	virtual void Shutdown() override;
+};
+}
+
+
+*/
