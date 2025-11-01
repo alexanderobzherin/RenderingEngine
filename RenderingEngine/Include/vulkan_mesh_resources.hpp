@@ -36,13 +36,13 @@ public:
 
     /**
      * @brief Create a GPU vertex buffer from 3D unlit vertex data.
-     * @param vertices Vector of VertexPositionTextureColor data.
+     * @param vertices Vector of VertexPositionColorTexture data.
      */
     void CreateVertexBuffer(std::vector<VertexPositionColorTexture> vertices) override;
 
     /**
      * @brief Create a GPU vertex buffer from 3D lit vertex data.
-     * @param vertices Vector of VertexPositionTextureColorNormalTangent data.
+     * @param vertices Vector of VertexPositionColorTextureNormalTangent data.
      */
     void CreateVertexBuffer(std::vector<VertexPositionColorTextureNormalTangent> vertices) override;
 

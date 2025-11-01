@@ -1,3 +1,27 @@
+// This file is part of the Rendering Engine project.
+// Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+// Copyright (c) 2025 Alexander Obzherin
+// Distributed under the terms of the zlib License. See LICENSE.md for details.
+
+/**
+ * @file image_codec_jpeg.hpp
+ * @brief JPEG read/write backend using libjpeg.
+ *
+ * Provides low-level I/O routines bridging `ImageData` and the libjpeg API.
+ * Supports 8-bit RGB images for loading and saving.
+ *
+ * @details
+ * The implementation follows the official libjpeg API workflow:
+ * - https://libjpeg.sourceforge.io/
+ * - Steps: setup error handler -> create compressor/decompressor -> set parameters -> read/write scanlines -> clean up.
+ *
+ * Custom error handling is implemented via `codec_error_mgr` to safely recover
+ * from libjpeg’s internal `longjmp` behavior.
+ *
+ * @note This file is an internal backend of the Rendering Engine and is not part of the public API.
+ *
+ * @see rendering_engine::ImageData
+ */
 #pragma once
 
 #include <iostream>
@@ -6,6 +30,11 @@
 #include <setjmp.h>
 #include "image_data.hpp"
 
+ /**
+  * @brief Saves image data to a JPEG file.
+  * @param imageData Source image in RGB format.
+  * @param filename Path to the output file.
+  */
 static void SaveTextureFileJpeg(rendering_engine::ImageData const& imageData, char const* filename)
 {
 	auto const imageDataVector = imageData.GetImageDataRGB();
@@ -95,6 +124,14 @@ DoReadJpegFile(struct jpeg_decompress_struct* cinfo,
  * is passed in.  We want to return 1 on success, 0 on error.
  */
 
+ /**
+  * @brief Reads a JPEG file into an RGB image buffer.
+  * @param filename Path to input JPEG file.
+  * @param width [out] Image width in pixels.
+  * @param height [out] Image height in pixels.
+  * @param rgbImageDataVector [out] Output vector of RGB pixel data (3 bytes per pixel).
+  * @return true on success, false on failure.
+  */
 static bool ReadJpegFile(char const* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector)
 {
 	/* This struct contains the JPEG decompression parameters and pointers to

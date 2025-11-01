@@ -4,8 +4,6 @@
 #include "app_clock.hpp"
 #include "app_time.hpp"
 #include "scene_manager.hpp"
-#include "test_triangle.hpp"
-#include "test_sprite2D.hpp"
 
 #include <exception>
 
@@ -80,14 +78,6 @@ void CoreApplication::Initialize()
     }
     mRenderer->InitializeRenderer();
 
-    //mTestTriangle = std::make_shared<TestTriangle>();
-    //VulkanRenderer* vulkanRenderer = dynamic_cast<VulkanRenderer*>(mRenderer.get());
-    //mTestTriangle->Initialize(vulkanRenderer);
-
-    //mTestSprite2D = std::make_shared<TestSprite2D>();
-    //VulkanRenderer* vulkanRenderer = dynamic_cast<VulkanRenderer*>(mRenderer.get());
-    //mTestSprite2D->Initialize(vulkanRenderer);
-
     mSceneManager = std::make_shared<SceneManager>(mRenderer.get(), this);
     mSceneManager->Initialize();
 }
@@ -119,8 +109,6 @@ void CoreApplication::Draw()
     if (mRenderer->BeginFrame())
     {
         mRenderer->BeginRenderPass();
-        //mTestTriangle->Draw();
-        //mTestSprite2D->Draw();
         mSceneManager->Draw();
         mRenderer->EndRenderPass();
         mRenderer->EndFrame();
@@ -130,8 +118,6 @@ void CoreApplication::Draw()
 void CoreApplication::Shutdown()
 {
     mRenderer->WaitIdle();
-    //mTestTriangle->Shutdown();
-    //mTestSprite2D->Shutdown();
     mSceneManager->Shutdown();
     mRenderer->ShutdownRenderer();
     mWindowSystem->Shutdown();

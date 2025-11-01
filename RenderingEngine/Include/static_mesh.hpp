@@ -20,8 +20,8 @@ class StaticMesh : public Drawable3D
 {
 public:
 	/**
-	 * @brief Constructs the StaticMesh with a render context.
-	 * @param renderContext Resource context.
+	 * @brief Constructs a StaticMesh component associated with a given render context.
+	 * @param renderContext Rendering resource context for material and mesh initialization.
 	 */
 	StaticMesh(RenderResourceContext renderContext);
 

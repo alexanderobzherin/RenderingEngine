@@ -32,10 +32,10 @@ namespace rendering_engine
  *
  * @note
  * - Euler angles are expected in radians, using the convention (pitch, yaw, roll).
- * - The rendering engine uses a left-handed coordinate system:
- * - X+ : Forward (world forward direction)
- * - Y+ : Right
- * - Z+ : Up
+ * The rendering engine uses a **left-handed** coordinate system:
+ *   - **X+** : Forward (world forward direction)
+ *   - **Y+** : Right
+ *   - **Z+** : Up
  * - Copy and assignment are disabled for this class.
  */
 class SceneComponent
@@ -61,7 +61,7 @@ public:
 	 * @brief Returns the world transformation matrix (model matrix).
 	 * @return The current world/model matrix (glm::mat4).
 	 */
-	const glm::mat4& GetWorldMatrix(); // const;
+	const glm::mat4& GetWorldMatrix() const;
 
 	/**
 	 * @brief Sets the position of the component in world space.

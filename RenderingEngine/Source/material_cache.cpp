@@ -53,7 +53,7 @@ void MaterialCache::CreateBuildInMaterials()
 
 	// Test sprite 2d
 	MaterialSettings setTestSprite2d;
-	setTestSprite2d.materialName = std::string{ "TestSprite2D" };
+	setTestSprite2d.materialName = std::string{ "Quad2D" };
 	setTestSprite2d.materialDomain = MaterialDomain::Sprite2D;
 	setTestSprite2d.shadingModel = ShadingModel::Unlit;
 	setTestSprite2d.blendMode = BlendMode::Opaque;

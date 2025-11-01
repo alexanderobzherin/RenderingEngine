@@ -1,3 +1,33 @@
+// This file is part of the Rendering Engine project.
+// Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+// Copyright (c) 2025 Alexander Obzherin
+// Distributed under the terms of the zlib License. See LICENSE.md for details.
+
+/**
+ * @file image_codec_png.hpp
+ * @brief PNG read/write backend using libpng.
+ *
+ * This module bridges the Rendering Engine's `ImageData` abstraction and the libpng C API.
+ * It provides direct read/write routines for 8-bit RGBA images.
+ *
+ * @details
+ * The implementation follows the official libpng examples and reference documentation:
+ * - https://www.libpng.org/pub/png/libpng.html
+ * - See "Simplified API for Reading and Writing" for modern usage examples.
+ *
+ * The function sequence mirrors the standard libpng workflow:
+ * 1. Create and initialize `png_structp` and `png_infop`.
+ * 2. Set up `setjmp` error handling.
+ * 3. Configure image metadata with `png_set_IHDR`.
+ * 4. Write/read rows with `png_write_row` / `png_image_finish_read`.
+ * 5. Clean up with `png_destroy_write_struct`.
+ *
+ * @note
+ * This file is considered an engine backend implementation detail.
+ * It is not intended for use outside `ImageData` and `ImageDataGpu`.
+ *
+ * @see rendering_engine::ImageData
+ */
 #pragma once
 
 #include <cstring>
@@ -5,6 +35,15 @@
 #include <stdlib.h>
 #include <png.h>
 
+/**
+ * @brief Saves image data to a PNG file.
+ *
+ * Uses libpng to write RGBA data from ImageData into a PNG file.
+ * The function performs full file initialization, metadata setup, and cleanup.
+ *
+ * @param imageData Source image to save.
+ * @param filename Path to the output PNG file.
+ */
 static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, char const* filename)
 {
     FILE* fp;
@@ -12,7 +51,6 @@ static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, cha
     png_infop info_ptr;
     png_colorp palette;
     
-    /* Open the file */
     fp = fopen(filename, "wb");
     if( fp == NULL )
     {
@@ -21,11 +59,7 @@ static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, cha
     }
 
     /* Create and initialize the png_struct with the desired error handler
-     * functions.  If you want to use the default stderr and longjump method,
-     * you can supply NULL for the last three parameters.  We also check that
-     * the library version is compatible with the one used at compile time,
-     * in case we are using dynamically linked libraries.  REQUIRED.
-     */
+     * functions.  */
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
         NULL, NULL, NULL);
 
@@ -35,7 +69,7 @@ static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, cha
         return;
     }
 
-    /* Allocate/initialize the image information data.  REQUIRED */
+    /* Allocate/initialize the image information data. */
     info_ptr = png_create_info_struct(png_ptr);
     if( info_ptr == NULL )
     {
@@ -55,19 +89,16 @@ static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, cha
         return;
     }
 
-    /* One of the following I/O initialization functions is REQUIRED */
+    /* I/O initialization */
 
     png_init_io(png_ptr, fp);
     auto const png_transforms = PNG_TRANSFORM_IDENTITY;
 
-   /* Set the image information here.  Width and height are up to 2^31,
-    * bit_depth is one of 1, 2, 4, 8, or 16, but valid values also depend on
-    * the color_type selected. color_type is one of PNG_COLOR_TYPE_GRAY,
+   /* Set the image information.  color_type is one of PNG_COLOR_TYPE_GRAY,
     * PNG_COLOR_TYPE_GRAY_ALPHA, PNG_COLOR_TYPE_PALETTE, PNG_COLOR_TYPE_RGB,
     * or PNG_COLOR_TYPE_RGB_ALPHA.  interlace is either PNG_INTERLACE_NONE or
     * PNG_INTERLACE_ADAM7, and the compression_type and filter_type MUST
-    * currently be PNG_COMPRESSION_TYPE_BASE and PNG_FILTER_TYPE_BASE. REQUIRED
-    */
+    * currently be PNG_COMPRESSION_TYPE_BASE and PNG_FILTER_TYPE_BASE. */
     int const bit_depth = 8;
     png_set_IHDR(png_ptr, info_ptr, imageData.GetWidth(), imageData.GetHeight(), bit_depth, PNG_COLOR_TYPE_RGB_ALPHA,
         PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
@@ -77,18 +108,10 @@ static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, cha
         * sizeof(png_color));
     /* ... Set palette colors ... */
     png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
-    /* You must not free palette here, because png_set_PLTE only makes a link to
-     * the palette that you malloced.  Wait until you are about to destroy
-     * the png structure.
-     */
 
      /* Optional significant bit (sBIT) chunk */
     png_color_8 sig_bit;
 
-    /* If we are dealing with a grayscale image then */
-    //sig_bit.gray = true_bit_depth;
-
-    /* Otherwise, if we are dealing with a color image then */
     sig_bit.red = 8; //true_red_bit_depth;
     sig_bit.green = 8; //true_green_bit_depth;
     sig_bit.blue = 8; // true_blue_bit_depth;
@@ -119,26 +142,8 @@ static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, cha
      /* It is REQUIRED to call this to finish writing the rest of the file */
     png_write_end(png_ptr, info_ptr);
 
-    /* If you png_malloced a palette, free it here (don't free info_ptr->palette,
-     * as recommended in versions 1.0.5m and earlier of this example; if
-     * libpng mallocs info_ptr->palette, libpng will free it).  If you
-     * allocated it with malloc() instead of png_malloc(), use free() instead
-     * of png_free().
-     */
     png_free(png_ptr, palette);
     palette = NULL;
-    
-    /* Similarly, if you png_malloced any data that you passed in with
-     * png_set_something(), such as a hist or trans array, free it here,
-     * when you can be sure that libpng is through with it.
-     */
-    //png_free(png_ptr, png_transforms);
-    //trans = NULL;
-    /* Whenever you use png_free() it is a good idea to set the pointer to
-     * NULL in case your application inadvertently tries to png_free() it
-     * again.  When png_free() sees a NULL it returns without action, thus
-     * avoiding the double-free security problem.
-     */
 
      /* Clean up after the write, and free any memory allocated */
     png_destroy_write_struct(&png_ptr, &info_ptr);
@@ -147,6 +152,17 @@ static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, cha
     fclose(fp);
 }
 
+/**
+ * @brief Reads a PNG file into RGBA image data.
+ *
+ * Loads an image using libpng’s simplified API and converts it to 8-bit RGBA format.
+ *
+ * @param filename Path to the PNG file.
+ * @param width [out] Image width.
+ * @param height [out] Image height.
+ * @param rgbaImageDataVector [out] Filled with 4-byte-per-pixel RGBA data.
+ * @return true if the image was successfully read, false otherwise.
+ */
 static bool ReadPngFile(char const* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbaImageDataVector)
 {
     png_image image; /* The control structure used by libpng */

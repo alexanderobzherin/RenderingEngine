@@ -1,3 +1,7 @@
+# This file is part of the Rendering Engine project.
+# Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+# Copyright (c) 2025 Alexander Obzherin
+# Distributed under the terms of the zlib License. See LICENSE.md for details.
 cmake_minimum_required(VERSION 3.10)
 
 #set header files
@@ -10,15 +14,10 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Shaders/BasicTexture3D/BasicTexture3D.frag
 	${PROJECT_SOURCE_DIR}/Shaders/FlatColorFiltering/FlatColorFiltering.vert
 	${PROJECT_SOURCE_DIR}/Shaders/FlatColorFiltering/FlatColorFiltering.frag
-	${PROJECT_SOURCE_DIR}/Shaders/TestTriangle/TestTriangle.vert
-	${PROJECT_SOURCE_DIR}/Shaders/TestTriangle/TestTriangle.frag
-	${PROJECT_SOURCE_DIR}/Shaders/TestSprite2D/TestSprite2D.vert
-	${PROJECT_SOURCE_DIR}/Shaders/TestSprite2D/TestSprite2D.frag
+	${PROJECT_SOURCE_DIR}/Shaders/Quad2D/Quad2D.vert
+	${PROJECT_SOURCE_DIR}/Shaders/Quad2D/Quad2D.frag
 
 	# Windowing system level
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/test_triangle.hpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/test_sprite2D.hpp
-
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/i_window_system.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/standalone_window_system.hpp
 
@@ -29,7 +28,6 @@ set(HEADER_FILES
 	# Renderers
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/i_renderer.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/i_renderer_observer.hpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/_vulkan_renderer.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/vulkan_renderer.hpp
 	
 	# Render resources manegment
@@ -65,7 +63,6 @@ set(HEADER_FILES
 	
 	# Drawable entities
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/drawable_component.hpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/_drawable_component.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/drawable_2d.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/drawable_3d.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/quad_2d.hpp
@@ -88,17 +85,11 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_time.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/app_clock.hpp
 	
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/_renderer_base.hpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/_vulkan_image_data.hpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/_vulkan_drawable_component.hpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/actor.hpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Include/_vulkan_vertex_declarations.hpp
 )
 
 #set source files
 set(SRC_FILES
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/test_triangle.cpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/test_sprite2D.cpp
 	# Windowing system level
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/standalone_window_system.cpp
 	
@@ -106,7 +97,6 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/core_application.cpp
 	
 	# Renderers
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/_vulkan_renderer.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/vulkan_renderer.cpp
 
 	# Render resources manegment
@@ -133,7 +123,6 @@ set(SRC_FILES
 
 	# Drawable entities
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/drawable_component.cpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/_drawable_component.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/drawable_2d.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/drawable_3d.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/quad_2d.cpp
@@ -155,9 +144,6 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/app_time.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/app_clock.cpp
 	
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/_vulkan_image_data.cpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/_renderer_base.cpp
-	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/_vulkan_drawable_component.cpp
 	${PROJECT_SOURCE_DIR}/RenderingEngine/Source/actor.cpp
 )
 
@@ -222,10 +208,10 @@ set(test_triangle_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestTriangle/TestTri
 set(test_triangle_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/TestTriangle/TestTriangle.frag")
 set(test_triangle_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestTriangle/TestTriangle_frag.spv")
 
-set(test_sprite2D_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/TestSprite2D/TestSprite2D.vert")
-set(test_sprite2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestSprite2D/TestSprite2D_vert.spv")
-set(test_sprite2D_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/TestSprite2D/TestSprite2D.frag")
-set(test_sprite2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestSprite2D/TestSprite2D_frag.spv")
+set(quad2D_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/Quad2D/Quad2D.vert")
+set(quad2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_vert.spv")
+set(quad2D_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/Quad2D/Quad2D.frag")
+set(quad2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_frag.spv")
 
 if(WIN32)
 add_custom_command(
@@ -240,7 +226,7 @@ add_custom_command(
 	COMMAND cmd /c ${SHADER_COMPILER} ${test_triangle_vert_source} -o ${test_triangle_vert_spv}
 	COMMAND cmd /c ${SHADER_COMPILER} ${test_triangle_frag_source} -o ${test_triangle_frag_spv}
 
-	COMMAND cmd /c ${SHADER_COMPILER} ${test_sprite2D_vert_source} -o ${test_sprite2D_vert_spv}
-	COMMAND cmd /c ${SHADER_COMPILER} ${test_sprite2D_frag_source} -o ${test_sprite2D_frag_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_vert_source} -o ${quad2D_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_frag_source} -o ${quad2D_frag_spv}
 )
 endif()

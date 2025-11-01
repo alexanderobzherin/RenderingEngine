@@ -31,7 +31,7 @@ void SceneManager::Initialize()
 	boost::filesystem::path path;
 	const auto textureFolder = path / ".." / "Intermediate" / "Textures";
 	mTextureCache = std::make_shared<TextureCache>(mRenderer);
-	mTextureCache->LoadTexturesFromFoloder(textureFolder.string());
+	mTextureCache->LoadTexturesFromFolder(textureFolder.string());
 
 	const auto modelsFolder = path / ".." / "Intermediate" / "Models";
 	mModelCache = std::make_shared<ModelCache>(mRenderer);

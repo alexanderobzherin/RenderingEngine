@@ -69,6 +69,13 @@ public:
 	 */
 	void LoadModel(std::string path);
 
+	/**
+	 * @brief Creates a 1×1 unit quad centered at the origin.
+	 *
+	 * The quad spans from -0.5 to +0.5 on both X and Y axes and uses
+	 * counterclockwise winding. Suitable as a base mesh for sprites
+	 * or 2D UI elements.
+	 */
 	void CreateQuad2D();
 
 	/**

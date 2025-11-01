@@ -77,7 +77,7 @@ public:
 
     /**
      * @brief Gets the model matrix for this component.
-     * @return The model matrix as glm::mat3.
+     * @return The model matrix as glm::mat4.
      *
      * @note Use this to transform object-local coordinates into world (scene) coordinates.
      */
@@ -86,6 +86,7 @@ public:
     /**
      * @brief Updates the model matrix from the current position, rotation, and scale.
      * @details Called automatically after property changes, but can be called manually if needed.
+     * @see SetPosition(), SetRotation(), SetScale()
      */
     void UpdateModelMatrix();
 

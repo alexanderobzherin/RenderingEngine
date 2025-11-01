@@ -54,7 +54,25 @@ public:
 	 */
 	virtual void Update(float deltaTime);
 
+	/**
+	 * @brief Sets the viewport dimensions used to compute the projection matrix.
+	 *
+	 * This defines the visible area of the camera in screen-space units.
+	 * The projection matrix will be recomputed based on these dimensions.
+	 *
+	 * @param width  Viewport width in pixels or world units.
+	 * @param height Viewport height in pixels or world units.
+	 */
 	void SetViewportSize(float width, float height);
+
+	/**
+	 * @brief Returns the current orthographic projection matrix.
+	 *
+	 * The matrix is built from the camera’s viewport size, and is typically
+	 * multiplied with the view (world) matrix to transform coordinates into clip space.
+	 *
+	 * @return 4×4 orthographic projection matrix.
+	 */
 	glm::mat4 GetProjectionMatrix() const;
 
 	/**

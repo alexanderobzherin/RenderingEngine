@@ -8,7 +8,7 @@
 namespace rendering_engine
 {
 
-/*
+/**
  * @brief Interface for observing renderer resource lifecycle events.
  *
  * Classes implementing this interface can be registered as observers with the renderer.

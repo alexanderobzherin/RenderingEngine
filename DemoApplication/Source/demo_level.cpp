@@ -47,7 +47,7 @@ void DemoLevel::Initialize()
 
 	mDrawables2D.push_back(new Quad2D(mSceneManager.GetRenderResourceContext()));
 	mQuad2D = static_cast<Quad2D*>(mDrawables2D.back());
-	mQuad2D->SetMaterialName("TestSprite2D");
+	mQuad2D->SetMaterialName("Quad2D");
 	mQuad2D->SetMeshName("Quad2D");
 
 	mQuad2D->Initialize();

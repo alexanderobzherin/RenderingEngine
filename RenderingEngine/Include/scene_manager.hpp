@@ -21,29 +21,92 @@ class MaterialCache;
 
 struct RenderResourceContext;
 
+/**
+ * @class SceneManager
+ * @brief Manages scenes, resource caches, and scene transitions within the rendering engine.
+ *
+ * SceneManager handles the creation, updating, and rendering of scenes.
+ * It maintains ownership of core caches (TextureCache, ModelCache, MaterialCache),
+ * and provides the RenderResourceContext that allows drawable objects
+ * to access shared rendering resources.
+ *
+ * The class also supports dynamic scene registration through factories,
+ * enabling runtime creation of scenes by name.
+ *
+ * @see Scene, RenderResourceContext, TextureCache, ModelCache, MaterialCache
+ */
 class SceneManager
 {
 public:
+	/**
+	 * @brief Constructs a SceneManager instance.
+	 * @param renderer Pointer to the active renderer instance.
+	 * @param app Pointer to the owning application instance.
+	 */
 	SceneManager(IRenderer* renderer, IApplication* app);
+	/**
+	 * @brief Destructor. Cleans up resources and active scenes.
+	 */
 	~SceneManager();
-
+	/**
+	 * @brief Initializes the current scene and related caches.
+	 */
 	virtual void Initialize();
+	/**
+	 * @brief Updates the currently active scene.
+	 * @param deltaTime Time elapsed since the previous frame, in milliseconds.
+	 */
 	virtual void Update(float deltaTime);
+	/**
+	 * @brief Draws the active scene using the associated renderer.
+	 */
 	virtual void Draw();
+	/**
+	 * @brief Releases all scene-related resources and shuts down the manager.
+	 */
 	virtual void Shutdown();
-
+	/**
+	 * @brief Returns the application associated with this SceneManager.
+	 * @return Pointer to the IApplication instance.
+	 */
 	IApplication* GetApplication();
-
+	/**
+	 * @brief Loads a new scene by name.
+	 * @param sceneName The name of the registered scene to load.
+	 *
+	 * If the scene has been registered via SceneAutoRegistrar, it will be instantiated
+	 * and prepared for initialization on the next update.
+	 */
 	void LoadScene(std::string sceneName);
-
+	/**
+	 * @brief Retrieves the current RenderResourceContext.
+	 *
+	 * The RenderResourceContext provides references to shared caches (material, model, texture)
+	 * and allows drawable objects to access resources during initialization and rendering.
+	 *
+	 * @return A RenderResourceContext structure populated with shared cache pointers.
+	 */
 	RenderResourceContext GetRenderResourceContext() const;
-
+	/**
+	 * @brief Type alias for the factory used to create scenes.
+	 */
 	using Factory = std::function<std::unique_ptr<Scene>(SceneManager&)>;
-
+	/**
+	 * @brief Registers a scene type with a name string.
+	 * @param name Unique string identifier for the scene.
+	 * @param factory Function that constructs the scene when requested.
+	 * @return True if registration succeeded, false if a scene with the same name already exists.
+	 *
+	 * @note Typically used via the REG_SCENE() macro.
+	 */
 	static bool RegisterScene(const std::string& name, Factory factory);
-
+	/**
+	 * @brief Creates a scene instance by its registered name.
+	 * @param name The name of the registered scene type.
+	 * @param sm Reference to the SceneManager creating the scene.
+	 * @return Unique pointer to the newly created Scene instance.
+	 */
 	static std::unique_ptr<Scene> CreateScene(const std::string& name, SceneManager& sm);
-
 
 private:
 
@@ -66,7 +129,12 @@ private:
 	std::shared_ptr<ModelCache> mModelCache;
 	std::shared_ptr<MaterialCache> mMaterialCache;
 };
-
+/**
+ * @brief Template-based auto-registrar for scenes.
+ *
+ * Registers a scene type automatically at static initialization time.
+ * Used internally by the REG_SCENE() macro.
+ */
 template <class TScene>
 struct SceneAutoRegistrar
 {
@@ -77,20 +145,36 @@ explicit SceneAutoRegistrar(const char* name)
 		});
 }
 };
-
+/**
+ * @brief Convenience macro for registering a scene type with a name.
+ * @param Type Class type of the scene.
+ * @param NameStr Name string used for registration.
+ */
 #define REG_SCENE(Type, NameStr) \
     static rendering_engine::SceneAutoRegistrar<Type> \
         _auto_registrar_##Type##__{NameStr}
 
-
+ /**
+  * @brief Helper struct for automatically setting the start scene name.
+  */
 struct StartSceneAutoSetter
 {
 	explicit StartSceneAutoSetter(const char* n) { SceneManager::sStartSceneName = n; }
 };
-
+/**
+ * @brief Helper macros for concatenating tokens during static registration.
+ */
 #define RE_CAT_INNER(a,b) a##b
 #define RE_CAT(a,b) RE_CAT_INNER(a,b)
-
+ /**
+  * @brief Macro for defining the application's start scene.
+  * @param NameStr Name of the scene to start with.
+  *
+  * Example:
+  * @code
+  * START_SCENE("MainMenu");
+  * @endcode
+  */
 #define START_SCENE(NameStr) \
   static StartSceneAutoSetter RE_CAT(_start_scene_, __COUNTER__){NameStr}
 

@@ -1,3 +1,7 @@
+# This file is part of the Rendering Engine project.
+# Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+# Copyright (c) 2025 Alexander Obzherin
+# Distributed under the terms of the zlib License. See LICENSE.md for details.
 cmake_minimum_required(VERSION 3.10)
 
 #set the project name
@@ -6,19 +10,13 @@ project(DemoApplication)
 #set header files
 set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/level_register.hpp
-	${PROJECT_SOURCE_DIR}/Include/demo_application.hpp
 	${PROJECT_SOURCE_DIR}/Include/demo_level.hpp
-	${PROJECT_SOURCE_DIR}/Include/test_cube.hpp
-	${PROJECT_SOURCE_DIR}/Include/test_sprite.hpp
 )
 
 #set source files
 set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/Source/main.cpp
-	${PROJECT_SOURCE_DIR}/Source/demo_application.cpp
 	${PROJECT_SOURCE_DIR}/Source/demo_level.cpp
-	${PROJECT_SOURCE_DIR}/Source/test_cube.cpp
-	${PROJECT_SOURCE_DIR}/Source/test_sprite.cpp
 )
 
 include_directories(${PROJECT_SOURCE_DIR}/Include/)

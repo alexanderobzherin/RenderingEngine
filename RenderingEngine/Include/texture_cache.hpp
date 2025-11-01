@@ -44,7 +44,7 @@ public:
      *
      * @param pathToFolder Absolute or relative path to the folder containing texture files.
      */
-    void LoadTexturesFromFoloder(std::string pathToFolder);
+    void LoadTexturesFromFolder(std::string pathToFolder);
 
     /**
      * @brief Loads a single texture into RAM from the given file path.

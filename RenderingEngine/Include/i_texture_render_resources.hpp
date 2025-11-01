@@ -54,4 +54,4 @@ public:
 	 */
 	virtual size_t GetSizeInGPUBytes() const = 0;
 };
-}
+} // namespace rendering_engine

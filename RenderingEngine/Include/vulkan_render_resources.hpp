@@ -72,7 +72,9 @@ protected:
      * @copydoc IRendererObserver::OnRenderResourcesRebuild
      */
     void OnRenderResourcesRebuild() override;
-
+    /**
+     * @brief Allocates and initializes all GPU buffers, descriptor sets, and pipelines for this drawable.
+     */
     void AcquireResources();
     void CreateUniformBuffers();
     void CreateDescriptorPool();
@@ -81,6 +83,9 @@ protected:
     void UpdateTransformations(Transformations2D& transformations);
     void UpdateTransformations(Transformations3D& transformations);
     void UpdateMaterialParameters(const PackedMaterialData& materialParameters);
+    /**
+     * @brief Issues a Vulkan draw command for the currently bound indexed mesh.
+     */
     void DrawIndexed();
 
 private:
@@ -109,40 +114,3 @@ private:
 };
 
 } // namespace rendering_engine
-
-
-/*
-void VulkanRenderer::Shutdown()
-{
-    vkDeviceWaitIdle(mLogicalDevice);
-
-    CleanupSwapChain();
-
-    for( auto& object : mDrawableObjects )
-    {
-        object->Shutdown();
-    }
-
-    vkDestroyDescriptorPool(mLogicalDevice, mDescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(mLogicalDevice, mDescriptorSetLayout, nullptr);
-
-    for( size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++ )
-    {
-        vkDestroySemaphore(mLogicalDevice, mRenderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(mLogicalDevice, mImageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(mLogicalDevice, mInFlightFences[i], nullptr);
-    }
-
-    vkDestroyCommandPool(mLogicalDevice, mCommandPool, nullptr);
-
-    vkDestroyDevice(mLogicalDevice, nullptr);
-    if( enableValidationLayers )
-    {
-        DestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
-    }
-    vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
-    vkDestroyInstance(mInstance, nullptr);
-
-    RendererBase::Shutdown();
-}
-*/

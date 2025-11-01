@@ -1,3 +1,8 @@
+# This file is part of the Rendering Engine project.
+# Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+# Copyright (c) 2025 Alexander Obzherin
+# Distributed under the terms of the zlib License. See LICENSE.md for details.
+
 cmake_minimum_required(VERSION 3.10)
 
 #set the project name
@@ -19,7 +24,7 @@ if(WIN32)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/BasicTexture3D)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/FlatColorFiltering)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/TestTriangle)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/TestSprite2D)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/Quad2D)
 
 set(PATH_TO_COMPILED_SHADER_PATH "${CMAKE_BINARY_DIR}/Intermediate/Shaders")
 set(SHADER_COMPILER $ENV{glslc})

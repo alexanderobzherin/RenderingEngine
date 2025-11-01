@@ -11,7 +11,17 @@ class IRenderer;
 class ModelCache;
 class TextureCache;
 class MaterialCache;
-
+/**
+ * @struct RenderResourceContext
+ * @brief Aggregates pointers to global rendering resource managers.
+ *
+ * This structure provides access to core rendering subsystems required
+ * for creating and managing GPU resources. It is typically passed to
+ * drawable objects, materials, and scene components that need access to
+ * shared renderer and caches.
+ *
+ * @see IRenderer, ModelCache, TextureCache, MaterialCache
+ */
 struct RenderResourceContext
 {
     IRenderer* renderer;

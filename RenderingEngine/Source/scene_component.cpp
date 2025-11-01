@@ -18,7 +18,7 @@ void SceneComponent::UpdateWorldMatrix()
     // T * R * S
     mWorldMatrix = glm::translate(glm::mat4(1.0f), mPosition) * glm::toMat4(mRotation) * glm::scale(glm::mat4(1.0f), mScale);
 }
-const glm::mat4& SceneComponent::GetWorldMatrix()
+const glm::mat4& SceneComponent::GetWorldMatrix() const
 {
     return mWorldMatrix;
 }

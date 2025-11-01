@@ -10,7 +10,6 @@
 
 #include <stdexcept>
 
-
 namespace rendering_engine
 {
 

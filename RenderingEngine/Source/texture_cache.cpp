@@ -24,7 +24,7 @@ TextureCache::~TextureCache()
 	mRenderer->UnregisterObserver(this);
 }
 
-void TextureCache::LoadTexturesFromFoloder(std::string pathToFolder)
+void TextureCache::LoadTexturesFromFolder(std::string pathToFolder)
 {
 	// 1. Check if path is valid and exist
 	boost::filesystem::path pathToDirectory = boost::filesystem::path(pathToFolder);

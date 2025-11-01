@@ -20,8 +20,6 @@ layout(binding = 1) uniform sampler2D texSampler;
 
 void main()
 {
-    // If you later enable textures, replace this line with:
     outColor = texture(texSampler, fragUV) * fragColor;
-
     // outColor = fragColor;
 }

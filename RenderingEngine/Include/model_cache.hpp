@@ -43,6 +43,12 @@ public:
 	 */
 	void LoadModelsFromFolder(std::string pathToFolder);
 
+	/**
+	 * @brief Creates a built-in 2D quad mesh.
+	 *
+	 * This helper is used by 2D systems (e.g., UI, sprites) to create a reusable
+	 * quad mesh without external model files.
+	 */
 	void CreateQuad2D();
 
 	/**

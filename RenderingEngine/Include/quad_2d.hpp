@@ -11,8 +11,11 @@ namespace rendering_engine
 {
 /**
  * @class Quad2D
- * @brief 2D drawable component for for rendering 2D quads 
- *        (sprites, UI widgets, fonts, or procedural materials).
+ * @brief 2D drawable component for rendering rectangular primitives.
+ *
+ * Represents a simple 2D quad used for sprites, UI widgets, text, or procedural
+ * materials. Provides a lightweight implementation of a 2D drawable
+ * with transform and material properties inherited from Drawable2D.
  *
  * @note Not copyable or assignable.
  * @see Drawable2D, DrawableComponent, SceneComponent2D, Camera2D
