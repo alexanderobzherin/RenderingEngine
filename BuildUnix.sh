@@ -12,7 +12,7 @@ if [ "$1" == "--docs-only" ]; then
 fi
 
 PROJECT_ROOT_PATH=$(pwd)
-PATH_SHADERS_SOURCE=$PROJECT_ROOT_PATH/Shaders
+PATH_SHADERS_SOURCE=$PROJECT_ROOT_PATH/RenderingEngine/RenderingLibrary/BuiltInAssets/Shaders
 
 #Clean previously created binaries
 rm -rf Build
