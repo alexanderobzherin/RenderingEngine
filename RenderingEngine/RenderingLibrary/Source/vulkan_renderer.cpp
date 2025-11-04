@@ -1,3 +1,4 @@
+#include "version.h"
 #include "vulkan_renderer.hpp"
 #include "i_renderer_observer.hpp"
 #include "vulkan_texture_resources.hpp"
@@ -562,7 +563,11 @@ void VulkanRenderer::CreateInstance()
     appInfo.pApplicationName = mWindowSystem.GetApplication().GetScreenSettings().name.c_str();
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.pEngineName = "Rendering Engine";
-    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.engineVersion = VK_MAKE_VERSION(
+        RENDERING_ENGINE_VERSION_MAJOR,
+        RENDERING_ENGINE_VERSION_MINOR,
+        RENDERING_ENGINE_VERSION_PATCH
+    );
     appInfo.apiVersion = VK_API_VERSION_1_0;
 
     VkInstanceCreateInfo createInfo{};

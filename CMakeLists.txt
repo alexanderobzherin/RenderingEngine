@@ -6,8 +6,19 @@
 cmake_minimum_required(VERSION 3.10)
 
 #set the project name
-project(RenderingEngineProject)
+project(RenderingEngineProject VERSION 0.1.0 LANGUAGES CXX)
 
+# Get date in YYYY-MM-DD format
+string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
+
+# Path to template and output
+set(VERSION_TEMPLATE "${CMAKE_SOURCE_DIR}/RenderingEngine/RenderingLibrary/Include/version.h.in")
+set(VERSION_OUTPUT   "${CMAKE_BINARY_DIR}/Intermediate/Generated/version.h")
+
+configure_file(${VERSION_TEMPLATE} ${VERSION_OUTPUT} @ONLY)
+
+# Make generated header visible to all targets
+include_directories(${CMAKE_BINARY_DIR}/Intermediate/Generated)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 #Set path to output binaries
