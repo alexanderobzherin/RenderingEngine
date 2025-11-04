@@ -2,9 +2,9 @@
 #include <cstdint>
 #include "gtest/gtest.h"
 
-#include "../RenderingEngine/Include/image_data.hpp"
-#include "../RenderingEngine/Include/model.hpp"
-#include "../RenderingEngine/Include/mesh.hpp"
+#include "../RenderingLibrary/Include/image_data.hpp"
+#include "../RenderingLibrary/Include/model.hpp"
+#include "../RenderingLibrary/Include/mesh.hpp"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;

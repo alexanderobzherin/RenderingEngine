@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 #set the project name
-project(DemoApplication)
+project(TestApplication)
 
 #set header files
 set(HEADER_FILES
@@ -20,7 +20,7 @@ set(SRC_FILES
 )
 
 include_directories(${PROJECT_SOURCE_DIR}/Include/)
-include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/Include/)
+include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/RenderingLibrary/Include/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Shaders/)
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")

@@ -14,7 +14,7 @@ fi
 PROJECT_ROOT_PATH=$(pwd)
 PATH_SHADERS_SOURCE=$PROJECT_ROOT_PATH/Shaders
 
-#Clean previousle created binaries
+#Clean previously created binaries
 rm -rf Build
 #Create new build directory and step into it
 mkdir Build

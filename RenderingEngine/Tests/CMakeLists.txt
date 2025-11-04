@@ -12,7 +12,7 @@ set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 
 find_package(Threads REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/Include/)
+include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/RenderingLibrary/Include/)
 
 include_directories(${GTEST_INCLUDE_DIRS}
 )

@@ -2,8 +2,8 @@
 #include <cstdint>
 #include "gtest/gtest.h"
 
-#include "../RenderingEngine/Include/image_data.hpp"
-#include "../RenderingEngine/Include/texture_atlas_maker.hpp"
+#include "../RenderingLibrary/Include/image_data.hpp"
+#include "../RenderingLibrary/Include/texture_atlas_maker.hpp"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;

@@ -5,8 +5,8 @@
 #include "gtest/gtest.h"
 #include <random>
 
-#include "../RenderingEngine/Include/app_clock.hpp"
-#include "../RenderingEngine/Include/app_time.hpp"
+#include "../RenderingLibrary/Include/app_clock.hpp"
+#include "../RenderingLibrary/Include/app_time.hpp"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;

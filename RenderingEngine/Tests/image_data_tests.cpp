@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <cstdint>
 #include "gtest/gtest.h"
-#include "../RenderingEngine/Include/image_data.hpp"
+#include "../RenderingLibrary/Include/image_data.hpp"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;

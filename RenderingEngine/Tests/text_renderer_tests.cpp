@@ -2,8 +2,8 @@
 #include <cstdint>
 #include "gtest/gtest.h"
 
-#include "../RenderingEngine/Include/image_data.hpp"
-#include "../RenderingEngine/Include/text_renderer.hpp"
+#include "../RenderingLibrary/Include/image_data.hpp"
+#include "../RenderingLibrary/Include/text_renderer.hpp"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;
