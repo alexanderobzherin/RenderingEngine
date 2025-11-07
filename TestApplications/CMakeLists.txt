@@ -2,75 +2,8 @@
 # Author: Alexander Obzherin <alexanderobzherin@gmail.com>
 # Copyright (c) 2025 Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
-cmake_minimum_required(VERSION 3.10)
 
-#set the project name
-project(TestApplication)
+add_subdirectory(HelloUnixApp)
 
-#set header files
-set(HEADER_FILES
-	${PROJECT_SOURCE_DIR}/Include/level_register.hpp
-	${PROJECT_SOURCE_DIR}/Include/demo_level.hpp
-)
-
-#set source files
-set(SRC_FILES
-    ${PROJECT_SOURCE_DIR}/Source/main.cpp
-	${PROJECT_SOURCE_DIR}/Source/demo_level.cpp
-)
-
-include_directories(${PROJECT_SOURCE_DIR}/Include/)
-include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/RenderingLibrary/Include/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Shaders/)
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-#  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-endif()
-
-#add the executable
-add_executable(DemoApplication ${HEADER_FILES} ${SRC_FILES})
-
-#specify the compiling properties
-set_target_properties(DemoApplication PROPERTIES
-	CXX_STANDARD 17
-	CXX_STANDARD_REQUIRED ON
-)
-if(NOT WIN32)
-set_target_properties(DemoApplication PROPERTIES
-	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
-)
-else(
-set_target_properties(DemoApplication PROPERTIES
-	COMPILE_OPTIONS "-Wall;-Wextra"
-	#RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-	#set_target_properties( VulkanProject PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}" )
-)
-)
-endif()
-
-target_link_libraries(DemoApplication 
-	PUBLIC
-		RenderingEngine
-	PRIVATE
-		${Vulkan_LIBRARY}
-		${GTEST_LIBRARIES}
-		glfw
-		glm::glm
-		Boost::filesystem
-		#Threads::Threads
-		${JPEG_LIBRARIES}
-		PNG::PNG
-		assimp::assimp
-)
-target_include_directories(DemoApplication PUBLIC
-${CMAKE_CURRENT_SOURCE_DIR}/Shaders
-)
-
-#Set path to shaders
-set(shader_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.vert")
-set(shader_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_vert.spv")
-set(shader_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/basic_shader.frag")
-set(shader_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/basic_shader_frag.spv")
-
-
-
-
+add_subdirectory(HelloWinApp)
+add_subdirectory(RenderSpriteMesh)

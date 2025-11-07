@@ -2,10 +2,14 @@
 
 namespace rendering_engine
 {
-boost::filesystem::path const Utility::sDefaultShadersBinaryRelativePath = {"/Intermediate/Shaders/"};
-boost::filesystem::path Utility::sShadersBinaryPath;
-boost::filesystem::path Utility::sApplicationPath;
-boost::filesystem::path Utility::sBuildPath;
+using namespace boost::filesystem;
+path const Utility::sDefaultShadersBinaryRelativePath = {"/Intermediate/Shaders/"};
+path const Utility::sTextureRelativePathFolder = path{} / "Intermediate" / "Textures";
+path const Utility::sModelsRelativePathFolder =  path{} / "Intermediate" / "Models";
+path const Utility::sShadersRelativePathFolder = path{} / "Intermediate" / "Shaders";;
+path Utility::sShadersBinaryPath;
+path Utility::sApplicationPath;
+path Utility::sBuildPath;
 
 void Utility::InitializePaths(int argc, char* argv[])
 {
@@ -129,6 +133,31 @@ std::vector<std::string> Utility::GetListOfFileNamesInDirectory(const char* dire
 	}
 
 	return imageFileNames;
+}
+
+boost::filesystem::path Utility::ResolveProjectRoot()
+{
+	auto exeDir = boost::filesystem::canonical(boost::filesystem::path(boost::filesystem::current_path())); // default
+	if (exeDir.filename() == "Debug" || exeDir.filename() == "Release")
+		exeDir = exeDir.parent_path(); // step out of Debug/Release
+	if (exeDir.filename() == "Binaries")
+		exeDir = exeDir.parent_path(); // step out of Binaries
+	return exeDir;
+}
+
+boost::filesystem::path Utility::GetTextureFolderPath()
+{
+	return ResolveProjectRoot() / sTextureRelativePathFolder;
+}
+
+boost::filesystem::path Utility::GetModelsFolderPath()
+{
+	return ResolveProjectRoot() / sModelsRelativePathFolder;
+}
+
+boost::filesystem::path Utility::GetShadersFolderPath()
+{
+	return ResolveProjectRoot() / sShadersRelativePathFolder;
 }
 
 }

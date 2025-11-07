@@ -14,12 +14,12 @@ VulkanMaterialResources::VulkanMaterialResources(VulkanRenderer* renderer)
 void VulkanMaterialResources::Initialize(Material * material)
 {
 	mDescriptorSetLayout = mRenderer->CreateDescriptorSetLayout(material);
-
-	const std::string matPath = std::string{"../Intermediate/Shaders/"} 
-		+ material->GetMaterialSettings().materialName + "/" + material->GetMaterialSettings().materialName;
-
-	auto spvVert = Utility::ReadShaderBinaryFile(matPath + "_vert.spv");
-	auto spvFrag = Utility::ReadShaderBinaryFile(matPath + "_frag.spv");
+	
+	const auto matName = material->GetMaterialSettings().materialName;
+	boost::filesystem::path matPath = Utility::GetShadersFolderPath() / matName;
+	
+	auto spvVert = Utility::ReadShaderBinaryFile((matPath / std::string(matName + "_vert.spv")).string());
+	auto spvFrag = Utility::ReadShaderBinaryFile((matPath / std::string(matName + "_frag.spv")).string());
 
 	mPipelinePair = mRenderer->CreateGraphicsPipeline(material, mDescriptorSetLayout, spvVert, spvFrag);
 }

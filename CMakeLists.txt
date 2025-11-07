@@ -5,8 +5,12 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+set(VERSION_MAJOR "0")
+set(VERSION_MINOR "1")
+set(VERSION_PATCH "0")
+
 #set the project name
-project(RenderingEngineProject VERSION 0.1.0 LANGUAGES CXX)
+project(RenderingEngineProject VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
 
 # Get date in YYYY-MM-DD format
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
@@ -20,29 +24,14 @@ configure_file(${VERSION_TEMPLATE} ${VERSION_OUTPUT} @ONLY)
 # Make generated header visible to all targets
 include_directories(${CMAKE_BINARY_DIR}/Intermediate/Generated)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_BUILD_TYPE Debug)
-#Set path to output binaries
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(PATH_TO_SOURCE_SHADER_PATH "${PROJECT_SOURCE_DIR}/RenderingEngine/RenderingLibrary/BuiltInAssets/Shaders")
-set(PATH_TO_SOURCE_TEXTURES "${PROJECT_SOURCE_DIR}/RenderingEngine/RenderingLibrary/BuiltInAssets/Textures")
-set(PATH_TO_SOURCE_MODELS "${PROJECT_SOURCE_DIR}/RenderingEngine/RenderingLibrary/BuiltInAssets/Models")
-set(PATH_TO_SOURCE_FONTS "${PROJECT_SOURCE_DIR}/RenderingEngine/RenderingLibrary/BuiltInAssets/Fonts")
-file(COPY ${PATH_TO_SOURCE_TEXTURES} DESTINATION "${CMAKE_BINARY_DIR}/Intermediate")
-file(COPY ${PATH_TO_SOURCE_MODELS} DESTINATION "${CMAKE_BINARY_DIR}/Intermediate")
-file(COPY ${PATH_TO_SOURCE_FONTS} DESTINATION "${CMAKE_BINARY_DIR}/Intermediate")
-if(WIN32)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/BasicTexture3D)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/FlatColorFiltering)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/TestTriangle)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/Intermediate/Shaders/Quad2D)
 
-set(PATH_TO_COMPILED_SHADER_PATH "${CMAKE_BINARY_DIR}/Intermediate/Shaders")
-set(SHADER_COMPILER $ENV{glslc})
+if(UNIX)
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -g0 -s")
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 endif()
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-#  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-endif()
+
+option(RE_BUILD_ENGINE_ONLY "" OFF)
 
 # Use FindVulkan module added with CMAKE 3.7
 if (NOT CMAKE_VERSION VERSION_LESS 3.7.0)
@@ -102,5 +91,7 @@ message(STATUS "freetype2 LINK LIBRARIES:  ${freetype2_LINK_LIBRARIES}")
 endif()
 
 add_subdirectory(RenderingEngine)
-add_subdirectory(TestApplications)
 #add_subdirectory(ContentExamples)
+if(NOT RE_BUILD_ENGINE_ONLY)
+add_subdirectory(TestApplications)
+endif()

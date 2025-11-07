@@ -1,0 +1,28 @@
+:: This file is part of the Rendering Engine project.
+:: Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+:: Copyright (c) 2025 Alexander Obzherin
+:: Distributed under the terms of the zlib License. See LICENSE.md for details.
+
+:: Check for --docs-only argument
+IF "%1"=="--docs-only" (
+    :: Generate documentation
+    echo Generating Doxygen documentation only...
+    if exist Build\Docs rmdir /s /q Build\Docs
+    mkdir Build\Docs
+    cd Build\Docs
+    doxygen ..\..\Doxyfile
+    exit /b
+)
+
+::Clean previously created binaries
+rmdir /s /q Build
+::Create new build directory and step into it
+mkdir Build
+cd Build
+::Run root cmake file
+set TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake
+cmake .. -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE% -A x64
+
+:: Installation implementation postponed
+:: cmake --build . --config Debug
+::cmake --install . --config Debug --prefix "Installed"

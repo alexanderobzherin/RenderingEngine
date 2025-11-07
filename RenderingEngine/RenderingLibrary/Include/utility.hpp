@@ -70,6 +70,14 @@ public:
 	 */
 	static std::vector<std::string> GetListOfFileNamesInDirectory(const char* directory, std::string extToSearch);
 
+	static boost::filesystem::path ResolveProjectRoot();
+
+	static boost::filesystem::path GetTextureFolderPath();
+
+	static boost::filesystem::path GetModelsFolderPath();
+
+	static boost::filesystem::path GetShadersFolderPath();
+
 	private:
 		Utility();
 		Utility( const Utility& rhs );
@@ -82,6 +90,9 @@ public:
 		static boost::filesystem::path const sDefaultShadersBinaryRelativePath;
 		static boost::filesystem::path sBuildPath;
 		static boost::filesystem::path sShadersBinaryPath;
+		static boost::filesystem::path const sTextureRelativePathFolder;
+		static boost::filesystem::path const sModelsRelativePathFolder;
+		static boost::filesystem::path const sShadersRelativePathFolder;
 		
 };
 

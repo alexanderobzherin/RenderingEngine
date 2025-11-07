@@ -29,11 +29,11 @@ void SceneManager::Initialize()
 	// 2. Models
 	// 3. Materials
 	boost::filesystem::path path;
-	const auto textureFolder = path / ".." / "Intermediate" / "Textures";
+	const auto textureFolder = Utility::GetTextureFolderPath();
 	mTextureCache = std::make_shared<TextureCache>(mRenderer);
 	mTextureCache->LoadTexturesFromFolder(textureFolder.string());
 
-	const auto modelsFolder = path / ".." / "Intermediate" / "Models";
+	const auto modelsFolder = Utility::GetModelsFolderPath();
 	mModelCache = std::make_shared<ModelCache>(mRenderer);
 	mModelCache->LoadModelsFromFolder(modelsFolder.string());
 	mModelCache->CreateQuad2D();

@@ -5,4 +5,7 @@
 
 add_subdirectory(RenderingLibrary)
 add_subdirectory(MaterialCompiler)
+
+if(NOT RE_BUILD_ENGINE_ONLY)
 add_subdirectory(Tests)
+endif()

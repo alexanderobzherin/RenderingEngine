@@ -5,15 +5,21 @@
 cmake_minimum_required(VERSION 3.10)
 
 #set the project name
-project(RenderingLibrary)
-message(STATUS "Hello")
-message(STATUS ${PROJECT_SOURCE_DIR})
+project(RenderingLibrary VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
+
+include(GNUInstallDirs)
+set(CMAKE_INSTALL_LIBDIR "Library")
+set(CMAKE_INSTALL_INCLUDEDIR "Include")
+set(CMAKE_INSTALL_BINDIR "Binary")
+
 #set header files
 include_directories(${PROJECT_SOURCE_DIR}/Include/)
 
-include_directories(${PATH_TO_SOURCE_SHADER_PATH}/BuiltInAssets/Shaders)
+
+#include_directories(${PATH_TO_SOURCE_SHADER_PATH}/BuiltInAssets/Shaders)
 
 set(HEADER_FILES
+#[===[
 	# Shaders
 	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/BasicTexture3D/BasicTexture3D.vert
 	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/BasicTexture3D/BasicTexture3D.frag
@@ -21,6 +27,7 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/FlatColorFiltering/FlatColorFiltering.frag
 	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/Quad2D/Quad2D.vert
 	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/Quad2D/Quad2D.frag
+]===]
 
 	# Windowing system level
 	${PROJECT_SOURCE_DIR}/Include/i_window_system.hpp
@@ -92,6 +99,9 @@ set(HEADER_FILES
 	
 	${PROJECT_SOURCE_DIR}/Include/actor.hpp
 )
+
+set(RenderingLibrary_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/Include/")
+set(RenderingLibrary_LIBRARIES RenderingEngine)
 
 #set source files
 set(SRC_FILES
@@ -194,9 +204,11 @@ target_link_libraries(RenderingEngine
 
 target_include_directories(RenderingEngine PUBLIC
 ${freetype2_INCLUDE_DIRS}
-${CMAKE_CURRENT_SOURCE_DIR}/Shaders
+#${CMAKE_CURRENT_SOURCE_DIR}/Shaders
+$<INSTALL_INTERFACE:Include>
 )
 
+#[===[
 #Set path to shaders
 set(basic_texture_3d_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/BasicTexture3D/BasicTexture3D.vert")
 set(basic_texture_3d_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/BasicTexture3D/BasicTexture3D_vert.spv")
@@ -235,3 +247,97 @@ add_custom_command(
 	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_frag_source} -o ${quad2D_frag_spv}
 )
 endif()
+
+]===]
+
+#[===[
+# --- Install the library and headers for SDK use ---
+include(GNUInstallDirs)
+
+install(TARGETS RenderingEngine
+EXPORT RenderingEngineTargets
+ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+# Public headers (the API)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Include/
+DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/RenderingEngine
+FILES_MATCHING PATTERN "*.hpp"
+)
+
+# Generated version header
+install(FILES ${CMAKE_BINARY_DIR}/Intermediate/Generated/version.h
+DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/RenderingEngine
+)
+
+# Export CMake config
+install(EXPORT RenderingEngineTargets
+FILE RenderingEngineTargets.cmake
+NAMESPACE RenderingEngine::
+DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
+)
+
+# Generate Config file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+	"${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+	)
+	
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/RenderingEngineConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
+    @ONLY
+	)
+	
+	install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
+)
+# End of installation
+]===]
+
+### Installation 
+# --------------------------
+# Install headers
+# --------------------------
+install(DIRECTORY Include/
+        DESTINATION Include
+        FILES_MATCHING PATTERN "*.hpp")
+
+# --------------------------
+# Install the library
+# --------------------------
+install(TARGETS RenderingEngine
+        EXPORT RenderingEngineTargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# --------------------------
+# Export the CMake package
+# --------------------------
+install(EXPORT RenderingEngineTargets
+        FILE RenderingEngineTargets.cmake
+        NAMESPACE RenderingEngine::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine)
+
+# --------------------------
+# Generate a Config file
+# --------------------------
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/RenderingEngineConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
+    INSTALL_DESTINATION Library/cmake/RenderingEngine
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
+    DESTINATION Library/cmake/RenderingEngine
+)
+### / Installation 
