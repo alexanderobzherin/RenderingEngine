@@ -4,11 +4,25 @@
 #include "app_clock.hpp"
 #include "app_time.hpp"
 #include "scene_manager.hpp"
+#include "utility.hpp"
 
 #include <exception>
 
 namespace rendering_engine
 {
+CoreApplication::CoreApplication()
+    :
+    mAppTime(std::make_shared<AppTime>()),
+    mWindowSystem{ nullptr },
+    mRenderer{ nullptr }
+{
+    AppConfig appConfig = Utility::ReadConfigFile();
+
+    mAppName = appConfig.appName.c_str();
+    bIsFullScreen = appConfig.isFullScreen;
+    mWidth = static_cast<unsigned int>(appConfig.screenWidth);
+    mHeight = static_cast<unsigned int>(appConfig.screenHeight);
+}
 CoreApplication::CoreApplication(char const* appName)
     :
     bIsFullScreen{true},
@@ -69,6 +83,7 @@ void CoreApplication::Initialize()
     {
         mRenderer = std::make_shared<VulkanRenderer>(*mWindowSystem.get());
     }
+
 
     mWindowSystem->CreateAppWindow(mWidth, mHeight, mAppName);
     if (bIsFullScreen)

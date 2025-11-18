@@ -15,20 +15,7 @@ set(CMAKE_INSTALL_BINDIR "Binary")
 #set header files
 include_directories(${PROJECT_SOURCE_DIR}/Include/)
 
-
-#include_directories(${PATH_TO_SOURCE_SHADER_PATH}/BuiltInAssets/Shaders)
-
 set(HEADER_FILES
-#[===[
-	# Shaders
-	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/BasicTexture3D/BasicTexture3D.vert
-	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/BasicTexture3D/BasicTexture3D.frag
-	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/FlatColorFiltering/FlatColorFiltering.vert
-	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/FlatColorFiltering/FlatColorFiltering.frag
-	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/Quad2D/Quad2D.vert
-	${PROJECT_SOURCE_DIR}/BuiltInAssets/Shaders/Quad2D/Quad2D.frag
-]===]
-
 	# Windowing system level
 	${PROJECT_SOURCE_DIR}/Include/i_window_system.hpp
 	${PROJECT_SOURCE_DIR}/Include/standalone_window_system.hpp
@@ -199,6 +186,7 @@ target_link_libraries(RenderingEngine
 	PNG::PNG
 	assimp::assimp
 	freetype
+	nlohmann_json::nlohmann_json
 )
 
 
@@ -207,98 +195,6 @@ ${freetype2_INCLUDE_DIRS}
 #${CMAKE_CURRENT_SOURCE_DIR}/Shaders
 $<INSTALL_INTERFACE:Include>
 )
-
-#[===[
-#Set path to shaders
-set(basic_texture_3d_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/BasicTexture3D/BasicTexture3D.vert")
-set(basic_texture_3d_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/BasicTexture3D/BasicTexture3D_vert.spv")
-set(basic_texture_3d_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/BasicTexture3D/BasicTexture3D.frag")
-set(basic_texture_3d_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/BasicTexture3D/BasicTexture3D_frag.spv")
-
-set(flat_color_filtering_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/FlatColorFiltering/FlatColorFiltering.vert")
-set(flat_color_filtering_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/FlatColorFiltering/FlatColorFiltering_vert.spv")
-set(flat_color_filtering_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/FlatColorFiltering/FlatColorFiltering.frag")
-set(flat_color_filtering_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/FlatColorFiltering/FlatColorFiltering_frag.spv")
-
-set(test_triangle_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/TestTriangle/TestTriangle.vert")
-set(test_triangle_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestTriangle/TestTriangle_vert.spv")
-set(test_triangle_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/TestTriangle/TestTriangle.frag")
-set(test_triangle_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestTriangle/TestTriangle_frag.spv")
-
-set(quad2D_vert_source "${PATH_TO_SOURCE_SHADER_PATH}/Quad2D/Quad2D.vert")
-set(quad2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_vert.spv")
-set(quad2D_frag_source "${PATH_TO_SOURCE_SHADER_PATH}/Quad2D/Quad2D.frag")
-set(quad2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_frag.spv")
-
-if(WIN32)
-add_custom_command(
-	TARGET RenderingEngine 
-	PRE_BUILD
-	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_vert_source} -o ${basic_texture_3d_vert_spv}
-	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_frag_source} -o ${basic_texture_3d_frag_spv}
-
-	COMMAND cmd /c ${SHADER_COMPILER} ${flat_color_filtering_vert_source} -o ${flat_color_filtering_vert_spv}
-	COMMAND cmd /c ${SHADER_COMPILER} ${flat_color_filtering_frag_source} -o ${flat_color_filtering_frag_spv}
-
-	COMMAND cmd /c ${SHADER_COMPILER} ${test_triangle_vert_source} -o ${test_triangle_vert_spv}
-	COMMAND cmd /c ${SHADER_COMPILER} ${test_triangle_frag_source} -o ${test_triangle_frag_spv}
-
-	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_vert_source} -o ${quad2D_vert_spv}
-	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_frag_source} -o ${quad2D_frag_spv}
-)
-endif()
-
-]===]
-
-#[===[
-# --- Install the library and headers for SDK use ---
-include(GNUInstallDirs)
-
-install(TARGETS RenderingEngine
-EXPORT RenderingEngineTargets
-ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
-# Public headers (the API)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Include/
-DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/RenderingEngine
-FILES_MATCHING PATTERN "*.hpp"
-)
-
-# Generated version header
-install(FILES ${CMAKE_BINARY_DIR}/Intermediate/Generated/version.h
-DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/RenderingEngine
-)
-
-# Export CMake config
-install(EXPORT RenderingEngineTargets
-FILE RenderingEngineTargets.cmake
-NAMESPACE RenderingEngine::
-DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
-)
-
-# Generate Config file
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-	"${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY AnyNewerVersion
-	)
-	
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/RenderingEngineConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
-    @ONLY
-	)
-	
-	install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfigVersion.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
-)
-# End of installation
-]===]
 
 ### Installation 
 # --------------------------

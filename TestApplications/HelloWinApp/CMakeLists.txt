@@ -21,6 +21,7 @@ set(SRC_FILES
 
 include_directories(${PROJECT_SOURCE_DIR}/Include/)
 include_directories(${PROJECT_SOURCE_DIR}/Assets/Shaders/)
+include_directories(${PROJECT_SOURCE_DIR}/Config/)
 
 if(WIN32)
 	include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/RenderingLibrary/Include/)
@@ -79,10 +80,12 @@ set(BUILDIN_SOURCE_SHADER_PATH "${PROJECT_SOURCE_DIR}/Assets/Shaders")
 set(PATH_TO_SOURCE_TEXTURES "${PROJECT_SOURCE_DIR}/Assets/Textures")
 set(PATH_TO_SOURCE_MODELS "${PROJECT_SOURCE_DIR}/Assets/Models")
 set(PATH_TO_SOURCE_FONTS "${PROJECT_SOURCE_DIR}/Assets/Fonts")
+set(PATH_TO_APP_CONFIG "${PROJECT_SOURCE_DIR}/Config")
 file(COPY ${PATH_TO_SOURCE_TEXTURES} DESTINATION "${PROJECT_BINARY_DIR}/Intermediate")
 file(COPY ${PATH_TO_SOURCE_MODELS} DESTINATION "${PROJECT_BINARY_DIR}/Intermediate")
 file(COPY ${PATH_TO_SOURCE_FONTS} DESTINATION "${PROJECT_BINARY_DIR}/Intermediate")
 file(COPY ${BUILDIN_SOURCE_SHADER_PATH} DESTINATION "${PROJECT_BINARY_DIR}/Intermediate")
+file(COPY ${PATH_TO_APP_CONFIG} DESTINATION "${PROJECT_BINARY_DIR}")
 set(PATH_TO_SOURCE_SHADER "${PROJECT_BINARY_DIR}/Intermediate/Shaders")
 
 #Set paths to buildin shaders
@@ -108,8 +111,29 @@ set(quad2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_frag.spv")
 
 if(WIN32)
 add_custom_command(
-	TARGET HelloWinApp 
+	TARGET HelloWinApp  
 	PRE_BUILD
+
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_SOURCE_TEXTURES}
+            ${PROJECT_BINARY_DIR}/Intermediate/Textures
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_SOURCE_MODELS}
+            ${PROJECT_BINARY_DIR}/Intermediate/Models
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_SOURCE_FONTS}
+            ${PROJECT_BINARY_DIR}/Intermediate/Fonts
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${BUILDIN_SOURCE_SHADER_PATH}
+            ${PROJECT_BINARY_DIR}/Intermediate/Shaders
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_APP_CONFIG}
+            ${PROJECT_BINARY_DIR}/Config
+
 	# Compile buildin shaders
 	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_vert_source} -o ${basic_texture_3d_vert_spv}
 	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_frag_source} -o ${basic_texture_3d_frag_spv}

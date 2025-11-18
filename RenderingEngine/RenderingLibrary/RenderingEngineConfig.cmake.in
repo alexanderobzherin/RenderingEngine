@@ -33,6 +33,7 @@ find_dependency(Boost REQUIRED COMPONENTS filesystem)
 find_dependency(PNG REQUIRED)
 find_dependency(JPEG REQUIRED)
 find_dependency(assimp CONFIG REQUIRED)
+find_dependency(nlohmann_json CONFIG REQUIRED)
 
 # Freetype handling
 if(WIN32)

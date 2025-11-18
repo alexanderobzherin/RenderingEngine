@@ -4,6 +4,6 @@
 
 # Developer Guide
 
-[Prepare Environment](prepare_environment.md)
-[Docker Container](docker_container.md)
-[Project Creation Guide](project_creation_guide.md)
+- [Prepare Environment](prepare_environment.md)
+- [Docker Container](docker_container.md)
+- [Project Creation Guide](project_creation_guide.md)

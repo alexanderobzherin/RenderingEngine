@@ -78,6 +78,8 @@ find_package(PNG REQUIRED)
 
 find_package(assimp CONFIG REQUIRED)
 
+find_package(nlohmann_json CONFIG QUIET)
+
 if(WIN32)
 find_package(freetype CONFIG REQUIRED)
 else()

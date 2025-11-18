@@ -1,0 +1,6 @@
+{
+  "appName": "@PROJECT_NAME@",
+  "isFullScreen": false,
+  "screenWidth": 800,
+  "screenHeight": 600
+}

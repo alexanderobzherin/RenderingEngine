@@ -33,6 +33,12 @@ class CoreApplication : public IApplication
 {
 public:
 	/**
+	 * @brief Constructs a CoreApplication using settings from the config file.
+	 *
+	 * Loads AppConfig and applies its values to window setup.
+	 */
+	CoreApplication();
+	/**
 	 * @brief Constructs a CoreApplication with full-screen window size.
 	 * @param appName Name of the application, used for window caption and logging.
 	 */
@@ -84,7 +90,7 @@ protected:
 	bool bIsFullScreen;
 	unsigned int mWidth;
 	unsigned int mHeight;
-	char const* mAppName;
+	std::string mAppName;
 	
 	std::shared_ptr<AppTime> mAppTime;
 	std::shared_ptr<IWindowSystem> mWindowSystem;

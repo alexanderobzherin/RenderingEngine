@@ -11,8 +11,29 @@
 #include <vector>
 #include "boost/filesystem.hpp"
 
+
 namespace rendering_engine
 {
+/**
+ * @struct AppConfig
+ * @brief Basic application settings loaded from a configuration file.
+ *
+ * This structure represents a minimal configuration schema for applications
+ * built using the Rendering Engine. Values are typically read from
+ * `Config/app_config.json` at startup and applied during window creation.
+ */
+struct AppConfig
+{
+	/** @brief Name of the application */
+	std::string appName;
+	/** @brief Whether the application should start in full-screen mode. */
+	bool isFullScreen = false;
+	/** @brief Desired window width in pixels (ignored in full-screen mode). */
+	float screenWidth = 800.0f;
+	/** @brief Desired window height in pixels (ignored in full-screen mode). */
+	float screenHeight = 600.0f;
+};
+
 /**
  * @class Utility
  * @brief Provides static helper methods for file I/O and path management.
@@ -35,6 +56,14 @@ public:
      * @param argv Command-line argument vector.
      */
 	static void InitializePaths(int argc, char* argv[]);
+	/**
+	 * @brief Reads application settings from the JSON config file.
+	 *
+	 * Missing or invalid fields fall back to default AppConfig values.
+	 *
+	 * @return Populated AppConfig structure.
+	 */
+	static AppConfig ReadConfigFile();
 	/**
 	 * @brief Reads a binary shader file from disk.
 	 * @param filename Path to the shader file.
@@ -78,6 +107,8 @@ public:
 
 	static boost::filesystem::path GetShadersFolderPath();
 
+	static boost::filesystem::path GetConfigFilePath();
+
 	private:
 		Utility();
 		Utility( const Utility& rhs );
@@ -93,6 +124,7 @@ public:
 		static boost::filesystem::path const sTextureRelativePathFolder;
 		static boost::filesystem::path const sModelsRelativePathFolder;
 		static boost::filesystem::path const sShadersRelativePathFolder;
+		static boost::filesystem::path const sAppConfigFilePath;
 		
 };
 

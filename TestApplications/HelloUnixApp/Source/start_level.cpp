@@ -62,7 +62,7 @@ void StartLevel::Update(float deltaTime)
 
 	mQuad2D->SetRotation(newRot);
 
-	mTestCube->SetRotation(glm::vec3(newRot*0.5f, 0.0f, newRot * 0.5f));
+	mTestCube->SetRotation(glm::vec3(newRot * 0.5f, 0.0f, newRot * 0.5f));
 
 	mTestDice1->SetRotation(glm::vec3(newRot * 0.5f, -newRot * 0.5f, 0.0f));
 	mTestDice2->SetRotation(glm::vec3(-newRot * 0.5f, newRot * 0.5f, 0.0f));

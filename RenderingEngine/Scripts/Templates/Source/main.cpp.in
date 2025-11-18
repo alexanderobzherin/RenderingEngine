@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	std::cout << "App is running..." << std::endl;
     Utility::InitializePaths(argc, argv);
 
-    std::unique_ptr<CoreApplication> app = std::make_unique<CoreApplication>(800, 600, "Application Name");
+    std::unique_ptr<CoreApplication> app = std::make_unique<CoreApplication>();
     try
     {
         app->Initialize();

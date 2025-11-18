@@ -1,12 +1,16 @@
 #include "utility.hpp"
+#include <nlohmann/json.hpp>
 
 namespace rendering_engine
 {
 using namespace boost::filesystem;
+
 path const Utility::sDefaultShadersBinaryRelativePath = {"/Intermediate/Shaders/"};
 path const Utility::sTextureRelativePathFolder = path{} / "Intermediate" / "Textures";
 path const Utility::sModelsRelativePathFolder =  path{} / "Intermediate" / "Models";
-path const Utility::sShadersRelativePathFolder = path{} / "Intermediate" / "Shaders";;
+path const Utility::sShadersRelativePathFolder = path{} / "Intermediate" / "Shaders";
+path const Utility:: sAppConfigFilePath = path{} / "Config" / "app_config.json";
+
 path Utility::sShadersBinaryPath;
 path Utility::sApplicationPath;
 path Utility::sBuildPath;
@@ -17,6 +21,40 @@ void Utility::InitializePaths(int argc, char* argv[])
 
 	sBuildPath = FindPath( "Build" );
 	sShadersBinaryPath = sBuildPath += sDefaultShadersBinaryRelativePath;
+}
+
+AppConfig Utility::ReadConfigFile()
+{
+	AppConfig cfg;
+
+	std::ifstream f(GetConfigFilePath().string());
+	if (!f.is_open())
+	{
+		return cfg;
+	}
+
+	try
+	{
+		nlohmann::json appConfigData = nlohmann::json::parse(f);
+
+		if (appConfigData.contains("appName"))
+			cfg.appName = appConfigData["appName"].get<std::string>();
+
+		if (appConfigData.contains("isFullScreen"))
+			cfg.isFullScreen = appConfigData["isFullScreen"].get<bool>();
+
+		if (appConfigData.contains("screenWidth"))
+			cfg.screenWidth = appConfigData["screenWidth"].get<float>();
+
+		if (appConfigData.contains("screenHeight"))
+			cfg.screenHeight = appConfigData["screenHeight"].get<float>();
+	}
+	catch (const std::exception& e)
+	{
+		return cfg;
+	}
+
+	return cfg;
 }
 
 std::vector<char> Utility::ReadShaderBinaryFile( std::string const & filename )
@@ -158,6 +196,11 @@ boost::filesystem::path Utility::GetModelsFolderPath()
 boost::filesystem::path Utility::GetShadersFolderPath()
 {
 	return ResolveProjectRoot() / sShadersRelativePathFolder;
+}
+
+boost::filesystem::path Utility::GetConfigFilePath()
+{
+	return ResolveProjectRoot() / sAppConfigFilePath;
 }
 
 }
