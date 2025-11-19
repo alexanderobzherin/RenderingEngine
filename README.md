@@ -30,6 +30,7 @@ The following libraries are required:
 - [libpng](http://www.libpng.org/)
 - [Assimp](https://github.com/assimp/assimp)
 - [FreeType](https://freetype.org/)
+- [nlohmann/json](https://json.nlohmann.me/)
 
 ---
 
