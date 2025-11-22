@@ -73,6 +73,8 @@ CoreApplication::CoreApplication(char const* appName,
     mRenderer{ renderer }
 {}
 
+CoreApplication::~CoreApplication(){};
+
 void CoreApplication::Initialize()
 {
     if (!mWindowSystem)

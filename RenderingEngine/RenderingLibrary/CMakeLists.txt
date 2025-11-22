@@ -2,7 +2,7 @@
 # Author: Alexander Obzherin <alexanderobzherin@gmail.com>
 # Copyright (c) 2025 Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 #set the project name
 project(RenderingLibrary VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
@@ -16,6 +16,7 @@ set(CMAKE_INSTALL_BINDIR "Binary")
 include_directories(${PROJECT_SOURCE_DIR}/Include/)
 
 set(HEADER_FILES
+	${PROJECT_SOURCE_DIR}/Include/rendering_engine_export.hpp
 	# Windowing system level
 	${PROJECT_SOURCE_DIR}/Include/i_window_system.hpp
 	${PROJECT_SOURCE_DIR}/Include/standalone_window_system.hpp
@@ -155,7 +156,8 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 endif()
 
 #add shared library
-add_library(RenderingEngine STATIC ${HEADER_FILES} ${SRC_FILES})
+add_library(RenderingEngine SHARED ${HEADER_FILES} ${SRC_FILES})
+target_compile_definitions(RenderingEngine PRIVATE RENDERING_ENGINE_BUILD)
 
 #specify the compiling properties
 set_target_properties(RenderingEngine PROPERTIES
@@ -170,29 +172,37 @@ if(NOT WIN32)
 else(
 	set_target_properties(RenderingEngine PROPERTIES
 		COMPILE_OPTIONS "-Wall;-Wextra"
-		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-		RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}"
+		RUNTIME_OUTPUT_DIRECTORY           "${CMAKE_BINARY_DIR}"
+		RUNTIME_OUTPUT_DIRECTORY_DEBUG     "${CMAKE_BINARY_DIR}"
+		RUNTIME_OUTPUT_DIRECTORY_RELEASE   "${CMAKE_BINARY_DIR}"
 	)
 )
 endif()
 
-target_link_libraries(RenderingEngine 
+# Public includes for SDK users
+target_include_directories(RenderingEngine
     PUBLIC
-    ${Vulkan_LIBRARY}
-    glfw
-    glm::glm
-	Boost::filesystem
-	${JPEG_LIBRARIES}
-	PNG::PNG
-	assimp::assimp
-	freetype
-	nlohmann_json::nlohmann_json
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Include>
+        $<INSTALL_INTERFACE:Include>
+       # ${CMAKE_BINARY_DIR}/Intermediate/Generated
+)
+
+target_link_libraries(RenderingEngine 
+	PUBLIC
+		glfw
+		glm::glm
+		Boost::filesystem
+		JPEG::JPEG 
+		PNG::PNG
+		assimp::assimp
+		freetype
+		nlohmann_json::nlohmann_json	
+    	Vulkan::Vulkan
 )
 
 
 target_include_directories(RenderingEngine PUBLIC
 ${freetype2_INCLUDE_DIRS}
-#${CMAKE_CURRENT_SOURCE_DIR}/Shaders
 $<INSTALL_INTERFACE:Include>
 )
 

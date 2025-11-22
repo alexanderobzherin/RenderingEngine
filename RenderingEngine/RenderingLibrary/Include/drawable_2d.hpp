@@ -5,12 +5,13 @@
 
 #pragma once
 
+#include "rendering_engine_export.hpp"
 #include "drawable_component.hpp"
 #include "scene_component_2d.hpp"
 
 namespace rendering_engine
 {
-class Camera2D;
+class RE_API Camera2D;
 
 /**
  * @class Drawable2D
@@ -22,7 +23,7 @@ class Camera2D;
  * @note Not copyable or assignable.
  * @see DrawableComponent, SceneComponent2D, Camera2D
  */
-class Drawable2D : public DrawableComponent
+class RE_API Drawable2D : public DrawableComponent
 {
 public:
 	/**

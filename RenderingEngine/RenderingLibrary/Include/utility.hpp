@@ -11,6 +11,7 @@
 #include <vector>
 #include "boost/filesystem.hpp"
 
+#include "rendering_engine_export.hpp"
 
 namespace rendering_engine
 {
@@ -43,7 +44,7 @@ struct AppConfig
  *
  * All methods are static and thread-safe, designed for use throughout the engine.
  */
-class Utility final
+class RE_API Utility final
 {
 public:
     /**

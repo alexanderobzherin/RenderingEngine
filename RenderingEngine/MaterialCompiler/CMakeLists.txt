@@ -47,9 +47,3 @@ endif()
 target_link_libraries(MaterialCompiler PRIVATE
 	RenderingEngine
 )
-	
-	
-	
-	
-	
-	

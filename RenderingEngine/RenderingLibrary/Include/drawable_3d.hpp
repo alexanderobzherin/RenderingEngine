@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "rendering_engine_export.hpp"
 #include "drawable_component.hpp"
 #include "scene_component.hpp"
 
@@ -22,7 +23,7 @@ class Camera;
  * @note Not copyable or assignable.
  * @see DrawableComponent, SceneComponent, Camera
  */
-class Drawable3D : public DrawableComponent
+class RE_API Drawable3D : public DrawableComponent
 {
 public:
 	/**

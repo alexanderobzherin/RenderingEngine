@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "rendering_engine_export.hpp"
 #include "drawable_2d.hpp"
 
 namespace rendering_engine
@@ -20,7 +21,7 @@ namespace rendering_engine
  * @note Not copyable or assignable.
  * @see Drawable2D, DrawableComponent, SceneComponent2D, Camera2D
  */
-class Quad2D : public Drawable2D
+class RE_API Quad2D : public Drawable2D
 {
 public:
 	/**

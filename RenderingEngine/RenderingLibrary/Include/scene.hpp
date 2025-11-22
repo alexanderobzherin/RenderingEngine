@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 
+#include "rendering_engine_export.hpp"
+
 namespace rendering_engine
 {
 class SceneManager;
@@ -30,7 +32,7 @@ class Drawable2D;
  * @note Scenes are created and managed by SceneManager.
  * @see SceneManager, Drawable3D, Drawable2D, Camera, Camera2D
  */
-class Scene
+class RE_API Scene
 {
 public:
 	/**
@@ -61,7 +63,7 @@ public:
 	 * @brief Renders all 3D and 2D drawables in the scene.
 	 *
 	 * The base implementation can iterate through mDrawables3D and mDrawables2D
-	 * to call each object’s Draw() method, using the active cameras.
+	 * to call each objectï¿½s Draw() method, using the active cameras.
 	 */
 	virtual void Draw();
 	/**

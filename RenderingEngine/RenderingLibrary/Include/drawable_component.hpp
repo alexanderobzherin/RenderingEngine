@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include "rendering_engine_export.hpp"
 #include "vertex_declarations.hpp"
 #include "render_resource_context.hpp"
 #include "i_render_resources.hpp"
@@ -34,7 +35,7 @@ class MeshDataGpu;
  * @note Not copyable or assignable.
  * @see Drawable2D, Drawable3D
  */
-class DrawableComponent
+class RE_API DrawableComponent
 {
 public:
     /**

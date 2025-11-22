@@ -14,6 +14,10 @@ IF "%1"=="--docs-only" (
     exit /b
 )
 
+IF "%1"=="--build-sdk" (
+set BUILD_ENGINE_ONLY="ON"
+)
+
 ::Clean previously created binaries
 rmdir /s /q Build
 ::Create new build directory and step into it
@@ -21,8 +25,9 @@ mkdir Build
 cd Build
 ::Run root cmake file
 set TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake
-cmake .. -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE% -A x64
+cmake .. -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE% -DVCPKG_TARGET_TRIPLET=x64-windows-static-md -A x64 -DRE_BUILD_ENGINE_ONLY=%BUILD_ENGINE_ONLY%
 
-:: Installation implementation postponed
-:: cmake --build . --config Debug
-::cmake --install . --config Debug --prefix "Installed"
+IF "%1"=="--build-sdk" (
+cmake --build . --config Release
+cmake --install . --config Release --prefix "Installed"
+)

@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
+#include "rendering_engine_export.hpp"
 #include "vector_definitions.hpp"
 
 namespace rendering_engine
@@ -43,7 +44,7 @@ class SceneComponent;
  * @see rendering_engine::SceneComponent
  * @see rendering_engine::axes
  */
-class Camera
+class RE_API Camera
 {
 public:
 	/**

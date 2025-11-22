@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "rendering_engine_export.hpp"
 #include "drawable_3d.hpp"
 
 namespace rendering_engine
@@ -16,7 +17,7 @@ namespace rendering_engine
  * @note Not copyable or assignable.
  * @see Drawable3D, DrawableComponent, SceneComponent, Camera
  */
-class StaticMesh : public Drawable3D
+class RE_API StaticMesh : public Drawable3D
 {
 public:
 	/**

@@ -19,8 +19,7 @@ cd vcpkg
 
 2. Install required libraries:
 ```bash
-.\vcpkg.exe install glfw3 glm boost-filesystem gtest libjpeg-turbo libpng assimp freetype nlohmann-json
-.\vcpkg.exe install glfw3:x64-windows glm:x64-windows boost-filesystem:x64-windows gtest:x64-windows libjpeg-turbo:x64-windows libpng:x64-windows assimp:x64-windows freetype:x64-windows nlohmann-json:x64-windows
+.\vcpkg install --triplet x64-windows-static-md glfw3 glm boost-filesystem libpng libjpeg-turbo freetype assimp nlohmann-json gtest
 ```
 
 3. Set the VCPKG_ROOT environment variable to the folder where you cloned vcpkg:

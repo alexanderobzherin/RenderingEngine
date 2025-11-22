@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "rendering_engine_export.hpp"
 #include "render_resource_context.hpp"
 
 #include <memory>
@@ -35,7 +36,7 @@ struct RenderResourceContext;
  *
  * @see Scene, RenderResourceContext, TextureCache, ModelCache, MaterialCache
  */
-class SceneManager
+class RE_API SceneManager
 {
 public:
 	/**

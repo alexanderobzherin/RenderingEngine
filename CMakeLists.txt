@@ -3,7 +3,7 @@
 # Copyright (c) 2025 Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "1")
@@ -24,56 +24,62 @@ configure_file(${VERSION_TEMPLATE} ${VERSION_OUTPUT} @ONLY)
 # Make generated header visible to all targets
 include_directories(${CMAKE_BINARY_DIR}/Intermediate/Generated)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Build flags
 if(UNIX)
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -g0 -s")
 else()
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
 endif()
 
 option(RE_BUILD_ENGINE_ONLY "" OFF)
+option(BUILD_SDK "Build the Rendering Engine as SDK" OFF)
 
-# Use FindVulkan module added with CMAKE 3.7
 if (NOT CMAKE_VERSION VERSION_LESS 3.7.0)
-	message(STATUS "Using module to find Vulkan")
-	find_package(Vulkan)
+    find_package(Vulkan REQUIRED)
+else()
+    message(FATAL_ERROR "CMake >= 3.7 required for FindVulkan.")
 endif()
 
-IF(WIN32)
-	IF (NOT Vulkan_FOUND)
-		find_library(Vulkan_LIBRARY NAMES vulkan-1 vulkan PATHS ${CMAKE_SOURCE_DIR}/libs/vulkan)
-		IF (Vulkan_LIBRARY)
-			set(Vulkan_FOUND ON)
-			MESSAGE("Using bundled Vulkan library version")
-		ENDIF()
-	ENDIF()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVK_USE_PLATFORM_WIN32_KHR")
-ELSEIF(LINUX)
-	IF (NOT Vulkan_FOUND)
-		find_library(Vulkan_LIBRARY NAMES vulkan HINTS "$ENV{VULKAN_SDK}/lib" "${CMAKE_SOURCE_DIR}/libs/vulkan" REQUIRED)
-		IF (Vulkan_LIBRARY)
-			set(Vulkan_FOUND ON)
-			MESSAGE("Using bundled Vulkan library version")
-		ENDIF()
-	ENDIF()
-ENDIF()
+# Extra fallback for manual SDK path if needed
+if (NOT Vulkan_FOUND)
+    if (WIN32)
+        find_library(Vulkan_LIBRARY NAMES vulkan-1 vulkan
+                     PATHS "${CMAKE_SOURCE_DIR}/libs/vulkan")
+    elseif (UNIX)
+        find_library(Vulkan_LIBRARY NAMES vulkan
+                     HINTS "$ENV{VULKAN_SDK}/lib" "${CMAKE_SOURCE_DIR}/libs/vulkan")
+    endif()
 
-IF (NOT Vulkan_FOUND)
-	message(FATAL_ERROR "Could not find Vulkan library!")
-ELSE()
-	message(STATUS ${Vulkan_LIBRARY})
-ENDIF()
+    if (Vulkan_LIBRARY)
+        set(Vulkan_FOUND ON)
+        add_library(Vulkan::Vulkan UNKNOWN IMPORTED)
+        set_target_properties(Vulkan::Vulkan PROPERTIES
+            IMPORTED_LOCATION "${Vulkan_LIBRARY}")
+        message(STATUS "Using bundled Vulkan library: ${Vulkan_LIBRARY}")
+    else()
+        message(FATAL_ERROR "Could not find Vulkan library!")
+    endif()
+endif()
+
+if (WIN32)
+    add_compile_definitions(VK_USE_PLATFORM_WIN32_KHR)
+endif()
 
 find_package(glfw3 CONFIG REQUIRED)
 
 find_package(glm CONFIG REQUIRED)
 
-find_package(Boost 1.36.0 REQUIRED COMPONENTS filesystem)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
 find_package(GTest REQUIRED)
 
+set(JPEG_STATIC ON)
 find_package(JPEG REQUIRED)
 
+set(PNG_STATIC ON)
 find_package(PNG REQUIRED)
 
 find_package(assimp CONFIG REQUIRED)

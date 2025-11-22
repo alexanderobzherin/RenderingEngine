@@ -4,6 +4,7 @@
 // Distributed under the terms of the zlib License. See LICENSE.md for details.
 #pragma once
 
+#include "rendering_engine_export.hpp"
 #include "i_application.hpp"
 #include "i_window_system.hpp"
 #include "i_renderer.hpp"
@@ -29,7 +30,7 @@ class SceneManager;
  * @see IWindowSystem
  * @see IRenderer
  */
-class CoreApplication : public IApplication
+class RE_API CoreApplication : public IApplication
 {
 public:
 	/**
@@ -63,6 +64,8 @@ public:
 					char const* appName,
 					std::shared_ptr<IWindowSystem> windowSystem,
 					std::shared_ptr<IRenderer> renderer);
+
+					
 	/**
 	 * @brief Constructs a CoreApplication with custom systems but default window size.
 	 * @param appName       Name of the application.
@@ -72,7 +75,8 @@ public:
 	CoreApplication(char const* appName,
 					std::shared_ptr<IWindowSystem> windowSystem,
 					std::shared_ptr<IRenderer> renderer);
-
+	virtual ~CoreApplication();
+						
 	/** @copydoc IApplication::Initialize */
 	void Initialize() override;
 	/** @copydoc IApplication::Run */

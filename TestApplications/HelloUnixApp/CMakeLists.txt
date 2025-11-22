@@ -27,8 +27,6 @@ if(WIN32)
 	include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/RenderingLibrary/Include/)
 endif()
 
-find_package(Boost 1.36.0 REQUIRED COMPONENTS filesystem)
-
 if(UNIX)
 set(RENDERING_ENGINE_ROOT
     "${CMAKE_CURRENT_LIST_DIR}/../../Build/Installed/Library/cmake/RenderingEngine"
@@ -149,5 +147,11 @@ add_custom_command(
 
 	# Compile custom user shader from json files via calling MaterialCompiler
 	# TO DO
+
+	TARGET HelloUnixApp POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:HelloUnixApp>
+            $<TARGET_FILE_DIR:HelloUnixApp>
+    COMMAND_EXPAND_LISTS
 )
 endif()

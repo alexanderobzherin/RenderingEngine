@@ -9,6 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
 
+#include "rendering_engine_export.hpp"
+
 namespace rendering_engine
 {
 class IApplication;
@@ -30,7 +32,7 @@ class SceneComponent2D;
  *
  * @see rendering_engine::SceneComponent2D
  */
-class Camera2D
+class RE_API Camera2D
 {
 public:
 	/**
@@ -68,10 +70,10 @@ public:
 	/**
 	 * @brief Returns the current orthographic projection matrix.
 	 *
-	 * The matrix is built from the camera’s viewport size, and is typically
+	 * The matrix is built from the cameraï¿½s viewport size, and is typically
 	 * multiplied with the view (world) matrix to transform coordinates into clip space.
 	 *
-	 * @return 4×4 orthographic projection matrix.
+	 * @return 4ï¿½4 orthographic projection matrix.
 	 */
 	glm::mat4 GetProjectionMatrix() const;
 
