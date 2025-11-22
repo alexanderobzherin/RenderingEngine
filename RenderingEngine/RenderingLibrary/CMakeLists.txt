@@ -206,6 +206,7 @@ ${freetype2_INCLUDE_DIRS}
 $<INSTALL_INTERFACE:Include>
 )
 
+#[===[
 ### Installation 
 # --------------------------
 # Install headers
@@ -247,3 +248,5 @@ install(FILES
     DESTINATION Library/cmake/RenderingEngine
 )
 ### / Installation 
+
+]===]

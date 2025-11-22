@@ -103,3 +103,54 @@ add_subdirectory(RenderingEngine)
 if(NOT RE_BUILD_ENGINE_ONLY)
 add_subdirectory(TestApplications)
 endif()
+
+# SDK installation directory mapping
+set(CMAKE_INSTALL_LIBDIR "Library")
+set(CMAKE_INSTALL_INCLUDEDIR "Include")
+set(CMAKE_INSTALL_BINDIR "Binary")
+
+# -------------------------------
+# Install Public Headers
+# -------------------------------
+install(DIRECTORY RenderingEngine/RenderingLibrary/Include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING PATTERN "*.hpp")
+
+# -------------------------------
+# Install Shared Library
+# -------------------------------
+install(TARGETS RenderingEngine
+    EXPORT RenderingEngineTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+# -------------------------------
+# Install MaterialCompiler
+# -------------------------------
+install(TARGETS MaterialCompiler
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+# -------------------------------
+# Export CMake Package
+# -------------------------------
+install(EXPORT RenderingEngineTargets
+    FILE RenderingEngineTargets.cmake
+    NAMESPACE RenderingEngine::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
+)
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    RenderingEngine/RenderingLibrary/RenderingEngineConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
+)
