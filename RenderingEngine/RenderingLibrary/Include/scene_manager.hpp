@@ -39,6 +39,7 @@ struct RenderResourceContext;
 class RE_API SceneManager
 {
 public:
+	using Factory = std::function<std::unique_ptr<Scene>(SceneManager&)>;
 	/**
 	 * @brief Constructs a SceneManager instance.
 	 * @param renderer Pointer to the active renderer instance.
@@ -71,6 +72,13 @@ public:
 	 * @return Pointer to the IApplication instance.
 	 */
 	IApplication* GetApplication();
+
+	/**
+	 * @brief Type alias for the factory used to create scenes.
+	 */
+
+	static std::vector<std::pair<std::string, Factory>>& GetPendingRegistrations();
+
 	/**
 	 * @brief Loads a new scene by name.
 	 * @param sceneName The name of the registered scene to load.
@@ -88,10 +96,6 @@ public:
 	 * @return A RenderResourceContext structure populated with shared cache pointers.
 	 */
 	RenderResourceContext GetRenderResourceContext() const;
-	/**
-	 * @brief Type alias for the factory used to create scenes.
-	 */
-	using Factory = std::function<std::unique_ptr<Scene>(SceneManager&)>;
 	/**
 	 * @brief Registers a scene type with a name string.
 	 * @param name Unique string identifier for the scene.
@@ -139,12 +143,15 @@ private:
 template <class TScene>
 struct SceneAutoRegistrar
 {
-explicit SceneAutoRegistrar(const char* name)
-{
-	SceneManager::RegisterScene(name, [](SceneManager& sm) {
-		return std::make_unique<TScene>(sm);
-		});
-}
+	explicit SceneAutoRegistrar(const char* name)
+	{
+		auto& list = SceneManager::GetPendingRegistrations();
+		list.emplace_back(
+			std::string{ name },
+			[](SceneManager& sm) {
+				return std::make_unique<TScene>(sm);
+			});
+	}
 };
 /**
  * @brief Convenience macro for registering a scene type with a name.

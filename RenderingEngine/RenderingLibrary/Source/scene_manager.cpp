@@ -24,6 +24,18 @@ SceneManager::~SceneManager()
 
 void SceneManager::Initialize()
 {
+	// Apply pending registrations once (first initialization only)
+	static bool sRegistrationsApplied = false;
+	if (!sRegistrationsApplied)
+	{
+		auto& pending = GetPendingRegistrations();
+		for (auto& entry : pending)
+		{
+			RegisterScene(entry.first, entry.second);
+		}
+		pending.clear();
+		sRegistrationsApplied = true;
+	}
 	// Innitialize resources in next order.
 	// 1. Textures
 	// 2. Models
@@ -94,6 +106,12 @@ void SceneManager::Shutdown()
 IApplication* SceneManager::GetApplication()
 {
 	return mApp;
+}
+
+std::vector<std::pair<std::string, SceneManager::Factory>>& SceneManager::GetPendingRegistrations()
+{
+	static std::vector<std::pair<std::string, Factory>> pending;
+	return pending;
 }
 
 void SceneManager::LoadScene(std::string sceneName)
