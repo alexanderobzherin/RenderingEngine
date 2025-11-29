@@ -106,7 +106,27 @@ def write_manifest(path, version, platform):
         f.write("- Doc/                             : documentation\n")
     logging.info(f"Manifest written: {path}")
 
+def patch_build_script_for_sdk(build_script_path):
+    """Force RE_DEV_MODE=OFF inside build_project.sh"""
+    if not os.path.isfile(build_script_path):
+        return
 
+    with open(build_script_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Patch the cmake configuration line:
+    # cmake -S "$PROJECT_SOURCE_DIR" -B "$PROJECT_BUILD_DIR" -DCMAKE_BUILD_TYPE=...
+    content = re.sub(
+        r'cmake\s+-S\s+"\$PROJECT_SOURCE_DIR"\s+-B\s+"\$PROJECT_BUILD_DIR"\s+-DCMAKE_BUILD_TYPE=\$BUILD_MODE',
+        r'cmake -S "$PROJECT_SOURCE_DIR" -B "$PROJECT_BUILD_DIR" -DCMAKE_BUILD_TYPE=$BUILD_MODE -DRE_DEV_MODE=OFF',
+        content
+    )
+
+    with open(build_script_path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    logging.info(f"Patched build_project.sh for SDK: {build_script_path}")
+    
 # --------------------------------------------------------------------
 # Main Packaging Logic
 # --------------------------------------------------------------------
@@ -256,6 +276,10 @@ def main():
             dst = os.path.join(examples_dst_root, proj)
             copy_tree(src, dst, ignore=ignore_example)
             logging.info(f"Copied example project: {proj}")
+
+            # Patch build_project.sh inside copied example
+            build_script = os.path.join(dst, "build_project.sh")
+            patch_build_script_for_sdk(build_script)
 
         # --------------------------------------------------------------
         # 7. UserApplications (empty placeholder)

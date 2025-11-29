@@ -59,7 +59,7 @@ elseif(UNIX)
 	if(RE_DEV_MODE)
 		message(STATUS "RenderingEngine: Developer Mode (Unix)")
 		set(RENDERING_ENGINE_ROOT
-			"${CMAKE_CURRENT_LIST_DIR}/../../Build/Installed/Library/cmake/RenderingEngine"
+			"${CMAKE_CURRENT_LIST_DIR}/../../Build/Installed/RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine"
 			CACHE PATH "Path to installed RenderingEngine SDK")
 	else()
 		message(STATUS "RenderingEngine: SDK-user Mode (Unix)")

@@ -9,6 +9,7 @@ BUILD_ENGINE_ONLY="OFF"
 SOURCE_DIR="$(pwd)"
 BUILD_DIR="${SOURCE_DIR}/Build"
 DOCS_ONLY=false
+BUILD_SDK=false
 
 # Check for --docs-only argument
 BuildDocumentation()
@@ -35,6 +36,10 @@ for arg in "$@"; do
       ;;
     --engine-only)
       BUILD_ENGINE_ONLY="ON"
+      shift
+      ;;
+    --build-sdk)
+      BUILD_SDK=true
       shift
       ;;
     --docs-only)
@@ -66,6 +71,11 @@ rm -rf Build
 mkdir Build
 cd Build
 PATH_TO_BUILD=$(pwd)
+
+if [ "$BUILD_SDK" = true ]; then
+    BUILD_ENGINE_ONLY=true
+fi
+
 # Run root cmake file
 # Configure
 cmake -S .. -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" -DRE_BUILD_ENGINE_ONLY="${BUILD_ENGINE_ONLY}"
@@ -75,3 +85,6 @@ cmake --build .
 
 cmake --install . --prefix "${BUILD_DIR}/Installed"
 
+if [ "$BUILD_SDK" = true ]; then
+    python3 ../RenderingEngine/Scripts/package_sdk.py
+fi
