@@ -3,6 +3,9 @@
 :: Copyright (c) 2025 Alexander Obzherin
 :: Distributed under the terms of the zlib License. See LICENSE.md for details.
 
+@echo off
+setlocal
+
 :: Check for --docs-only argument
 IF "%1"=="--docs-only" (
     :: Generate documentation
@@ -30,4 +33,6 @@ cmake .. -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE% -DVCPKG_TARGET_TRIPLET=x64-wind
 IF "%1"=="--build-sdk" (
 cmake --build . --config Release
 cmake --install . --config Release --prefix "Installed"
+
+python3 ..\RenderingEngine\Scripts\package_sdk.py
 )

@@ -1,51 +1,50 @@
-# ==============================================================================
+# ======================================================================
 # RenderingEngineConfig.cmake.in
 # Installed CMake package configuration file.
-#
-# This file is processed by configure_package_config_file() during installation.
-# It becomes RenderingEngineConfig.cmake inside the installed SDK.
-# ==============================================================================
+# ======================================================================
 
 @PACKAGE_INIT@
 
-# ------------------------------------------------------------------------------
-# Load exported CMake targets (RenderingEngineTargets.cmake)
-# ------------------------------------------------------------------------------
+# Load exported engine targets
 include("${CMAKE_CURRENT_LIST_DIR}/RenderingEngineTargets.cmake")
 
-# Expose engine version
+# Package version
 set(RenderingEngine_VERSION "@PROJECT_VERSION@")
 
-# ------------------------------------------------------------------------------
-# Forward dependencies to consumers
+# ======================================================================
+# Public SDK include directories
+# (exactly matching SDK layout)
+# ======================================================================
+
+set(RenderingEngine_INCLUDE_DIR
+    "${CMAKE_CURRENT_LIST_DIR}/../../../Include"
+)
+
+set(RenderingEngine_EXTERNAL_DIR
+    "${CMAKE_CURRENT_LIST_DIR}/../../../External"
+)
+
+set(RenderingEngine_INCLUDE_DIRS
+    "${RenderingEngine_INCLUDE_DIR}"
+    "${RenderingEngine_EXTERNAL_DIR}/glm"
+    "${RenderingEngine_EXTERNAL_DIR}/boost"
+)
+
+# IMPORTANT:
+# Do NOT export json, vulkan, freetype, glfw, stb, or any system includes.
+# They must remain PRIVATE inside the engine.
+
+# ======================================================================
+# Path to engine library directory
+# ======================================================================
+set(RenderingEngine_LIBRARY_DIR
+    "${CMAKE_CURRENT_LIST_DIR}/../.."
+)
+
+# ======================================================================
+# Consumers simply use:
 #
-# Any library that RenderingEngine::RenderingEngine links PUBLICly should be
-# listed here. This ensures find_package(RenderingEngine) automatically pulls
-# in its ecosystem of dependencies.
-# ------------------------------------------------------------------------------
-include(CMakeFindDependencyMacro)
-
-# Core dependencies
-find_dependency(Vulkan REQUIRED)
-find_dependency(glm CONFIG REQUIRED)
-find_dependency(glfw3 CONFIG REQUIRED)
-find_dependency(Boost REQUIRED COMPONENTS filesystem)
-find_dependency(PNG REQUIRED)
-find_dependency(JPEG REQUIRED)
-find_dependency(assimp CONFIG REQUIRED)
-find_dependency(nlohmann_json CONFIG REQUIRED)
-
-# Freetype handling
-if(WIN32)
-    # vcpkg or system-installed
-    find_dependency(freetype CONFIG REQUIRED)
-else()
-    find_dependency(PkgConfig)
-    pkg_check_modules(freetype2 REQUIRED freetype2)
-endif()
-
-# ------------------------------------------------------------------------------
-# Optional message for debugging
-# ------------------------------------------------------------------------------
-# message(STATUS "RenderingEngine @PROJECT_VERSION@ loaded from ${CMAKE_CURRENT_LIST_DIR}")
-
+#   find_package(RenderingEngine REQUIRED)
+#   target_link_libraries(app PRIVATE RenderingEngine::RenderingEngine)
+#
+# ======================================================================

@@ -1,0 +1,22 @@
+# ======================================================================
+#  RenderingEngineTargets.cmake.in
+#  Installed SDK target definitions
+# ======================================================================
+
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/RenderingEngineTargets-release.cmake")
+
+# Fix imported target include paths to match SDK layout
+set_target_properties(RenderingEngine::RenderingEngine PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES
+        "${PACKAGE_PREFIX_DIR}/RenderingEngine/RenderingLibrary/Include"
+        "${PACKAGE_PREFIX_DIR}/RenderingEngine/External/glm"
+        "${PACKAGE_PREFIX_DIR}/RenderingEngine/External/boost"
+)
+
+# IMPORTANT:
+# Do NOT export Vulkan, GLFW, Freetype, json, or any system dependencies.
+# These must remain PRIVATE inside the engine.
+
+message(STATUS "RenderingEngine SDK loaded from: ${PACKAGE_PREFIX_DIR}")

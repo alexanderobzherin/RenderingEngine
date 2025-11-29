@@ -7,11 +7,6 @@ cmake_minimum_required(VERSION 3.16)
 #set the project name
 project(RenderingLibrary VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
 
-include(GNUInstallDirs)
-set(CMAKE_INSTALL_LIBDIR "Library")
-set(CMAKE_INSTALL_INCLUDEDIR "Include")
-set(CMAKE_INSTALL_BINDIR "Binary")
-
 #set header files
 include_directories(${PROJECT_SOURCE_DIR}/Include/)
 
@@ -179,74 +174,30 @@ else(
 )
 endif()
 
-# Public includes for SDK users
+# Engine public headers (visible to SDK user)
 target_include_directories(RenderingEngine
     PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Include>
-        $<INSTALL_INTERFACE:Include>
-       # ${CMAKE_BINARY_DIR}/Intermediate/Generated
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Include>
+        $<INSTALL_INTERFACE:RenderingEngine/RenderingLibrary/Include>
+        $<INSTALL_INTERFACE:RenderingEngine/External/glm>
+        $<INSTALL_INTERFACE:RenderingEngine/External/boost>
 )
 
-target_link_libraries(RenderingEngine 
-	PUBLIC
+target_link_libraries(RenderingEngine
+    PRIVATE
+		Vulkan::Vulkan
 		glfw
-		glm::glm
-		Boost::filesystem
-		JPEG::JPEG 
+		JPEG::JPEG
 		PNG::PNG
 		assimp::assimp
-		freetype
-		nlohmann_json::nlohmann_json	
-    	Vulkan::Vulkan
+		glm::glm
+		Boost::filesystem
+		nlohmann_json::nlohmann_json
 )
 
+if(WIN32)
+    target_link_libraries(RenderingEngine PRIVATE freetype)
+else()
+    target_link_libraries(RenderingEngine PRIVATE ${FREETYPE2_LIBRARIES})
+endif()
 
-target_include_directories(RenderingEngine PUBLIC
-${freetype2_INCLUDE_DIRS}
-$<INSTALL_INTERFACE:Include>
-)
-
-#[===[
-### Installation 
-# --------------------------
-# Install headers
-# --------------------------
-install(DIRECTORY Include/
-        DESTINATION Include
-        FILES_MATCHING PATTERN "*.hpp")
-
-# --------------------------
-# Install the library
-# --------------------------
-install(TARGETS RenderingEngine
-        EXPORT RenderingEngineTargets
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-# --------------------------
-# Export the CMake package
-# --------------------------
-install(EXPORT RenderingEngineTargets
-        FILE RenderingEngineTargets.cmake
-        NAMESPACE RenderingEngine::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine)
-
-# --------------------------
-# Generate a Config file
-# --------------------------
-include(CMakePackageConfigHelpers)
-
-configure_package_config_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/RenderingEngineConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
-    INSTALL_DESTINATION Library/cmake/RenderingEngine
-)
-
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
-    DESTINATION Library/cmake/RenderingEngine
-)
-### / Installation 
-
-]===]

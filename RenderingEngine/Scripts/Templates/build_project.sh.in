@@ -12,7 +12,15 @@ fi
 echo "Build mode: "
 echo "$BUILD_MODE"
 
-ENGINE_ROOT_FOLDER=$(find / -type d -name RenderingEngine 2>/dev/null | head -n 1)
+ENGINE_ROOT_FOLDER="$PROJECT_SOURCE_DIR"
+while [ "$ENGINE_ROOT_FOLDER" != "/" ]; do
+    if [ -d "$SEARCH_DIR/RenderingEngine" ]; then
+        ENGINE_ROOT="$SEARCH_DIR/RenderingEngine"
+        break
+    fi
+ENGINE_ROOT_FOLDER=$(dirname "$SEARCH_DIR")
+done
+
 echo "Engine source dir: "
 echo "$ENGINE_ROOT_FOLDER"
 

@@ -104,44 +104,94 @@ if(NOT RE_BUILD_ENGINE_ONLY)
 add_subdirectory(TestApplications)
 endif()
 
-# SDK installation directory mapping
-set(CMAKE_INSTALL_LIBDIR "Library")
-set(CMAKE_INSTALL_INCLUDEDIR "Include")
-set(CMAKE_INSTALL_BINDIR "Binary")
+# ======================================================================
+# SDK INSTALLATION LAYOUT
+# ======================================================================
 
-# -------------------------------
-# Install Public Headers
-# -------------------------------
-install(DIRECTORY RenderingEngine/RenderingLibrary/Include/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        FILES_MATCHING PATTERN "*.hpp")
+set(CMAKE_INSTALL_INCLUDEDIR "RenderingEngine/RenderingLibrary/Include")
+set(CMAKE_INSTALL_LIBDIR     "RenderingEngine/RenderingLibrary/Library")
+set(CMAKE_INSTALL_BINDIR     "RenderingEngine/RenderingLibrary/Library")
 
-# -------------------------------
-# Install Shared Library
-# -------------------------------
-install(TARGETS RenderingEngine
-    EXPORT RenderingEngineTargets
+# ======================================================================
+# Install Public Engine Headers
+# ======================================================================
+install(
+    DIRECTORY RenderingEngine/RenderingLibrary/Include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILES_MATCHING PATTERN "*.hpp"
+)
+
+# ======================================================================
+# Install Vendored Headers
+# ======================================================================
+find_path(GLM_INCLUDE_DIR
+          NAMES glm/glm.hpp
+          REQUIRED)
+
+if(NOT GLM_INCLUDE_DIR)
+    message(FATAL_ERROR "GLM headers not found on this system.")
+endif()
+
+message(STATUS "GLM include dir: ${GLM_INCLUDE_DIR}")
+install(
+    DIRECTORY ${GLM_INCLUDE_DIR}/glm
+    DESTINATION RenderingEngine/External/glm
+)
+
+find_path(BOOST_FS_INCLUDE_DIR
+          NAMES boost/filesystem.hpp
+          REQUIRED)
+
+if(NOT BOOST_FS_INCLUDE_DIR)
+    message(FATAL_ERROR "Boost filesystem headers not found on this system.")
+endif()
+
+message(STATUS "Boost include dir: ${BOOST_FS_INCLUDE_DIR}")
+install(
+    DIRECTORY ${BOOST_FS_INCLUDE_DIR}/boost
+    DESTINATION RenderingEngine/External/boost
+)
+
+# ======================================================================
+# Install Engine Library (dll/lib/so)
+# ======================================================================
+install(
+    TARGETS RenderingEngine
+    EXPORT  RenderingEngineTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-# -------------------------------
+# ======================================================================
 # Install MaterialCompiler
-# -------------------------------
-install(TARGETS MaterialCompiler
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+# ======================================================================
+install(
+    TARGETS MaterialCompiler
+    RUNTIME DESTINATION RenderingEngine/MaterialCompiler
+    LIBRARY DESTINATION RenderingEngine/MaterialCompiler
 )
 
-# -------------------------------
-# Export CMake Package
-# -------------------------------
-install(EXPORT RenderingEngineTargets
+if(WIN32)
+    install(
+        FILES $<TARGET_FILE:RenderingEngine>
+        DESTINATION RenderingEngine/MaterialCompiler
+    )
+endif()
+
+# ======================================================================
+# Install CMake package
+# ======================================================================
+
+# Export Engine Targets
+install(
+    EXPORT RenderingEngineTargets
     FILE RenderingEngineTargets.cmake
     NAMESPACE RenderingEngine::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
 )
 
+# Configure Package Config
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
@@ -150,7 +200,7 @@ configure_package_config_file(
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
 )
 
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/RenderingEngineConfig.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RenderingEngine
 )
