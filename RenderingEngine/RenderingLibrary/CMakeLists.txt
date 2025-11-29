@@ -183,10 +183,18 @@ target_include_directories(RenderingEngine
         $<INSTALL_INTERFACE:RenderingEngine/External/boost>
 )
 
+if(UNIX)
+	target_include_directories(RenderingEngine PUBLIC
+	${freetype2_INCLUDE_DIRS}
+	)
+endif()
+
+
 target_link_libraries(RenderingEngine
     PRIVATE
 		Vulkan::Vulkan
 		glfw
+		freetype
 		JPEG::JPEG
 		PNG::PNG
 		assimp::assimp
