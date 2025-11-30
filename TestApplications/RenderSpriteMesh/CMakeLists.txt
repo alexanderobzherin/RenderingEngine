@@ -2,7 +2,7 @@
 # Author: Alexander Obzherin <alexanderobzherin@gmail.com>
 # Copyright (c) 2025 Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 #set the project name
 project(RenderSpriteMesh LANGUAGES CXX)
@@ -23,19 +23,52 @@ include_directories(${PROJECT_SOURCE_DIR}/Include/)
 include_directories(${PROJECT_SOURCE_DIR}/Assets/Shaders/)
 include_directories(${PROJECT_SOURCE_DIR}/Config/)
 
+option(RE_DEV_MODE "Build using RenderingEngine directly from source tree (Windows only)" ON)
+
+set(RENDERING_ENGINE_SDK_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine")
 if(WIN32)
-	include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/RenderingLibrary/Include/)
-endif()
+	if(RE_DEV_MODE)
+		message(STATUS "RenderingEngine: Developer Mode (Windows)")
 
-find_package(Boost 1.36.0 REQUIRED COMPONENTS filesystem)
+		# Engine headers in source tree
+		include_directories(
+			${CMAKE_CURRENT_LIST_DIR}/../../RenderingEngine/RenderingLibrary/Include
+		)
 
-if(UNIX)
-set(RENDERING_ENGINE_ROOT
-    "${CMAKE_CURRENT_LIST_DIR}/../../Build/Installed/Library/cmake/RenderingEngine"
-    CACHE PATH "Path to installed RenderingEngine SDK"
-)
-list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_ROOT}")
-find_package(RenderingEngine REQUIRED)
+		# Vulkan SDK
+		if(DEFINED ENV{VULKAN_SDK})
+			include_directories("$ENV{VULKAN_SDK}/Include")
+			message(STATUS "DevMode: Vulkan headers from $ENV{VULKAN_SDK}/Include")
+		else()
+			message(FATAL_ERROR "VULKAN_SDK environment variable is not set!")
+		endif()
+
+		# vcpkg for glfw, freetype, etc.
+		if(DEFINED ENV{VCPKG_ROOT})
+			include_directories("$ENV{VCPKG_ROOT}/installed/x64-windows-static-md/include")
+		endif()
+	else()
+		message(STATUS "RenderingEngine: SDK-user Mode (Windows)")
+		set(RENDERING_ENGINE_ROOT
+		"${RENDERING_ENGINE_SDK_ROOT}"
+		CACHE PATH "Path to installed RenderingEngine SDK")
+		list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_ROOT}")
+		find_package(RenderingEngine REQUIRED)
+	endif()
+elseif(UNIX)
+	if(RE_DEV_MODE)
+		message(STATUS "RenderingEngine: Developer Mode (Unix)")
+		set(RENDERING_ENGINE_ROOT
+			"${CMAKE_CURRENT_LIST_DIR}/../../Build/Installed/RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine"
+			CACHE PATH "Path to installed RenderingEngine SDK")
+	else()
+		message(STATUS "RenderingEngine: SDK-user Mode (Unix)")
+		set(RENDERING_ENGINE_ROOT
+		"${RENDERING_ENGINE_SDK_ROOT}"
+		CACHE PATH "Path to installed RenderingEngine SDK")
+	endif()
+	list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_ROOT}")
+	find_package(RenderingEngine REQUIRED)
 endif()
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -48,28 +81,32 @@ add_executable(RenderSpriteMesh ${HEADER_FILES} ${SRC_FILES})
 target_include_directories(RenderSpriteMesh PUBLIC
 ${PROJECT_SOURCE_DIR}/Assets/Shaders/
 )
+
 if(UNIX)
-set_target_properties(RenderSpriteMesh PROPERTIES
-	CXX_STANDARD 17
-	CXX_STANDARD_REQUIRED ON
-	COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${PROJECT_BINARY_DIR}/Debug"
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Release"
-)
-target_link_libraries(RenderSpriteMesh 
-	PRIVATE
-		RenderingEngine::RenderingEngine 
-		Boost::filesystem
+	set_target_properties(RenderSpriteMesh PROPERTIES
+		CXX_STANDARD 17
+		CXX_STANDARD_REQUIRED ON
+		COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
+		RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${PROJECT_BINARY_DIR}/Debug"
+		RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Release"
 )
 elseif(WIN32)
-set_target_properties(RenderSpriteMesh PROPERTIES
-	CXX_STANDARD 17
-	CXX_STANDARD_REQUIRED ON
+	set_target_properties(RenderSpriteMesh PROPERTIES
+		CXX_STANDARD 17
+		CXX_STANDARD_REQUIRED ON
 )
-target_link_libraries(RenderSpriteMesh 
-	PRIVATE
+endif()
+
+if(WIN32 AND RE_DEV_MODE)
+	target_link_libraries(RenderSpriteMesh 
+		PRIVATE
 		RenderingEngine
-)
+	)
+else()	
+	target_link_libraries(RenderSpriteMesh 
+		PRIVATE
+			RenderingEngine::RenderingEngine 
+	)
 endif()
 
 set(PATH_TO_COMPILED_SHADER_PATH "${PROJECT_BINARY_DIR}/Intermediate/Shaders")
@@ -111,7 +148,7 @@ set(quad2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_frag.spv")
 
 if(WIN32)
 add_custom_command(
-	TARGET RenderSpriteMesh 
+	TARGET RenderSpriteMesh  
 	PRE_BUILD
 
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -149,5 +186,11 @@ add_custom_command(
 
 	# Compile custom user shader from json files via calling MaterialCompiler
 	# TO DO
+
+	TARGET RenderSpriteMesh POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:RenderSpriteMesh>
+            $<TARGET_FILE_DIR:RenderSpriteMesh>
+    COMMAND_EXPAND_LISTS
 )
 endif()
