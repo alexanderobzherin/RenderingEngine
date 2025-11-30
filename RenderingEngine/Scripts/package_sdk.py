@@ -1,8 +1,28 @@
 #!/usr/bin/env python3
+# This file is part of the Rendering Engine project.
+# Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+# Copyright (c) 2025 Alexander Obzherin
+# Distributed under the terms of the zlib License. See LICENSE.md for details.
+##
 """
-Rendering Engine - SDK Packaging Script
-Author: Alexander Obzherin
-License: zlib
+@file package_sdk.py
+@brief Build-time helper for assembling the Rendering Engine SDK.
+
+This script is intended to be invoked indirectly via the platform build
+scripts:
+
+  - Windows: build_engine.bat --build-sdk
+  - Unix/FreeBSD: ./build_engine.sh --build-sdk
+
+Responsibilities:
+  - Read engine version from Intermediate/Generated/version.h.
+  - Copy the installed RenderingEngine library, headers, and CMake config
+    into a distributable SDK layout.
+  - Copy vendored headers (glm, boost, nlohmann_json, Vulkan headers if used).
+  - Copy project templates and the create_project.py helper.
+  - Copy and patch ContentExamples into SDK-user mode (RE_DEV_MODE=OFF).
+  - Emit documentation files and a human-readable Manifest.txt.
+  - Create a compressed archive suitable for CI/CD artifacts.
 """
 
 import os

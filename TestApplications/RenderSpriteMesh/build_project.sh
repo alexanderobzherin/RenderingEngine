@@ -12,17 +12,32 @@ fi
 echo "Build mode: "
 echo "$BUILD_MODE"
 
-ENGINE_ROOT_FOLDER=$(find / -type d -name RenderingEngine 2>/dev/null | head -n 1)
-echo "Engine source dir: "
-echo "$ENGINE_ROOT_FOLDER"
-
 PROJECT_SOURCE_DIR=$(pwd)
 echo "Project source dir: "
 echo $PROJECT_SOURCE_DIR
 
+ENGINE_ROOT_FOLDER="$PROJECT_SOURCE_DIR"
+
+# Search for RenderingEngine directory
+while true; do
+    if [ -d "RenderingEngine" ]; then
+        ENGINE_ROOT_FOLDER=$(pwd)
+        break
+    fi    
+    # If we're at root directory, stop searching
+    if [ "$(pwd)" = "/" ]; then
+        echo "RenderingEngine not found in parent directories"
+        exit 1
+    fi    
+    cd ..
+done
+
+echo "Engine source dir: "
+echo "$ENGINE_ROOT_FOLDER"
+
 cd $ENGINE_ROOT_FOLDER
 cd ..
-PROJECT_BUILD_DIR=$(pwd)/Build/TestApplications/RenderSpriteMesh
+PROJECT_BUILD_DIR=$ENGINE_ROOT_FOLDER/Build/TestApplications/RenderSpriteMesh
 echo "Project build dir: "
 echo $PROJECT_BUILD_DIR
 
@@ -37,7 +52,7 @@ cd $PROJECT_BUILD_DIR
 
 mkdir -p $BUILD_MODE
 #Run root cmake file
-cmake -DCMAKE_BUILD_TYPE=$BUILD_MODE "$PROJECT_SOURCE_DIR"
+cmake -S "$PROJECT_SOURCE_DIR" -B "$PROJECT_BUILD_DIR" -DCMAKE_BUILD_TYPE=$BUILD_MODE
 #Run make file
 make
 
