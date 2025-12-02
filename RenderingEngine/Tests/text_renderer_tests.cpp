@@ -18,7 +18,7 @@ using namespace rendering_engine;
 
 TEST(ImageDataTest, CreateGlyphBitmapStatic)
 {
-    std::string const pathToFont{ "../Intermediate/Fonts/Exo/Exo-Medium.otf" };
+    std::string const pathToFont{ "../Content/Fonts/Exo/Exo-Medium.otf" };
 
     auto imageData = std::make_shared<ImageData>(TextRenderer::CreateGlyphBitmap(pathToFont, '7' ));
     imageData->WritePngFile("testGlyphStatic.png");
@@ -28,7 +28,7 @@ TEST(ImageDataTest, CreateGlyphBitmapStatic)
 
 TEST(ImageDataTest, CreateGlyphBitmap)
 {
-    std::string const pathToFont{ "../Intermediate/Fonts/Exo/Exo-Medium.otf" };
+    std::string const pathToFont{ "../Content/Fonts/Exo/Exo-Medium.otf" };
 
     TextRenderer textRenderer(pathToFont, 14);
 
@@ -40,7 +40,7 @@ TEST(ImageDataTest, CreateGlyphBitmap)
 
 TEST(ImageDataTest, CreateTextBitmap1)
 {
-    std::string const pathToFont{ "../Intermediate/Fonts/Pirulen/pirulen_rg.otf" };
+    std::string const pathToFont{ "../Content/Fonts/Pirulen/pirulen_rg.otf" };
 
     TextRenderer textRenderer( pathToFont, 48 );
 
@@ -53,7 +53,7 @@ TEST(ImageDataTest, CreateTextBitmap1)
 
 TEST(ImageDataTest, CreateTextBitmap2)
 {
-    std::string const pathToFont{ "../Intermediate/Fonts/DigitalDream/DIGITALDREAM.ttf" };
+    std::string const pathToFont{ "../Content/Fonts/DigitalDream/DIGITALDREAM.ttf" };
 
     TextRenderer textRenderer(pathToFont, 48);
 

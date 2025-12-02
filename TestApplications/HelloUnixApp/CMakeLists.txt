@@ -109,7 +109,7 @@ else()
 	)
 endif()
 
-set(PATH_TO_COMPILED_SHADER_PATH "${PROJECT_BINARY_DIR}/Intermediate/Shaders")
+set(PATH_TO_COMPILED_SHADER_PATH "${PROJECT_BINARY_DIR}/Content/Shaders")
 set(SHADER_COMPILER $ENV{glslc})
 
 # Shader compilation
@@ -118,12 +118,12 @@ set(PATH_TO_SOURCE_TEXTURES "${PROJECT_SOURCE_DIR}/Assets/Textures")
 set(PATH_TO_SOURCE_MODELS "${PROJECT_SOURCE_DIR}/Assets/Models")
 set(PATH_TO_SOURCE_FONTS "${PROJECT_SOURCE_DIR}/Assets/Fonts")
 set(PATH_TO_APP_CONFIG "${PROJECT_SOURCE_DIR}/Config")
-file(COPY ${PATH_TO_SOURCE_TEXTURES} DESTINATION "${PROJECT_BINARY_DIR}/Intermediate")
-file(COPY ${PATH_TO_SOURCE_MODELS} DESTINATION "${PROJECT_BINARY_DIR}/Intermediate")
-file(COPY ${PATH_TO_SOURCE_FONTS} DESTINATION "${PROJECT_BINARY_DIR}/Intermediate")
-file(COPY ${BUILDIN_SOURCE_SHADER_PATH} DESTINATION "${PROJECT_BINARY_DIR}/Intermediate")
+file(COPY ${PATH_TO_SOURCE_TEXTURES} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${PATH_TO_SOURCE_MODELS} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${PATH_TO_SOURCE_FONTS} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${BUILDIN_SOURCE_SHADER_PATH} DESTINATION "${PROJECT_BINARY_DIR}/Content")
 file(COPY ${PATH_TO_APP_CONFIG} DESTINATION "${PROJECT_BINARY_DIR}")
-set(PATH_TO_SOURCE_SHADER "${PROJECT_BINARY_DIR}/Intermediate/Shaders")
+set(PATH_TO_SOURCE_SHADER "${PROJECT_BINARY_DIR}/Content/Shaders")
 
 #Set paths to buildin shaders
 set(basic_texture_3d_vert_source "${PATH_TO_SOURCE_SHADER}/BasicTexture3D/BasicTexture3D.vert")
@@ -153,19 +153,19 @@ add_custom_command(
 
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${PATH_TO_SOURCE_TEXTURES}
-            ${PROJECT_BINARY_DIR}/Intermediate/Textures
+            ${PROJECT_BINARY_DIR}/Content/Textures
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${PATH_TO_SOURCE_MODELS}
-            ${PROJECT_BINARY_DIR}/Intermediate/Models
+            ${PROJECT_BINARY_DIR}/Content/Models
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${PATH_TO_SOURCE_FONTS}
-            ${PROJECT_BINARY_DIR}/Intermediate/Fonts
+            ${PROJECT_BINARY_DIR}/Content/Fonts
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${BUILDIN_SOURCE_SHADER_PATH}
-            ${PROJECT_BINARY_DIR}/Intermediate/Shaders
+            ${PROJECT_BINARY_DIR}/Content/Shaders
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${PATH_TO_APP_CONFIG}

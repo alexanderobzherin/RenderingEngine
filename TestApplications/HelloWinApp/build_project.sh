@@ -12,29 +12,36 @@ fi
 echo "Build mode: "
 echo "$BUILD_MODE"
 
+PROJECT_SOURCE_DIR=$(pwd)
+echo "Project source dir: "
+echo $PROJECT_SOURCE_DIR
+
 ENGINE_ROOT_FOLDER="$PROJECT_SOURCE_DIR"
-while [ "$ENGINE_ROOT_FOLDER" != "/" ]; do
-    if [ -d "$SEARCH_DIR/RenderingEngine" ]; then
-        ENGINE_ROOT="$SEARCH_DIR/RenderingEngine"
+
+# Search for RenderingEngine directory
+while true; do
+    if [ -d "RenderingEngine" ]; then
+        ENGINE_ROOT_FOLDER=$(pwd)
         break
-    fi
-ENGINE_ROOT_FOLDER=$(dirname "$SEARCH_DIR")
+    fi    
+    # If we're at root directory, stop searching
+    if [ "$(pwd)" = "/" ]; then
+        echo "RenderingEngine not found in parent directories"
+        exit 1
+    fi    
+    cd ..
 done
 
 echo "Engine source dir: "
 echo "$ENGINE_ROOT_FOLDER"
 
-PROJECT_SOURCE_DIR=$(pwd)
-echo "Project source dir: "
-echo $PROJECT_SOURCE_DIR
-
 cd $ENGINE_ROOT_FOLDER
 cd ..
-PROJECT_BUILD_DIR=$(pwd)/Build/TestApplications/HelloWinApp
+PROJECT_BUILD_DIR=$ENGINE_ROOT_FOLDER/Build/TestApplications/HelloWinApp
 echo "Project build dir: "
 echo $PROJECT_BUILD_DIR
 
-PATH_SHADERS_SOURCE=$PROJECT_BUILD_DIR/Intermediate/Shaders
+PATH_SHADERS_SOURCE=$PROJECT_BUILD_DIR/Content/Shaders
 echo "Shader source dir: "
 echo $PATH_SHADERS_SOURCE
 PATH_SHADERS_BIN=$PATH_SHADERS_SOURCE
@@ -45,7 +52,7 @@ cd $PROJECT_BUILD_DIR
 
 mkdir -p $BUILD_MODE
 #Run root cmake file
-cmake -DCMAKE_BUILD_TYPE=$BUILD_MODE "$PROJECT_SOURCE_DIR"
+cmake -S "$PROJECT_SOURCE_DIR" -B "$PROJECT_BUILD_DIR" -DCMAKE_BUILD_TYPE=$BUILD_MODE
 #Run make file
 make
 

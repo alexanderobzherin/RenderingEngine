@@ -41,7 +41,7 @@ PROJECT_BUILD_DIR=$ENGINE_ROOT_FOLDER/Build/TestApplications/RenderSpriteMesh
 echo "Project build dir: "
 echo $PROJECT_BUILD_DIR
 
-PATH_SHADERS_SOURCE=$PROJECT_BUILD_DIR/Intermediate/Shaders
+PATH_SHADERS_SOURCE=$PROJECT_BUILD_DIR/Content/Shaders
 echo "Shader source dir: "
 echo $PATH_SHADERS_SOURCE
 PATH_SHADERS_BIN=$PATH_SHADERS_SOURCE

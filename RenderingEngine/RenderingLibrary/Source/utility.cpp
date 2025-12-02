@@ -5,10 +5,10 @@ namespace rendering_engine
 {
 using namespace boost::filesystem;
 
-path const Utility::sDefaultShadersBinaryRelativePath = {"/Intermediate/Shaders/"};
-path const Utility::sTextureRelativePathFolder = path{} / "Intermediate" / "Textures";
-path const Utility::sModelsRelativePathFolder =  path{} / "Intermediate" / "Models";
-path const Utility::sShadersRelativePathFolder = path{} / "Intermediate" / "Shaders";
+path const Utility::sDefaultShadersBinaryRelativePath = {"/Content/Shaders/"};
+path const Utility::sTextureRelativePathFolder = path{} / "Content" / "Textures";
+path const Utility::sModelsRelativePathFolder =  path{} / "Content" / "Models";
+path const Utility::sShadersRelativePathFolder = path{} / "Content" / "Shaders";
 path const Utility:: sAppConfigFilePath = path{} / "Config" / "app_config.json";
 
 path Utility::sShadersBinaryPath;

@@ -19,8 +19,8 @@ using namespace rendering_engine;
 
 TEST(ImageDataTest, ModelsLoading)
 {
-    std::string const modelFilepath{ "../Intermediate/Models/TestCube/test_cube.fbx" };
-    std::string const textureFilepath{ "../Intermediate/Models/TestCube/test_cube_color.png" };
+    std::string const modelFilepath{ "../Content/Models/TestCube/test_cube.fbx" };
+    std::string const textureFilepath{ "../Content/Models/TestCube/test_cube_color.png" };
 
     ImageData textureImageData(textureFilepath);
     textureImageData.GetHeight();
