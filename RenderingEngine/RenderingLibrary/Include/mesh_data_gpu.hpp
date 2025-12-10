@@ -36,11 +36,35 @@ enum class MeshType
 class MeshDataGpu
 {
 public:
+    /**
+     * @brief Constructs an empty MeshDataGpu object.
+     *
+     * This constructor is typically used when the mesh data will be filled
+     * or generated procedurally before being uploaded to the GPU.
+     *
+     * @param renderer Pointer to the rendering backend interface.
+     */
+	MeshDataGpu(IRenderer* renderer);
 	/**
 	 * @brief Construct a MeshDataGpu instance.
+	 * @param filename Path to the model file
 	 * @param renderer Pointer to the rendering backend interface.
 	 */
-	MeshDataGpu(IRenderer* renderer);
+	MeshDataGpu(const std::string& filename, IRenderer* renderer);
+
+	/**
+     * @brief Constructs a MeshDataGpu instance from in-memory model data.
+     *
+     * This version loads a model directly from a raw file buffer in memory. 
+	 * It allows meshes to be created from packed assets, archives, network 
+	 * transfers, or any other non-filesystem source. After loading the model, 
+	 * vertex and index data are uploaded to GPU buffers the same way as in 
+	 * the file-based constructor.
+     *
+     * @param fileBytes Raw contents of the model file.
+     * @param renderer Pointer to the rendering backend interface.
+     */
+	MeshDataGpu(std::vector<uint8_t> const& fileBytes, IRenderer* renderer);
 
 	/**
 	 * @brief Destructor. Releases GPU resources if allocated.
@@ -64,13 +88,7 @@ public:
 	bool IsOnGPU() const;
 
 	/**
-	 * @brief Load a model from file and extract mesh data to RAM.
-	 * @param path Path to the model file (e.g., FBX).
-	 */
-	void LoadModel(std::string path);
-
-	/**
-	 * @brief Creates a 1×1 unit quad centered at the origin.
+	 * @brief Creates a 1ï¿½1 unit quad centered at the origin.
 	 *
 	 * The quad spans from -0.5 to +0.5 on both X and Y axes and uses
 	 * counterclockwise winding. Suitable as a base mesh for sprites
@@ -144,6 +162,13 @@ public:
 	const std::vector<uint32_t>& GetIndices() const { return mIndices; }
 
 protected:
+	/**
+	 * @brief Load a model from file and extract mesh data to RAM.
+	 * @param path Path to the model file (e.g., FBX).
+	 */
+	void LoadModel(std::string path);
+
+	void LoadModel(std::vector<uint8_t> const& fileBytes);
 	/**
 	 * @brief Calculate and cache sizes of RAM buffers for statistics or debugging.
 	 */

@@ -47,6 +47,23 @@ public:
     void LoadTexturesFromFolder(std::string pathToFolder);
 
     /**
+     * @brief Loads all textures from the packed asset archive.
+     *
+     * This function behaves similarly to LoadTexturesFromFolder(), but instead of
+     * scanning a filesystem directory, it iterates over virtual file entries
+     * stored inside the packed content system created by the packaging tool.
+     *
+     * Only entries located under the virtual folder:
+     *     "Textures/"
+     * are considered valid texture resources.
+     *
+     * For each entry, the raw file bytes are retrieved via Utility::ReadPackedFile(),
+     * decoded into an ImageDataGpu instance, and stored in the RAM cache.
+     * GPU uploading must still be triggered via UploadTextureToGPU().
+     */
+    void LoadTexturesFromPackage();
+
+    /**
      * @brief Loads a single texture into RAM from the given file path.
      *
      * The texture will not be uploaded to GPU automatically. The caller must use UploadTextureToGPU()
@@ -56,6 +73,23 @@ public:
      * @return The base filename used as the cache key, or an empty string if loading failed.
      */
     std::string UploadTextureToRAM(std::string path);
+
+    /**
+     * @brief Loads a single texture into RAM from raw file bytes.
+     *
+     * This overload enables texture loading from virtual files stored in a
+     * packed asset archive or from any memory-based source rather than the OS
+     * filesystem.
+     *
+     * The fileBytes buffer must contain the complete encoded texture data
+     * (e.g., PNG or JPEG). The data is decoded and stored inside ImageDataGpu.
+     *
+     * @param textureFileName Cache key representing the virtual texture path
+     *        (e.g., "Textures/myTexture.png" or simply "myTexture").
+     * @param fileBytes Raw encoded texture file data (PNG/JPG).
+     * @return The cache key on success, or an empty string on failure.
+     */
+    std::string UploadTextureToRAM(std::string textureFileName, std::vector<uint8_t> const& fileBytes);
     
     /**
      * @brief Uploads a texture (previously loaded into RAM) to GPU.

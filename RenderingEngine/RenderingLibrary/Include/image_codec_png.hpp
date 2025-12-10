@@ -155,7 +155,7 @@ static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, cha
 /**
  * @brief Reads a PNG file into RGBA image data.
  *
- * Loads an image using libpng’s simplified API and converts it to 8-bit RGBA format.
+ * Loads an image using libpng's simplified API and converts it to 8-bit RGBA format.
  *
  * @param filename Path to the PNG file.
  * @param width [out] Image width.
@@ -235,5 +235,57 @@ static bool ReadPngFile(char const* filename, unsigned int& width, unsigned int&
             return false;
         }
     }
+    return true;
+}
+
+/**
+ * @brief Reads a PNG image from memory into RGBA image data.
+ *
+ * Works similarly to ReadPngFile(), but instead of loading from disk it
+ * accepts a raw memory buffer containing a complete PNG file. The data
+ * is decoded with libpngâ€™s simplified API and converted to 8-bit RGBA format.
+ *
+ * @param memory Pointer to the PNG file data in memory.
+ * @param memorySize Size of the memory buffer in bytes.
+ * @param width [out] Image width in pixels.
+ * @param height [out] Image height in pixels.
+ * @param rgbaImageDataVector [out] Output buffer filled with RGBA pixel data
+ *        (4 bytes per pixel, stored in a vector of 32-bit unsigned integers).
+ * @return true if decoding succeeded, false otherwise.
+ */
+static bool ReadPngFromMemory(
+    const unsigned char* memory,
+    size_t memorySize,
+    unsigned int& width,
+    unsigned int& height,
+    std::vector<unsigned int>& rgbaImageDataVector)
+{
+    png_image image;
+    memset(&image, 0, sizeof(image));
+    image.version = PNG_IMAGE_VERSION;
+
+    if (png_image_begin_read_from_memory(&image, memory, memorySize) == 0)
+        return false;
+
+    image.format = PNG_FORMAT_RGBA;
+
+    png_bytep buffer = new png_byte[PNG_IMAGE_SIZE(image)];
+    if (!buffer)
+        return false;
+
+    if (png_image_finish_read(&image, nullptr, buffer, 0, nullptr) == 0)
+    {
+        delete[] buffer;
+        return false;
+    }
+
+    width = image.width;
+    height = image.height;
+
+    rgbaImageDataVector.resize(width * height * 4);
+    for (size_t i = 0; i < width * height * 4; ++i)
+        rgbaImageDataVector[i] = buffer[i];
+
+    delete[] buffer;
     return true;
 }

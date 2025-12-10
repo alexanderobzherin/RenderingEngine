@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace rendering_engine
 {
@@ -30,6 +31,20 @@ public:
      * @param renderer Pointer to the rendering engine interface (IRenderer).
      */
     ImageDataGpu(std::string path, IRenderer* renderer);
+
+    /**
+     * @brief Constructs an ImageDataGpu object from raw image file bytes.
+     *
+     * This constructor allows loading GPU-ready image data directly from a memory
+     * buffer rather than from disk. The input is interpreted as an encoded image
+     * (PNG or JPEG). After decoding via ImageData, the pixel data is uploaded to
+     * GPU memory through the provided IRenderer interface.
+     *
+     * @param fileBytes Raw binary contents of an image file (PNG or JPEG).
+     * @param renderer Pointer to the rendering engine interface responsible for
+     *                 uploading the texture to GPU memory.
+     */
+    ImageDataGpu(std::vector<uint8_t> const& fileBytes, IRenderer* renderer);
 
     /**
      * @brief Destructor. Frees GPU memory if allocated.

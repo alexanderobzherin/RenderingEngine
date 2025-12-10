@@ -44,6 +44,22 @@ public:
 	void LoadModelsFromFolder(std::string pathToFolder);
 
 	/**
+     * @brief Load all models from the packed asset container.
+     *
+     * This function behaves similarly to LoadModelsFromFolder(), but instead
+     * retrieves model files from the packed asset system created by the
+     * Packaging Tool. Each packed file is read into memory and processed via
+     * UploadModelToRAM(std::string, const std::vector<uint8_t>&).
+     *
+     * Only file entries located under the virtual folder:
+     *     "Models/"
+     * are considered.
+     *
+     * The resulting MeshDataGpu objects remain cached and ready for GPU upload.
+     */
+	void LoadModelsFromPackage();
+
+	/**
 	 * @brief Creates a built-in 2D quad mesh.
 	 *
 	 * This helper is used by 2D systems (e.g., UI, sprites) to create a reusable
@@ -57,6 +73,18 @@ public:
 	 * @return The filename used as a cache key, or empty string on failure.
 	 */
 	std::string UploadModelToRAM(std::string path);
+
+	/**
+     * @brief Load a single model into RAM from a raw file buffer.
+     *
+     * This overload is used when the model originates from a packed asset
+     * archive or any virtual filesystem source rather than the OS filesystem.
+     *
+     * @param fileName Cache key (typically relative virtual path, e.g. "Models/cube.fbx").
+     * @param fileBytes Raw contents of the model file.
+     * @return The cache key on success, or an empty string on failure.
+     */
+	std::string UploadModelToRAM(std::string fileName, std::vector<uint8_t> const& fileBytes);
 
 	/**
 	 * @brief Upload a cached model's mesh data to the GPU.

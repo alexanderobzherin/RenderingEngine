@@ -40,16 +40,22 @@ void SceneManager::Initialize()
 	// 1. Textures
 	// 2. Models
 	// 3. Materials
-	boost::filesystem::path path;
-	const auto textureFolder = Utility::GetTextureFolderPath();
 	mTextureCache = std::make_shared<TextureCache>(mRenderer);
-	mTextureCache->LoadTexturesFromFolder(textureFolder.string());
-
-	const auto modelsFolder = Utility::GetModelsFolderPath();
 	mModelCache = std::make_shared<ModelCache>(mRenderer);
-	mModelCache->LoadModelsFromFolder(modelsFolder.string());
+	const auto modelsFolder = Utility::GetModelsFolderPath();
 	mModelCache->CreateQuad2D();
 
+	if (Utility::IsPackageProvided())
+	{
+		mTextureCache->LoadTexturesFromPackage();
+		mModelCache->LoadModelsFromPackage();
+	}
+	else
+	{
+		const auto textureFolder = Utility::GetTextureFolderPath();
+		mTextureCache->LoadTexturesFromFolder(textureFolder.string());
+		mModelCache->LoadModelsFromFolder(modelsFolder.string());
+	}
 	mMaterialCache = std::make_shared<MaterialCache>(mRenderer);
 	mMaterialCache->CreateBuildInMaterials();
 

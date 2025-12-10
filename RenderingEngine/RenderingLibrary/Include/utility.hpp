@@ -36,6 +36,18 @@ struct AppConfig
 };
 
 /**
+ * @struct PackEntry
+ * @brief Metadata describing one file stored inside a packed asset archive.
+ */
+struct PackEntry
+{
+	size_t offset;
+	size_t size;
+};
+
+using PackEntries = std::unordered_map<std::string, PackEntry>;
+
+/**
  * @class Utility
  * @brief Provides static helper methods for file I/O and path management.
  *
@@ -100,15 +112,38 @@ public:
 	 */
 	static std::vector<std::string> GetListOfFileNamesInDirectory(const char* directory, std::string extToSearch);
 
+	/// @brief Resolves project root folder (handles Release/Debug/Binaries layouts).
 	static boost::filesystem::path ResolveProjectRoot();
 
+	/// @brief Returns absolute path to Content/Textures.
 	static boost::filesystem::path GetTextureFolderPath();
 
+	/// @brief Returns absolute path to Content/Models.
 	static boost::filesystem::path GetModelsFolderPath();
 
+	/// @brief Returns absolute path to Content/Shaders.
 	static boost::filesystem::path GetShadersFolderPath();
 
+	/// @brief Returns absolute path to Config/app_config.json.
 	static boost::filesystem::path GetConfigFilePath();
+
+	/**
+     * @brief Checks whether packed assets (Pack.bin / Pack.json) exist.
+     */
+	static bool IsPackageProvided();
+
+	/**
+     * @brief Returns the manifest of packed files.
+     */
+	static const PackEntries& GetPackEntries();
+
+	/**
+     * @brief Reads raw bytes of a file stored inside Pack.bin.
+     *
+     * @param entryPath Virtual path inside the pack (e.g. "Textures/my.png").
+     * @return Decoded file bytes, or empty vector on failure.
+     */
+	static std::vector<uint8_t> ReadPackedFile(const std::string& entryPath);
 
 	private:
 		Utility();
@@ -117,11 +152,14 @@ public:
 
 		static boost::filesystem::path FindPath( std::string fileOrFolderName, std::string searchingFrom = "../../" );
 
-	private:
+	public:
 		static boost::filesystem::path sApplicationPath;
 		static boost::filesystem::path const sDefaultShadersBinaryRelativePath;
 		static boost::filesystem::path sBuildPath;
 		static boost::filesystem::path sShadersBinaryPath;
+		static boost::filesystem::path const sContentRelativePathFolder;
+		static boost::filesystem::path const sContentPackageFilePath;
+		static boost::filesystem::path const sContentPackEntriesFilePath;
 		static boost::filesystem::path const sTextureRelativePathFolder;
 		static boost::filesystem::path const sModelsRelativePathFolder;
 		static boost::filesystem::path const sShadersRelativePathFolder;

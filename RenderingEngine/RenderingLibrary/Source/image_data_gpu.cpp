@@ -17,6 +17,16 @@ ImageDataGpu::ImageDataGpu(std::string path, IRenderer* renderer)
 	mImageData = std::make_unique<ImageData>(path);
 }
 
+ImageDataGpu::ImageDataGpu(std::vector<uint8_t> const& fileBytes, IRenderer* renderer)
+	:
+	mPath{},
+	mRenderer{ renderer },
+	mImageData{ nullptr },
+	mGpuHandle{ nullptr }
+{
+	mImageData = std::make_unique<ImageData>(fileBytes);
+}
+
 rendering_engine::ImageDataGpu::~ImageDataGpu()
 {
 }

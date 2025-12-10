@@ -28,9 +28,9 @@ struct Color
 	{}
 	/**
 	 * @brief Constructs a fully opaque RGB color.
-	 * @param iR Red channel [0–255]
-	 * @param iG Green channel [0–255]
-	 * @param iB Blue channel [0–255]
+	 * @param iR Red channel [0ï¿½255]
+	 * @param iG Green channel [0ï¿½255]
+	 * @param iB Blue channel [0ï¿½255]
 	 */
 	Color( uint8_t iR, uint8_t iG, uint8_t iB )
 		:
@@ -38,10 +38,10 @@ struct Color
 	{}
 	/**
 	 * @brief Constructs a color with specified RGBA channels.
-	 * @param iR Red channel [0–255]
-	 * @param iG Green channel [0–255]
-	 * @param iB Blue channel [0–255]
-	 * @param iA Alpha channel [0–255]
+	 * @param iR Red channel [0ï¿½255]
+	 * @param iG Green channel [0ï¿½255]
+	 * @param iB Blue channel [0ï¿½255]
+	 * @param iA Alpha channel [0ï¿½255]
 	 */
 	Color( uint8_t iR, uint8_t iG, uint8_t iB, uint8_t iA )
 		:
@@ -88,7 +88,18 @@ public:
 	 * @brief Loads image data from a file.
 	 * @param filepath Path to the image file (JPG or PNG)
 	 */
-	ImageData( std::string filepath );
+	ImageData(std::string filepath);
+
+	/**
+	 * @brief Constructs an image by decoding raw file bytes.
+	 *
+	 * This constructor allows loading an image from a memory buffer rather than a file
+	 * on disk. The data is interpreted as either PNG or JPEG depending on format
+	 * detection. Decoded pixel data is stored internally in 32-bit RGBA format.
+	 *
+	 * @param fileBytes Raw contents of an image file (PNG or JPEG).
+	 */
+	ImageData(std::vector<uint8_t> const& fileBytes);
 
 	/**
 	 * @brief Constructs image from raw RGBA pixel buffer.
@@ -97,7 +108,6 @@ public:
 	 * @param pixelsRGBA Vector of RGBA pixel data (4 bytes per pixel)
 	 */
 	ImageData(unsigned int width, unsigned int height, std::vector<unsigned int> const& pixelsRGBA);
-
 
 	/**
 	 * @brief Destructor that frees memory.
@@ -181,7 +191,6 @@ public:
 	{
 		return static_cast<size_t>(mWidth) * static_cast<size_t>(mHeight) * sizeof(Color);
 	}
-
 
 	/**
 	 * @brief Writes the image data to a JPEG file.

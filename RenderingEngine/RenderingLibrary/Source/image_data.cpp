@@ -56,6 +56,47 @@ ImageData::ImageData(std::string filepath)
 	}
 }
 
+ImageData::ImageData(std::vector<uint8_t> const& fileBytes)
+{
+	if (fileBytes.size() < 4)
+		throw std::runtime_error("Invalid image buffer");
+
+	// PNG signature
+	if (fileBytes[0] == 0x89 &&
+		fileBytes[1] == 'P' &&
+		fileBytes[2] == 'N' &&
+		fileBytes[3] == 'G')
+	{
+		std::vector<unsigned int> pixelsRGBA;
+
+		if (!ReadPngFromMemory(fileBytes.data(), fileBytes.size(), mWidth, mHeight, pixelsRGBA))
+			throw std::runtime_error("PNG memory decode failed");
+
+		AllocateMemory(mWidth, mHeight);
+		Fill(Color(0, 0, 0, 255));
+		LoadImageDataRGBA(pixelsRGBA);
+		return;
+	}
+
+	// JPEG signature: FF D8 FF
+	if (fileBytes[0] == 0xFF &&
+		fileBytes[1] == 0xD8 &&
+		fileBytes[2] == 0xFF)
+	{
+		std::vector<unsigned int> pixelsRGB;
+
+		if (!ReadJpegFromMemory(fileBytes.data(), fileBytes.size(), mWidth, mHeight, pixelsRGB))
+			throw std::runtime_error("JPEG memory decode failed");
+
+		AllocateMemory(mWidth, mHeight);
+		LoadImageDataRGB(pixelsRGB);
+
+		return;
+	}
+
+	throw std::runtime_error("Unsupported image format in memory buffer");
+}
+
 ImageData::ImageData(unsigned int width, unsigned int height, std::vector<unsigned int> const& pixelsRGBA)
 	:
 ImageData::ImageData(width, height)

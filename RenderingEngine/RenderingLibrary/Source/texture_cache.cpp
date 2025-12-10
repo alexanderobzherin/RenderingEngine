@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "boost/filesystem.hpp"
+#include "utility.hpp"
 
 namespace rendering_engine
 {
@@ -45,6 +46,36 @@ void TextureCache::LoadTexturesFromFolder(std::string pathToFolder)
 	}
 }
 
+void TextureCache::LoadTexturesFromPackage()
+{
+	const auto& entries = Utility::GetPackEntries();
+
+	std::string folderEntry = { "Textures/" };
+	for (auto& entry : entries)
+	{
+		const std::string& virtualPath = entry.first;
+		if (virtualPath.rfind(folderEntry, 0) == 0) // starts with Textures/
+		{
+			std::string textureFileName = virtualPath.substr(folderEntry.size());
+
+			std::vector<uint8_t> binaryFileData = Utility::ReadPackedFile(virtualPath);
+			if (binaryFileData.empty())
+			{
+				std::cerr << "[TextureCache] Could not read packed texture: "
+					<< virtualPath << std::endl;
+				continue;
+			}
+
+			// Upload to RAM with textureName + binaryFileData
+			auto textureName = UploadTextureToRAM(textureFileName, binaryFileData);
+			if (!textureName.empty())
+			{
+				UploadTextureToGPU(textureName);
+			}
+		}
+	}
+}
+
 std::string TextureCache::UploadTextureToRAM(std::string path)
 {
 	auto filePath = boost::filesystem::path(path);
@@ -72,6 +103,22 @@ std::string TextureCache::UploadTextureToRAM(std::string path)
 	mTotalSizeRAM += size;
 
 	return filename;
+}
+
+std::string TextureCache::UploadTextureToRAM(std::string textureFileName, std::vector<uint8_t> const& fileBytes)
+{
+	auto textureName = boost::filesystem::path(textureFileName).stem().string();
+	// If texture is already loaded into RAM yet, do not add again.
+	if (auto search = mTextures.find(textureName); search != mTextures.end())
+	{
+		return std::string{};
+	}
+	mTextures[textureName] = std::make_shared<ImageDataGpu>(fileBytes, mRenderer);
+
+	size_t size = mTextures.at(textureName)->GetSizeInRAM();
+	mTotalSizeRAM += size;
+
+	return textureName;
 }
 
 void TextureCache::UploadTextureToGPU(std::string filename)

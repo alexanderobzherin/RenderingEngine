@@ -16,7 +16,7 @@
  * - Steps: setup error handler -> create compressor/decompressor -> set parameters -> read/write scanlines -> clean up.
  *
  * Custom error handling is implemented via `codec_error_mgr` to safely recover
- * from libjpeg�s internal `longjmp` behavior.
+ * from libjpeg�s internal `longjmp` behavior.
  *
  * @note This file is an internal backend of the Rendering Engine and is not part of the public API.
  *
@@ -275,4 +275,85 @@ DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char const* filename, unsig
 	return true;
 }
 
+/**
+ * @brief Decode a JPEG image directly from a memory buffer.
+ *
+ * This function behaves similarly to ReadJpegFile(), but instead of
+ * reading from disk, it reads raw JPEG bytes already loaded in memory.
+ *
+ * Useful when assets are stored in:
+ *   - packed archives (Pack.bin)
+ *   - networked streams
+ *   - compressed inline resources
+ *
+ * The function expects the buffer to contain valid JPEG-formatted data.
+ *
+ * @param memory
+ *     Pointer to the start of the JPEG byte stream.
+ *
+ * @param memorySize
+ *     Total size of the memory buffer in bytes.
+ *
+ * @param width [out]
+ *     Decoded image width in pixels.
+ *
+ * @param height [out]
+ *     Decoded image height in pixels.
+ *
+ * @param rgbImageDataVector [out]
+ *     Output RGB pixel buffer (3 bytes per pixel).
+ *
+ * @return
+ *     - `true`  → Successful decode.
+ *     - `false` → Memory buffer was not a valid JPEG stream or decode failed.
+ *
+ * @warning
+ *     The function does not attempt format detection beyond JPEG signature.
+ *     Callers must ensure the memory buffer contains JPEG data.
+ */
+static bool ReadJpegFromMemory(
+	const unsigned char* memory,
+	size_t memorySize,
+	unsigned int& width,
+	unsigned int& height,
+	std::vector<unsigned int>& rgbImageDataVector)
+{
+	struct jpeg_decompress_struct cinfo;
+	struct codec_error_mgr jerr;
 
+	cinfo.err = jpeg_std_error(&jerr.pub);
+	jerr.pub.error_exit = codec_error_exit;
+
+	if (setjmp(jerr.setjmp_buffer)) {
+		jpeg_destroy_decompress(&cinfo);
+		return false;
+	}
+
+	jpeg_create_decompress(&cinfo);
+
+	jpeg_mem_src(&cinfo, memory, memorySize);
+
+	jpeg_read_header(&cinfo, TRUE);
+	jpeg_start_decompress(&cinfo);
+
+	width = cinfo.output_width;
+	height = cinfo.output_height;
+	unsigned int components = cinfo.output_components; // should = 3
+
+	size_t row_stride = width * components;
+	rgbImageDataVector.resize(width * height * components);
+
+	while (cinfo.output_scanline < cinfo.output_height)
+	{
+		unsigned char* row = (unsigned char*)(
+			rgbImageDataVector.data() +
+			cinfo.output_scanline * row_stride
+			);
+		jpeg_read_scanlines(&cinfo, &row, 1);
+	}
+
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+
+	return true;
+}

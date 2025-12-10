@@ -2,6 +2,7 @@
 #include "i_renderer.hpp"
 #include "boost/filesystem.hpp"
 #include "mesh_data_gpu.hpp"
+#include "utility.hpp"
 
 namespace rendering_engine
 {
@@ -37,6 +38,32 @@ void ModelCache::LoadModelsFromFolder(std::string pathToFolder)
 	}
 }
 
+void ModelCache::LoadModelsFromPackage()
+{
+	const auto& entries = Utility::GetPackEntries();
+
+	std::string folderEntry = { "Models/" };
+	for (auto& entry : entries)
+	{
+		const std::string& virtualPath = entry.first;
+		if (virtualPath.rfind(folderEntry, 0) == 0) // starts with Models/
+		{
+			std::string modelName = virtualPath.substr(folderEntry.size());
+
+			std::vector<uint8_t> binaryFileData = Utility::ReadPackedFile(virtualPath);
+			if (binaryFileData.empty())
+			{
+				std::cerr << "[TextureCache] Could not read packed texture: "
+					<< virtualPath << std::endl;
+				continue;
+			}
+
+			// Upload to RAM with textureName + binaryFileData
+			(void)UploadModelToRAM(modelName, binaryFileData);
+		}
+	}
+}
+
 void ModelCache::CreateQuad2D()
 {
 	mModels["Quad2D"] = std::make_shared<MeshDataGpu>(mRenderer);
@@ -69,8 +96,7 @@ std::string ModelCache::UploadModelToRAM(std::string path)
 	{
 		return std::string{};
 	}
-	mModels[filename] = std::make_shared<MeshDataGpu>(mRenderer);
-	mModels[filename]->LoadModel(filePath.string());
+	mModels[filename] = std::make_shared<MeshDataGpu>(filePath.string(), mRenderer);
 
 	const size_t sizeVertices = mModels.at(filename)->GetCpuVertexBufferSize();
 	mTotalSizeRAM += sizeVertices;
@@ -78,6 +104,26 @@ std::string ModelCache::UploadModelToRAM(std::string path)
 	mTotalSizeRAM += sizeIndices;
 
 	return filename;
+}
+
+std::string ModelCache::UploadModelToRAM(std::string fileName, std::vector<uint8_t> const& fileBytes)
+{
+	auto modelName = boost::filesystem::path(fileName).stem().string();
+
+	// If model is already loaded into RAM yet, do not add again.
+	if (auto search = mModels.find(modelName); search != mModels.end())
+	{
+		return std::string{};
+	}
+
+	mModels[modelName] = std::make_shared<MeshDataGpu>(fileBytes, mRenderer);
+
+	const size_t sizeVertices = mModels.at(modelName)->GetCpuVertexBufferSize();
+	mTotalSizeRAM += sizeVertices;
+	const size_t sizeIndices = mModels.at(modelName)->GetCpuIndexBufferSize();
+	mTotalSizeRAM += sizeIndices;
+
+	return modelName;
 }
 
 void ModelCache::UploadModelToGPU(std::string filename)

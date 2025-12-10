@@ -16,10 +16,28 @@ void VulkanMaterialResources::Initialize(Material * material)
 	mDescriptorSetLayout = mRenderer->CreateDescriptorSetLayout(material);
 	
 	const auto matName = material->GetMaterialSettings().materialName;
-	boost::filesystem::path matPath = Utility::GetShadersFolderPath() / matName;
+
+	std::vector<char> spvVert;
+	std::vector<char> spvFrag;
+
+	if (Utility::IsPackageProvided())
+	{
+		const auto& entries = Utility::GetPackEntries();
+		std::string materialEntry = "Shaders/" + matName;
+
+		std::vector<uint8_t> binaryFileDataVert = Utility::ReadPackedFile(materialEntry + "/" + std::string(matName + "_vert.spv"));
+		std::vector<uint8_t> binaryFileDataFrag = Utility::ReadPackedFile(materialEntry + "/" + std::string(matName + "_frag.spv"));
+
+		spvVert.assign(binaryFileDataVert.begin(), binaryFileDataVert.end());
+		spvFrag.assign(binaryFileDataFrag.begin(), binaryFileDataFrag.end());
+	}
+	else
+	{
+		boost::filesystem::path matPath = Utility::GetShadersFolderPath() / matName;
 	
-	auto spvVert = Utility::ReadShaderBinaryFile((matPath / std::string(matName + "_vert.spv")).string());
-	auto spvFrag = Utility::ReadShaderBinaryFile((matPath / std::string(matName + "_frag.spv")).string());
+		spvVert = Utility::ReadShaderBinaryFile((matPath / std::string(matName + "_vert.spv")).string());
+		spvFrag = Utility::ReadShaderBinaryFile((matPath / std::string(matName + "_frag.spv")).string());
+	}
 
 	mPipelinePair = mRenderer->CreateGraphicsPipeline(material, mDescriptorSetLayout, spvVert, spvFrag);
 }

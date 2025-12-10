@@ -5,7 +5,6 @@
 
 namespace rendering_engine
 {
-
 MeshDataGpu::MeshDataGpu(IRenderer* renderer)
 	:
 	mRenderer(renderer),
@@ -14,7 +13,27 @@ MeshDataGpu::MeshDataGpu(IRenderer* renderer)
 	mSizeOfIndicesBytes(0),
 	mMeshType(MeshType::None)
 {
-	
+}
+	MeshDataGpu::MeshDataGpu(const std::string& filename, IRenderer* renderer)
+	:
+	mRenderer(renderer),
+	mGpuHandle(nullptr),
+	mSizeOfVerticesBytes(0),
+	mSizeOfIndicesBytes(0),
+	mMeshType(MeshType::None)
+{
+	LoadModel(filename);
+}
+
+MeshDataGpu::MeshDataGpu(std::vector<uint8_t> const& fileBytes, IRenderer* renderer)
+	:
+	mRenderer(renderer),
+	mGpuHandle(nullptr),
+	mSizeOfVerticesBytes(0),
+	mSizeOfIndicesBytes(0),
+	mMeshType(MeshType::None)
+{
+	LoadModel(fileBytes);
 }
 
 MeshDataGpu::~MeshDataGpu()
@@ -103,6 +122,34 @@ void MeshDataGpu::LoadModel(std::string path)
 		{
 			mPositions = model->Meshes()[0]->Vertices();
 			
+			if (model->Meshes()[0]->VertexColors().size() >= 1)
+				mColor = model->Meshes()[0]->VertexColors()[0];
+
+			mNormals = model->Meshes()[0]->Normals();
+			for (const auto& texCoord : model->Meshes()[0]->TextureCoordinates()[0])
+			{
+				mTexCoords.push_back(glm::vec2(texCoord.x, texCoord.y));
+			}
+			mTangents = model->Meshes()[0]->Tangents();
+			mIndices = model->Meshes()[0]->Indices();
+		}
+	}
+
+	CalculateMeshParameters();
+
+	mMeshType = MeshType::Surface;
+}
+
+void MeshDataGpu::LoadModel(std::vector<uint8_t> const& fileBytes)
+{
+	std::unique_ptr<Model> model = std::make_unique<Model>(fileBytes, true);
+
+	if (model)
+	{
+		if (model->HasMeshes())
+		{
+			mPositions = model->Meshes()[0]->Vertices();
+
 			if (model->Meshes()[0]->VertexColors().size() >= 1)
 				mColor = model->Meshes()[0]->VertexColors()[0];
 

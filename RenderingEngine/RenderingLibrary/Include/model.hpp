@@ -42,6 +42,24 @@ public:
      * @param flipUVs Whether to flip UV coordinates vertically (useful for texture alignment).
      */
     explicit Model(const std::string& filename, bool flipUVs = false);
+
+    /**
+     * @brief Constructs a model from an in-memory file buffer.
+     *
+     * This constructor allows importing a 3D model directly from raw file bytes
+     * stored in memory rather than from disk.
+     *
+     * The import process creates Mesh and ModelMaterial instances exactly the
+     * same way as the file-based constructor.
+     *
+     * @param fileBytes Raw contents of a model file (the full encoded file).
+     * @param flipUVs Whether to flip UV coordinates vertically during import.
+     *                This matches the behavior of the file-based constructor.
+     *
+     * @throws std::runtime_error If Assimp fails to load the model.
+     */
+    explicit Model(std::vector<uint8_t> const& fileBytes, bool flipUVs = false);
+
     Model(const Model&) = default;
     Model& operator=(const Model&) = default;
     Model(Model&&) = default;

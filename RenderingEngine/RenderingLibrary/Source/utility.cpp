@@ -6,14 +6,20 @@ namespace rendering_engine
 using namespace boost::filesystem;
 
 path const Utility::sDefaultShadersBinaryRelativePath = {"/Content/Shaders/"};
-path const Utility::sTextureRelativePathFolder = path{} / "Content" / "Textures";
-path const Utility::sModelsRelativePathFolder =  path{} / "Content" / "Models";
-path const Utility::sShadersRelativePathFolder = path{} / "Content" / "Shaders";
+path const Utility::sContentRelativePathFolder = path{} / "Content";
+path const Utility::sTextureRelativePathFolder = sContentRelativePathFolder / "Textures";
+path const Utility::sModelsRelativePathFolder = sContentRelativePathFolder / "Models";
+path const Utility::sShadersRelativePathFolder = sContentRelativePathFolder / "Shaders";
 path const Utility:: sAppConfigFilePath = path{} / "Config" / "app_config.json";
 
 path Utility::sShadersBinaryPath;
 path Utility::sApplicationPath;
 path Utility::sBuildPath;
+
+static PackEntries sPackEntries;
+static bool sPackEntriesLoaded = false;
+path const Utility::sContentPackageFilePath = path{} / "Content" / "Pack.bin";
+path const Utility::sContentPackEntriesFilePath = path{} / "Content" / "Pack.json";
 
 void Utility::InitializePaths(int argc, char* argv[])
 {
@@ -201,6 +207,114 @@ boost::filesystem::path Utility::GetShadersFolderPath()
 boost::filesystem::path Utility::GetConfigFilePath()
 {
 	return ResolveProjectRoot() / sAppConfigFilePath;
+}
+
+bool Utility::IsPackageProvided()
+{
+	const auto root = ResolveProjectRoot();
+	return boost::filesystem::exists(root / sContentPackageFilePath) &&
+		boost::filesystem::exists(root / sContentPackEntriesFilePath);
+}
+
+const PackEntries& Utility::GetPackEntries()
+{
+	if (sPackEntriesLoaded)
+		return sPackEntries;
+
+	sPackEntries.clear();
+
+	// Path to Pack.json
+	const boost::filesystem::path jsonPath = ResolveProjectRoot() / sContentPackEntriesFilePath;
+
+	if (!boost::filesystem::exists(jsonPath))
+	{
+		sPackEntriesLoaded = true;
+		return sPackEntries; // empty
+	}
+
+	// Load JSON
+	std::ifstream f(jsonPath.string());
+	if (!f.is_open())
+	{
+		std::cerr << "[ERROR] Failed to open Pack.json\n";
+		sPackEntriesLoaded = true;
+		return sPackEntries;
+	}
+
+	nlohmann::json j;
+	f >> j;
+
+	// Parse entries
+	for (auto it = j.begin(); it != j.end(); ++it)
+	{
+		PackEntry entry;
+		entry.offset = it.value().value("offset", 0);
+		entry.size = it.value().value("size", 0);
+		sPackEntries[it.key()] = entry;
+	}
+
+	sPackEntriesLoaded = true;
+	return sPackEntries;
+}
+
+std::vector<uint8_t> Utility::ReadPackedFile(const std::string& entryPath)
+{
+	std::vector<std::uint8_t> data;
+
+	if (!IsPackageProvided())
+		return data;
+
+	const path binPath = ResolveProjectRoot() / sContentPackageFilePath;
+	const path jsonPath = ResolveProjectRoot() / sContentPackEntriesFilePath;
+
+	if (!boost::filesystem::exists(binPath) ||
+		!boost::filesystem::exists(jsonPath))
+	{
+		std::cerr << "[Utility::ReadPackedFile] Missing Pack.bin or Pack.json\n";
+		return data;
+	}
+
+	GetPackEntries();
+	// Check if this entry exists in Pack.json
+	auto it = sPackEntries.find(entryPath);
+	if (it == sPackEntries.end())
+	{
+		std::cerr << "[Utility::ReadPackedFile] No such packed entry: "
+			<< entryPath << std::endl;
+		return data; // empty
+	}
+
+	const PackEntry& entry = it->second;
+
+	std::ifstream bin(binPath.string(), std::ios::binary);
+	if (!bin)
+	{
+		std::cerr << "[Utility::ReadPackedFile] Failed to open Pack.bin: "
+			<< binPath.string() << std::endl;
+		return data;
+	}
+
+	// Read the memory region [offset, offset + size)
+
+	data.resize(entry.size);
+
+	bin.seekg(entry.offset, std::ios::beg);
+	if (!bin.good())
+	{
+		std::cerr << "[Utility::ReadPackedFile] Seek error for entry: "
+			<< entryPath << std::endl;
+		return {};
+	}
+
+	bin.read(reinterpret_cast<char*>(data.data()), entry.size);
+	if (!bin.good())
+	{
+		std::cerr << "[Utility::ReadPackedFile] Read error for entry: "
+			<< entryPath << std::endl;
+		return {};
+	}
+
+	return data;
 }
 
 }
