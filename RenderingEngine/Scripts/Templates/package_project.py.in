@@ -5,12 +5,33 @@
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
 ##
 """
+@file package_project.py
+@brief Packages a built Rendering Engine application into a distributable layout.
+
 Usage:
     python3 package_project.py
+    python3 package_project.py --packed
+    python3 package_project.py --packed --keep-plain
 
-This script packages a built application into a Steam-compliant layout:
+Packaging modes:
 
-<project_root>/Build/<ProjectName>/Packages/<ProjectName>-vX.Y.Z-<Platform>/
+  • Default (no arguments)
+        Copies Content/ as loose files and folders.
+        Produces the package:
+            <Build>/<App>/Packages/<App>-vX.Y.Z-<Platform>/
+
+  • --packed
+        Packs all assets from Content/ into:
+            Content/Pack.bin
+            Content/Pack.json
+        Removes loose folders unless --keep-plain is also provided.
+
+  • --packed --keep-plain
+        Generates Pack.bin/Pack.json but preserves original loose assets.
+        Useful for debugging or verification.
+
+Both Windows and Unix platforms are supported.
+The resulting package folder is also archived as a ZIP.
 """
 
 import os
@@ -19,6 +40,7 @@ import sys
 import re
 import datetime
 import subprocess
+import json
 
 # --------------------------------------------------------------------------------------
 # Helpers
@@ -262,11 +284,78 @@ def collect_unix_shared_libs(executable, dst_dir):
             shutil.copy2(lib_path, dest)
             print(f"[COPY] Unix shared lib: {lib_path} -> {dest}")
 
+
+# --------------------------------------------------------------------------------------
+# PACKED ASSET SUPPORT
+# --------------------------------------------------------------------------------------
+
+def pack_assets(source_content, final_content, keep_plain=False):
+    """
+    Creates:
+      Content/Pack.bin
+      Content/Pack.json
+
+    The folder `final_content` already exists inside the package.
+    `source_content` is the folder from your build area.
+    """
+    pack_bin = os.path.join(final_content, "Pack.bin")
+    pack_json = os.path.join(final_content, "Pack.json")
+
+    print("[INFO] Packing assets into Pack.bin...")
+
+    manifest = {}
+    offset = 0
+
+    with open(pack_bin, "wb") as fout:
+        for root, dirs, files in os.walk(source_content):
+            for f in files:
+                abs_path = os.path.join(root, f)
+                rel_path = os.path.relpath(abs_path, source_content).replace("\\", "/")
+
+                size = os.path.getsize(abs_path)
+
+                # append data
+                with open(abs_path, "rb") as fin:
+                    fout.write(fin.read())
+
+                manifest[rel_path] = {"offset": offset, "size": size}
+                offset += size
+
+    # Write JSON manifest
+    with open(pack_json, "w", encoding="utf-8") as jf:
+        json.dump(manifest, jf, indent=4)
+
+    print(f"[INFO] Packed {len(manifest)} files into Pack.bin")
+
+    # Clean up plain assets
+    if not keep_plain:
+        for item in os.listdir(final_content):
+            p = os.path.join(final_content, item)
+            if os.path.isdir(p):
+                shutil.rmtree(p)
+        print("[INFO] Removed loose asset directories (only Pack.bin remains).")
+
+
 # --------------------------------------------------------------------------------------
 # Main
 # --------------------------------------------------------------------------------------
 
+import argparse
+
 def main():
+    parser = argparse.ArgumentParser(description="Rendering Engine Project Packager")
+    parser.add_argument(
+        "--packed",
+        action="store_true",
+        help="Pack all assets into Content/Pack.bin instead of copying loose files."
+    )
+    parser.add_argument(
+        "--keep-plain",
+        action="store_true",
+        help="Keep loose asset files when --packed is used."
+    )
+    args = parser.parse_args()
+
     project_root = os.path.abspath(os.getcwd())
     project_name = os.path.basename(project_root)
 
@@ -381,13 +470,31 @@ def main():
     content_fallback = os.path.join(build_root, "Content")
     config_fallback = os.path.join(build_root, "Config")
 
-    # --- Content (Shaders, Textures, Models, Fonts) ---
-    if os.path.isdir(content_primary):
-        copy_tree(content_primary, content_dst)
-    elif os.path.isdir(content_fallback):
-        copy_tree(content_fallback, content_dst)
+    # --- CONTENT HANDLING (PLAIN or PACKED) ---
+
+    if args.packed:
+        # Still need to copy content first (to source for packing)
+        if os.path.isdir(content_primary):
+            copy_tree(content_primary, content_dst)
+            source_for_packing = content_primary
+        elif os.path.isdir(content_fallback):
+            copy_tree(content_fallback, content_dst)
+            source_for_packing = content_fallback
+        else:
+            print("[ERROR] No Content folder found — cannot pack assets.")
+            return
+
+        # Now replace loose assets with Pack.bin / Pack.json
+        pack_assets(source_for_packing, content_dst, keep_plain=args.keep_plain)
+
     else:
-        print("[WARN] No Content folder found (neither Release/ nor Build root).")
+        # Normal mode: plain content
+        if os.path.isdir(content_primary):
+            copy_tree(content_primary, content_dst)
+        elif os.path.isdir(content_fallback):
+            copy_tree(content_fallback, content_dst)
+        else:
+            print("[WARN] No Content folder found (neither Release/ nor Build root).")# --- CONTENT HANDLING (PLAIN or PACKED) ---
 
     # --- Config ---
     if os.path.isdir(config_primary):
