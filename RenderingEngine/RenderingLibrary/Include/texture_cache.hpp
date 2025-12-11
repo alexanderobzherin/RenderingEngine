@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#include <vector>
 
 namespace rendering_engine
 {
