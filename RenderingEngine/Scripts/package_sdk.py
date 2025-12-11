@@ -55,6 +55,7 @@ DOC_FILES = [
     "Doc/docker_container.md",
     "Doc/prepare_environment.md",
     "Doc/project_creation_guide.md",
+    "Doc/project_packaging_guide.md",
     "Doc/sdk_packaging_guide.md",
 ]
 

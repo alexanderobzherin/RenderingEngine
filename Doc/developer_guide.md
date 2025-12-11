@@ -9,4 +9,5 @@
 - [Project Creation Guide](project_creation_guide.md)
 - [Application Config Guide](app_config_guide.md)
 - [Debugging Guide](debugging_guide.md)
+- [Project Packaging Guide](project_packaging_guide.md)
 - [SDK Packaging Guide](sdk_packaging_guide.md)
