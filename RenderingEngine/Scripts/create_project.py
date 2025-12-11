@@ -27,7 +27,7 @@ import sys
 import shutil
 
 TEMPLATE_ROOT = os.path.join("RenderingEngine", "Scripts", "Templates")
-DEST_ROOT = os.path.join("TestApplications")
+DEST_ROOT = os.path.join("UserApplications")
 
 ## @cond INTERNAL
 def copy_template(src_dir, dst_dir, project_name):

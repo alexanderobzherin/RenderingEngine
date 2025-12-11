@@ -49,12 +49,13 @@ VERSION_HEADER = os.path.join(
 
 DOC_FILES = [
     "README.md",
-    "Doc/developer_guide.md",
-    "Doc/prepare_environment.md",
     "Doc/app_config_guide.md",
     "Doc/debugging_guide.md",
-    "Doc/project_creation_guide.md",
+    "Doc/developer_guide.md",
     "Doc/docker_container.md",
+    "Doc/prepare_environment.md",
+    "Doc/project_creation_guide.md",
+    "Doc/sdk_packaging_guide.md",
 ]
 
 # --------------------------------------------------------------------
@@ -119,7 +120,7 @@ def write_manifest(path, version, platform):
         f.write(f"Date    : {datetime.datetime.now()}\n\n")
         f.write("Layout:\n")
         f.write("- RenderingEngine/RenderingLibrary : core engine library + headers + cmake files\n")
-        f.write("- RenderingEngine/MaterialCompiler: material compiler tool + local engine DLL\n")
+        f.write("- RenderingEngine/MaterialCompiler : material compiler tool + local engine DLL\n")
         f.write("- RenderingEngine/Scripts          : project generation scripts + templates\n")
         f.write("- ContentExamples/                 : sample projects\n")
         f.write("- UserApplications/                : place for user-created apps\n")
@@ -272,34 +273,32 @@ def main():
                 logging.warning(f"Documentation file missing, skipped: {src}")
 
         # --------------------------------------------------------------
-        # 6. Content Examples
+        # 6. Content Examples (copied directly from root-level folder)
         # --------------------------------------------------------------
+        examples_src_root = os.path.join(REPO_ROOT, "ContentExamples")
         examples_dst_root = ensure_dir(os.path.join(sdk_root, "ContentExamples"))
 
-        example_projects = [
-            "HelloUnixApp",
-            "HelloWinApp",
-            "RenderSpriteMesh",
-        ]
-
         def ignore_example(dirpath, names):
-            ignore_list = []
+            ignore = []
             for n in names:
                 if n in ("Build", "Intermediate", ".vs", ".vscode", "x64"):
-                    ignore_list.append(n)
+                    ignore.append(n)
                 elif n.endswith(".user") or n.endswith(".vcxproj") or n.endswith(".vcxproj.filters"):
-                    ignore_list.append(n)
-            return ignore_list
+                    ignore.append(n)
+            return ignore
 
-        for proj in example_projects:
-            src = os.path.join(REPO_ROOT, "TestApplications", proj)
-            dst = os.path.join(examples_dst_root, proj)
-            copy_tree(src, dst, ignore=ignore_example)
-            logging.info(f"Copied example project: {proj}")
+        if os.path.isdir(examples_src_root):
+            copy_tree(examples_src_root, examples_dst_root, ignore=ignore_example)
+            logging.info("Copied ContentExamples folder.")
 
-            # Patch build_project.sh inside copied example
-            build_script = os.path.join(dst, "build_project.sh")
-            patch_build_script_for_sdk(build_script)
+            # Patch build_project.sh in each example
+            for proj in os.listdir(examples_dst_root):
+                proj_path = os.path.join(examples_dst_root, proj)
+                if os.path.isdir(proj_path):
+                    build_script = os.path.join(proj_path, "build_project.sh")
+                    patch_build_script_for_sdk(build_script)
+        else:
+            logging.warning("No ContentExamples folder found.")
 
         # --------------------------------------------------------------
         # 7. UserApplications (empty placeholder)

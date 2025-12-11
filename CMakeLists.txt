@@ -99,9 +99,10 @@ message(STATUS "freetype2 LINK LIBRARIES:  ${freetype2_LINK_LIBRARIES}")
 endif()
 
 add_subdirectory(RenderingEngine)
-#add_subdirectory(ContentExamples)
 if(NOT RE_BUILD_ENGINE_ONLY)
+add_subdirectory(ContentExamples)
 add_subdirectory(TestApplications)
+add_subdirectory(UserApplications)
 endif()
 
 # ======================================================================
