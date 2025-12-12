@@ -1,26 +1,24 @@
-image: docker:24.0.7
-
-options:
-  size: 2x
+image: google/cloud-sdk:slim
 
 pipelines:
   default:
     - step:
-        name: Build SDK and Docs (Linux)
-        services:
-          - docker
-        caches:
-          - docker
+        name: Build SDK + Docs (Linux)
         script:
-          - docker build -t rendering-engine-ci .
-          - docker run --rm \
-              -v "$BITBUCKET_CLONE_DIR:/rendering-engine" \
-              rendering-engine-ci \
-              /bin/bash -c "./build_engine.sh --build-sdk"
-          - docker run --rm \
-              -v "$BITBUCKET_CLONE_DIR:/rendering-engine" \
-              rendering-engine-ci \
-              /bin/bash -c "./build_engine.sh --docs-only"
-        artifacts:
-          - Build/Packages/**
-          - Build/Docs/**
+          - echo "$GCP_SERVICE_ACCOUNT_JSON_B64" | base64 -d > /tmp/gcp-key.json
+          - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+          - apt-get update
+          - apt-get install -y --no-install-recommends build-essential git cmake doxygen graphviz libvulkan-dev vulkan-tools vulkan-validationlayers libglfw3-dev libglm-dev libgtest-dev libjpeg-dev libpng-dev libassimp-dev pkg-config libfreetype-dev nlohmann-json3-dev libboost-filesystem-dev curl ca-certificates
+          - chmod +x build_engine.sh
+          - ./build_engine.sh --build-sdk
+          - ./build_engine.sh --docs-only
+          # Upload SDK artifact
+          - |
+            gsutil cp \
+              Build/Packages/RenderingEngine-v0.2.0-SDK-Linux.tar.gz \
+              gs://downloads.rendering-engine.alexander-obzherin.info/
+          # Upload documentation
+          - |
+            gsutil -m rsync -r \
+              Build/Docs/html \
+              gs://docs.rendering-engine.alexander-obzherin.info/
