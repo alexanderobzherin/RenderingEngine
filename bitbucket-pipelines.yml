@@ -1,0 +1,26 @@
+image: docker:24.0.7
+
+options:
+  size: 2x
+
+pipelines:
+  default:
+    - step:
+        name: Build SDK and Docs (Linux)
+        services:
+          - docker
+        caches:
+          - docker
+        script:
+          - docker build -t rendering-engine-ci .
+          - docker run --rm \
+              -v "$BITBUCKET_CLONE_DIR:/rendering-engine" \
+              rendering-engine-ci \
+              /bin/bash -c "./build_engine.sh --build-sdk"
+          - docker run --rm \
+              -v "$BITBUCKET_CLONE_DIR:/rendering-engine" \
+              rendering-engine-ci \
+              /bin/bash -c "./build_engine.sh --docs-only"
+        artifacts:
+          - Build/Packages/**
+          - Build/Docs/**
