@@ -158,7 +158,7 @@ public:
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     /** @brief Returns reference to the physical device. */
     VkPhysicalDevice& GetPhysicalDevice();
-    /** @brief Returns reference to the physical device’s supported features. */
+    /** @brief Returns reference to the physical deviceï¿½s supported features. */
     VkPhysicalDeviceFeatures& GetPhysDevSupportedFeatures();
 
     /**
@@ -166,9 +166,9 @@ public:
      *
      * The layout defines how shader resources (uniform buffers, custom parameters, textures)
      * are bound to the pipeline. By the local convention of this engine:
-     * - **Binding 0** — Transformation matrices (model, view, projection) depending on material domain (2D or 3D).
-     * - **Binding 1** — Custom parameter variable block (if any). All variables are serialized and packed into a single binding.
-     * - **Bindings 2..n** — Texture samplers, one texture per binding.
+     * - **Binding 0** ï¿½ Transformation matrices (model, view, projection) depending on material domain (2D or 3D).
+     * - **Binding 1** ï¿½ Custom parameter variable block (if any). All variables are serialized and packed into a single binding.
+     * - **Bindings 2..n** ï¿½ Texture samplers, one texture per binding.
      *
      * This convention ensures consistent descriptor bindings across all shaders and materials.
      *
@@ -208,16 +208,6 @@ public:
      */
     template <typename T>
     static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
-    /** @copydoc GetAttributeDescriptions<Vertex2D> */
-    template <>
-    static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions<Vertex2D>();
-    /** @copydoc GetAttributeDescriptions<VertexPositionColorTexture> */
-    template <>
-    static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions<VertexPositionColorTexture>();
-    /** @copydoc GetAttributeDescriptions<VertexPositionColorTextureNormalTangent> */
-    template <>
-    static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions<VertexPositionColorTextureNormalTangent>();
-
 
 private:
     void CreateInstance();

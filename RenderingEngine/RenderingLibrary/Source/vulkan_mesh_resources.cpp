@@ -1,6 +1,8 @@
 #include "vulkan_mesh_resources.hpp"
 #include "vulkan_renderer.hpp"
 
+#include <cstring>
+
 namespace rendering_engine
 {
 

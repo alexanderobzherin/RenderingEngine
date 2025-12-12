@@ -8,8 +8,10 @@
 #include "rendering_engine_export.hpp"
 #include "render_resource_context.hpp"
 
-#include <memory>
 #include <functional>
+#include <memory>
+#include <string>
+#include <unordered_map>
 
 namespace rendering_engine
 {

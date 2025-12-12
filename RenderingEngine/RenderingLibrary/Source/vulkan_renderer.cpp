@@ -23,6 +23,18 @@ namespace rendering_engine
 	const bool enableValidationLayers = true;
 #endif
 
+template<>
+std::vector<VkVertexInputAttributeDescription>
+VulkanRenderer::GetAttributeDescriptions<Vertex2D>();
+
+template<>
+std::vector<VkVertexInputAttributeDescription>
+VulkanRenderer::GetAttributeDescriptions<VertexPositionColorTexture>();
+
+template<>
+std::vector<VkVertexInputAttributeDescription>
+VulkanRenderer::GetAttributeDescriptions<VertexPositionColorTextureNormalTangent>();
+
 VulkanRenderer::VulkanRenderer(IWindowSystem& windowSystem)
 	:
 	mWindowSystem{windowSystem},

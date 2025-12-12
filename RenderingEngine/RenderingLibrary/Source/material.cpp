@@ -2,6 +2,8 @@
 #include "i_renderer.hpp"
 #include "i_material_render_resources.hpp"
 
+#include <cstring>
+
 namespace rendering_engine
 {
 
@@ -50,7 +52,7 @@ PackedMaterialData Material::PackMaterialParameters()
         result.buffer.resize(currentOffset + 16); // 16 bytes for std140 vec3
         std::memcpy(result.buffer.data() + currentOffset, &value, 12);
         // pad last 4 bytes with zero
-        memset(result.buffer.data() + currentOffset + 12, 0, 4);
+        std::memset(result.buffer.data() + currentOffset + 12, 0, 4);
         currentOffset += 16;
     }
     // vec4
