@@ -3,12 +3,12 @@
 # Project details
 PROJECT_NAME           = "Rendering Engine"
 PROJECT_BRIEF          = "Modular Graphics Rendering Engine"
-PROJECT_NUMBER         = "1.0"
+PROJECT_NUMBER         = "0.2.0"
 OUTPUT_DIRECTORY       = ../../Build/Docs
 
 # Input
-INPUT                  = ../../RenderingEngine/Source ../../RenderingEngine/Include
-FILE_PATTERNS          = *.hpp *.h *.cpp *.c
+INPUT                  = ../../RenderingEngine ../../Doc
+FILE_PATTERNS          = *.hpp *.h *.cpp *.c *.py  *.md
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = */external/*
 
