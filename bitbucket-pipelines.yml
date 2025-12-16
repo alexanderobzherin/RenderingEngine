@@ -31,11 +31,24 @@ pipelines:
             - self.hosted
             - windows
           script:
-            - echo "%GCP_SERVICE_ACCOUNT_JSON_B64%" | base64 -d > C:\gcp-key.json
-            - gcloud auth activate-service-account --key-file=C:\gcp-key.json
+            - powershell -NoProfile -Command '
+                $out = Join-Path $env:TEMP "gcp-key.json";
+                $bytes = [Convert]::FromBase64String($env:GCP_SERVICE_ACCOUNT_JSON_B64);
+                [IO.File]::WriteAllBytes($out, $bytes)
+              '
+            # Authenticate to GCP
+            - gcloud auth activate-service-account --key-file "$env:TEMP\gcp-key.json"
 
-            - call build_engine.bat --build-sdk
+            # Verify toolchain (debug-friendly)
+            - where cl
+            - where cmake
+            - where gcloud
+            - where gsutil
 
-            - gsutil cp ^
-                Build\Packages\RenderingEngine-v0.2.0-SDK-Windows.tar.gz ^
+            # Build SDK
+            - .\build_engine.bat --build-sdk
+
+            # Upload artifact
+            - gsutil cp `
+                Build\Packages\RenderingEngine-v0.2.0-SDK-Windows.tar.gz `
                 gs://downloads.rendering-engine.alexander-obzherin.info/
