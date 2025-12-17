@@ -1,5 +1,4 @@
 image: google/cloud-sdk:slim
-
 pipelines:
   branches:
     main:
@@ -38,17 +37,36 @@ pipelines:
               '
             # Authenticate to GCP
             - gcloud auth activate-service-account --key-file "$env:TEMP\gcp-key.json"
-
             # Verify toolchain (debug-friendly)
             - where cl
             - where cmake
             - where gcloud
             - where gsutil
-
             # Build SDK
             - .\build_engine.bat --build-sdk
-
             # Upload artifact
             - gsutil cp `
                 Build\Packages\RenderingEngine-v0.2.0-SDK-Windows.tar.gz `
+                gs://downloads.rendering-engine.alexander-obzherin.info/    
+    freebsd-build:
+      - step:
+          name: Build SDK (FreeBSD self-hosted)
+          runs-on:
+            - self.hosted
+            - linux.shell
+          script:
+            - export PATH="/usr/local/bin:/usr/bin:/bin"
+            - echo "$GCP_SERVICE_ACCOUNT_JSON_B64" | base64 -d > /tmp/gcp-key.json
+            - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+            # Sanity checks (optional but useful)
+            - uname -a
+            - which cmake
+            - which gcloud
+            - which gsutil 
+            - chmod +x build_engine.sh
+            - ./build_engine.sh --build-sdk
+            # Upload SDK artifact
+            - |
+              gcloud storage cp \
+                Build/Packages/RenderingEngine-v0.2.0-SDK-FreeBSD.tar.gz \
                 gs://downloads.rendering-engine.alexander-obzherin.info/
