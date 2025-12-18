@@ -6,14 +6,14 @@ This document explains how to create a new project using the Rendering Engine.
 
 A project can be created in two ways:
 
-- **SDK-User Mode** — when the engine is downloaded as a precompiled SDK from an artifact repository.
-- **Dev Mode** — when a project is created inside the engine’s source tree during engine development.
+- **SDK-User Mode** - when the engine is downloaded as a precompiled SDK from an artifact repository.
+- **Dev Mode** - when a project is created inside the engine’s source tree during engine development.
 
 
 During the development of the rendering engine, it is needed to implement multiple test and demo applications. These applications serve two purposes:
 
-- Feature development and verification — to implement, test, and debug new rendering features.
-- Demonstration — to showcase the engine’s capabilities in a visual and accessible way.
+- Feature development and verification - to implement, test, and debug new rendering features.
+- Demonstration - to showcase the engine’s capabilities in a visual and accessible way.
 
 Rendering Engine supports automated creation of new demo/test applications using a Python script:
 ```bash
@@ -36,7 +36,7 @@ PS E:\Development\rendering-engine> python3 RenderingEngine\Scripts\create_proje
 ```
 This creates:
 ```bash
-TestApplications\HelloWinApp\
+UserApplications\HelloWinApp\
 ```
 
 2. Generate the Visual Studio solution (Dev Mode only)
@@ -81,13 +81,13 @@ Build/Installed/
 
 3. Build the project
 ```bash
-$ cd TestApplications/HelloUnixApp
+$ cd UserApplications/HelloUnixApp
 $ ./build_project.sh
 ```
 
 4. Run the application
 ```bash
-$ cd ../../Build/TestApplications/HelloUnixApp/Release
+$ cd ../../Build/UserApplications/HelloUnixApp/Release
 $ ./HelloUnixApp
 ```
 

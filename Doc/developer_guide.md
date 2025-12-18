@@ -11,3 +11,4 @@
 - [Debugging Guide](debugging_guide.md)
 - [Project Packaging Guide](project_packaging_guide.md)
 - [SDK Packaging Guide](sdk_packaging_guide.md)
+- [CI/CD Guide](ci_cd_guide.md)
