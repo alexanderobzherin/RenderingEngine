@@ -63,6 +63,7 @@ pipelines:
                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
                 FILENAME: 'build-alpha-status.svg' 
+  custom:
     SDK_Build_FreeBSD:
       - step:
           name: Build SDK (FreeBSD self-hosted)
