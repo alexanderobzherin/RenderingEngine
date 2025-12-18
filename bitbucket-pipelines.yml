@@ -1,6 +1,6 @@
 image: google/cloud-sdk:slim
 pipelines:
-  custom:
+  branches:
     Docs:
       - step:
           name: Build Documentation (Linux)
@@ -16,7 +16,7 @@ pipelines:
               gsutil -m rsync -r \
                 Build/Docs/html \
                 gs://docs.rendering-engine.alexander-obzherin.info/
-  custom:
+
     SDK_Build_Linux:
       - step:
           name: Build SDK (Linux)
@@ -32,7 +32,7 @@ pipelines:
               gsutil cp \
                 Build/Packages/RenderingEngine-v0.2.0-SDK-Linux.tar.gz \
                 gs://downloads.rendering-engine.alexander-obzherin.info/
-  custom:
+
     SDK_Build_Windows:
       - step:
           name: Build SDK (Windows self-hosted)
@@ -63,7 +63,7 @@ pipelines:
                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
                 FILENAME: 'build-alpha-status.svg' 
-  custom:
+
     SDK_Build_FreeBSD:
       - step:
           name: Build SDK (FreeBSD self-hosted)
