@@ -1,3 +1,12 @@
+## Build Status
+
+| Component | Status |
+|---------|--------|
+| Documentation | ![Docs](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/docs?label=Docs) |
+| SDK (Linux) | ![SDK Linux](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/sdk-linux?label=SDK_Linux) |
+| SDK (Windows) | ![SDK Windows](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/sdk-windows?label=SDK_Windows) |
+| SDK (FreeBSD) | ![SDK FreeBSD](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/sdk-freebsd?label=SDK_FreeBSD) |
+
 <p align="center">
     <img src="./Doc/Images/RE_Banner.png" alt="Rendering Engine">
 </p>
