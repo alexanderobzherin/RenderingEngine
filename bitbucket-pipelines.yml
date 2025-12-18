@@ -1,9 +1,25 @@
 image: google/cloud-sdk:slim
 pipelines:
-  branches:
-    main:
+  custom:
+    Docs:
       - step:
-          name: Build SDK + Docs (Linux)
+          name: Build Documentation (Linux)
+          script:
+            - echo "$GCP_SERVICE_ACCOUNT_JSON_B64" | base64 -d > /tmp/gcp-key.json
+            - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+            - apt-get update
+            - apt-get install -y --no-install-recommends build-essential git cmake doxygen graphviz curl ca-certificates
+            - chmod +x build_engine.sh
+            - ./build_engine.sh --docs-only
+            # Upload documentation
+            - |
+              gsutil -m rsync -r \
+                Build/Docs/html \
+                gs://docs.rendering-engine.alexander-obzherin.info/
+  custom:
+    SDK_Build_Linux:
+      - step:
+          name: Build SDK (Linux)
           script:
             - echo "$GCP_SERVICE_ACCOUNT_JSON_B64" | base64 -d > /tmp/gcp-key.json
             - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
@@ -11,19 +27,13 @@ pipelines:
             - apt-get install -y --no-install-recommends build-essential git cmake doxygen graphviz libvulkan-dev vulkan-tools vulkan-validationlayers libglfw3-dev libglm-dev libgtest-dev libjpeg-dev libpng-dev libassimp-dev pkg-config libfreetype-dev nlohmann-json3-dev libboost-filesystem-dev curl ca-certificates
             - chmod +x build_engine.sh
             - ./build_engine.sh --build-sdk
-            - ./build_engine.sh --docs-only
             # Upload SDK artifact
             - |
               gsutil cp \
                 Build/Packages/RenderingEngine-v0.2.0-SDK-Linux.tar.gz \
                 gs://downloads.rendering-engine.alexander-obzherin.info/
-            # Upload documentation
-            - |
-              gsutil -m rsync -r \
-                Build/Docs/html \
-                gs://docs.rendering-engine.alexander-obzherin.info/
   custom:
-    windows-build:
+    SDK_Build_Windows:
       - step:
           name: Build SDK (Windows self-hosted)
           runs-on:
@@ -47,8 +57,13 @@ pipelines:
             # Upload artifact
             - gsutil cp `
                 Build\Packages\RenderingEngine-v0.2.0-SDK-Windows.tar.gz `
-                gs://downloads.rendering-engine.alexander-obzherin.info/    
-    freebsd-build:
+                gs://downloads.rendering-engine.alexander-obzherin.info/
+            - pipe: atlassian/bitbucket-upload-file:0.3.2
+              variables:
+                BITBUCKET_USERNAME: $BITBUCKET_USERNAME
+                BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
+                FILENAME: 'build-alpha-status.svg' 
+    SDK_Build_FreeBSD:
       - step:
           name: Build SDK (FreeBSD self-hosted)
           runs-on:
