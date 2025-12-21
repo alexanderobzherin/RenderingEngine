@@ -19,8 +19,8 @@ Replace it with the following minimal working configuration:
             "name": "Debug",
             "type": "gdb",
             "request": "launch",
-            "target": "${workspaceFolder}/Build/TestApplications/HelloUnixApp/Release/HelloUnixApp",
-            "cwd": "${workspaceFolder}/Build/TestApplications/HelloUnixApp/Release",
+            "target": "${workspaceFolder}/Build/UserApplications/HelloUnixApp/Release/HelloUnixApp",
+            "cwd": "${workspaceFolder}/Build/UserApplications/HelloUnixApp/Release",
             "valuesFormatting": "parseText"
         }
     ]
@@ -31,7 +31,7 @@ Replace it with the following minimal working configuration:
 The engine resolves shader and asset paths relative to the executable’s working directory.
 Therefore, cwd must point to the folder where the executable normally runs, e.g.:
 ```bash
-Build/TestApplications/<ProjectName>/Release
+Build/UserApplications/<ProjectName>/Release
 ```
 
 <- [Back to Developer Guide Page](developer_guide.md)

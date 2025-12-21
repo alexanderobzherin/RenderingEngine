@@ -9,18 +9,33 @@
 
 # Rendering Engine
 
-A cross-platform rendering engine designed to be portable and backend-agnostic.  
-Currently supports Windows and Unix-like systems (Linux, FreeBSD).
-Rendering engine - is a library and set of tools to create graphics applications like video games, HMI (Human Machine Interface) applications, simulators, visualisation etc.
+**Rendering Engine** is a modular, cross-platform graphics engine designed to be portable and backend-agnostic.
 
-### Features (Work in Progress)
+It is provided as a **library and a set of supporting tools** for creating graphics applications such as:
+- video games
+- HMI (Human–Machine Interface) applications
+- simulators
+- visualisation and rendering tools
 
-- Support for 3D model loading and rendering (e.g., OBJ, FBX)
-- Texture loading and binding (PNG, JPEG support)
-- Customizable material and shader system (each model can use a unique shader)
-- Sprite rendering support
-- Text rendering (under development)
-- Unit tests and demo application included
+The engine currently supports Windows and Unix-like systems, including Linux and FreeBSD.
+
+---
+
+## Documentation
+
+Comprehensive documentation, including Getting Started guides, SDK downloads, and full API reference, is available here:
+
+[https://docs.rendering-engine.alexander-obzherin.info/](https://docs.rendering-engine.alexander-obzherin.info/)
+
+---
+
+## Supported Platforms
+
+- Windows
+- Linux
+- FreeBSD
+
+---
 
 ## Dependencies
 
@@ -37,11 +52,11 @@ The following libraries are required:
 - [FreeType](https://freetype.org/)
 - [nlohmann/json](https://json.nlohmann.me/)
 
+All listed dependencies use permissive or industry-standard licenses suitable for commercial and non-commercial use.
+
+Detailed build and setup instructions are provided in the online documentation.
+
 ---
-
-## Developer Guide
-
-[Developer guide](Doc/developer_guide.md) describes workflow in SDK mode, how to build rendering engine from source code, how to create test/demo aplications, CI/CD notes etc.
 
 ## Portability notes
 This engine builds and runs successfully on:

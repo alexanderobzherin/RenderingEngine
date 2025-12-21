@@ -8,7 +8,7 @@ git clone git@bitbucket.org:AlexanderObzherin/rendering-engine.git
 
 ## Windows Setup
 
-1. Install [vcpkg](https://github.com/microsoft/vcpkg):
+#### 1. Install [vcpkg](https://github.com/microsoft/vcpkg):
 
 ```bash
 git clone https://github.com/Microsoft/vcpkg.git
@@ -17,18 +17,21 @@ cd vcpkg
 .\vcpkg.exe integrate install
 ```
 
-2. Install required libraries:
+
+#### 2. Install required libraries:
+
 ```bash
 .\vcpkg install --triplet x64-windows-static-md glfw3 glm boost-filesystem libpng libjpeg-turbo freetype assimp nlohmann-json gtest
 ```
 
-3. Set the VCPKG_ROOT environment variable to the folder where you cloned vcpkg:
-Variable name: ```VCPKG_ROOT```
-Variable value: ```Path\To\vcpkg```
+#### 3. Set the VCPKG_ROOT environment variable to the folder where you cloned vcpkg:
 
-4. Download and install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
+Variable name: ```VCPKG_ROOT```  
+Variable value: ```Path\To\vcpkg```  
 
-5. Set the glslc environment variable to point to the glslc.exe binary included in the SDK:
+#### 4. Download and install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
+
+#### 5. Set the glslc environment variable to point to the glslc.exe binary included in the SDK:
 Variable name: ```glslc```
 Variable value: ```Path\To\glslc.exe```
 
@@ -36,14 +39,14 @@ Variable value: ```Path\To\glslc.exe```
 
 ### Ubuntu
 
-1. Install dependencies:
+#### 1. Install dependencies:
 
 ```bash
 sudo apt update
 sudo apt install cmake build-essential libglfw3-dev libglm-dev libboost-filesystem-dev libgtest-dev libjpeg-dev libpng-dev libassimp-dev libfreetype6-dev pkg-config nlohmann-json3-dev
 ```
 
-2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
+#### 2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
 Note: As of May 2025, LunarG has discontinued updating Vulkan SDK packages in the official Ubuntu repositories.
 The following approaches are now officially recommended:
 

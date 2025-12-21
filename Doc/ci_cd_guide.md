@@ -15,11 +15,12 @@ CI/CD for this project is handled via Bitbucket Pipelines, defined in the reposi
 bitbucket-pipelines.yml
 
 The pipelines are dedicated to building the following deliverables:
+```
 - Documentation
 - SDK (Linux)
 - SDK (Windows)
 - SDK (FreeBSD)
-
+```
 The resulting artifacts are published to:
 Documentation: https://docs.rendering-engine.alexander-obzherin.info
 SDK downloads: https://downloads.rendering-engine.alexander-obzherin.info

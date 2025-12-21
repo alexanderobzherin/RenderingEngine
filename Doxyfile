@@ -8,6 +8,8 @@ OUTPUT_DIRECTORY       = ../../Build/Docs
 
 HTML_COLORSTYLE = LIGHT
 
+LAYOUT_FILE = ../../Doc/DoxygenLayout.xml
+
 # Input
 INPUT                  = ../../RenderingEngine ../../Doc
 FILE_PATTERNS          = *.hpp *.h *.cpp *.c *.py  *.md *.png *.css
@@ -38,11 +40,11 @@ HTML_OUTPUT            = html
 GENERATE_LATEX         = NO
 
 # Diagrams (enable if Graphviz is installed)
-HAVE_DOT               = YES
+HAVE_DOT               = NO
 DOT_IMAGE_FORMAT       = svg
-CALL_GRAPH             = YES
-CALLER_GRAPH           = YES
-# CLASS_DIAGRAMS         = YES
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+CLASS_DIAGRAMS         = NO
 DOT_MULTI_TARGETS      = YES
 
 # Misc
