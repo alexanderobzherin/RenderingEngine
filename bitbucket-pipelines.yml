@@ -13,7 +13,7 @@ pipelines:
             - ./build_engine.sh --docs-only
             # Upload documentation
             - |
-              gsutil -m rsync -r \
+              gsutil -m rsync -r -d \
                 Build/Docs/html \
                 gs://docs.rendering-engine.alexander-obzherin.info/
 

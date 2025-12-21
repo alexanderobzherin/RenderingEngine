@@ -8,8 +8,6 @@ OUTPUT_DIRECTORY       = ../../Build/Docs
 
 HTML_COLORSTYLE = LIGHT
 
-LAYOUT_FILE = ../../Doc/DoxygenLayout.xml
-
 # Input
 INPUT                  = ../../RenderingEngine ../../Doc
 FILE_PATTERNS          = *.hpp *.h *.cpp *.c *.py  *.md *.png *.css
