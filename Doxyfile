@@ -2,15 +2,22 @@
 
 # Project details
 PROJECT_NAME           = "Rendering Engine"
-PROJECT_BRIEF          = "Modular Graphics Rendering Engine"
+PROJECT_BRIEF          = "Modular Graphics Rendering Engine | v0.2.0"
 PROJECT_NUMBER         = "0.2.0"
 OUTPUT_DIRECTORY       = ../../Build/Docs
 
+HTML_COLORSTYLE = LIGHT
+
 # Input
 INPUT                  = ../../RenderingEngine ../../Doc
-FILE_PATTERNS          = *.hpp *.h *.cpp *.c *.py  *.md
+FILE_PATTERNS          = *.hpp *.h *.cpp *.c *.py  *.md *.png *.css
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = */external/*
+
+USE_MDFILE_AS_MAINPAGE = ../../Doc/getting_started.md
+IMAGE_PATH = ../../Doc/Images/
+PROJECT_LOGO = ../../Doc/Images/RE_Banner.png
+HTML_EXTRA_STYLESHEET = ../../Doc/Style/theme.css
 
 # Build related
 EXTRACT_ALL            = YES

@@ -1,0 +1,254 @@
+body {
+  margin: 0 auto;
+  padding-top: 320px; 
+  background-color: #ffffff;
+
+  font-family: Inter, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #10409b;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings */
+h1, h2, h3, h4 {
+  font-weight: 600;
+  line-height: 1.3;
+  color: #25408b;
+}
+
+h1 {
+  font-size: 28px;
+  margin: 24px 0 16px;
+}
+
+h2 {
+  font-size: 22px;
+  margin: 28px 0 12px;
+}
+
+h3 {
+  font-size: 18px;
+  margin: 24px 0 10px;
+}
+
+/* Inline code */
+code {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  
+  font-size: 14px;
+  background: #ffffff;
+  background-color: #ddf1ff; /*Show background of #include files*/
+  padding: 2px 5px;
+  border-radius: 1px;
+}
+
+/* Main documentation text */
+.contents {
+  color: #10409b;
+  background-color: #f9fcff;
+}
+
+/* Code line background */
+div.line {
+  background: #f9fcff;
+}
+
+/* Code blocks */
+pre, div.fragment {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 13.5px;
+  color: #7c9bd3;
+  line-height: 1.6;
+
+  background: #f1f9ff;
+  border: 1px solid rgba(206, 233, 255, 0.836);
+  border-radius: 0px;
+  padding: 12px 14px;
+  overflow-x: auto;
+}
+
+div.line {
+background: #f9fcff;
+margin: 0;
+}
+
+/* Header background */
+
+#titlearea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  background: #ffffff;
+  border-bottom: 0px solid #3cff00;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+#projectlogo {
+  margin: 0 auto;
+}
+
+/* Logo sizing */
+#projectlogo img {
+  max-height: 220px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Project name — visually suppressed but still present */
+#projectname {
+  font-size: 0;          /* hides text */
+  margin: 0;
+}
+
+/* Project brief + version */
+#projectbrief {
+  font-size: 14px;
+  color: #7499bd;
+  margin-top: 12px;
+}
+
+
+/* Break Doxygen header table layout */
+#titlearea table {
+  width: 100%;
+}
+
+#titlearea tr {
+  display: block;
+}
+
+#titlearea td {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+#MSearchBox {
+  background-color: #ffffff;
+  border: 1px solid rgba(98, 161, 255, 0.4);
+
+  margin-top: 30px !important;
+  margin-bottom: 0 !important;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+#side-nav {
+  background: #ffffff;
+  border-right: 0px solid #ffffff;
+}
+
+/* Sidebar items */
+#nav-tree {
+  font-size: 14px;
+  padding: 3px 6px;
+  color: #ffffff;
+  background-color: #ffffff;
+}
+
+#nav-tree .item {
+  font-size: 14px;
+  padding: 3px 6px;
+  color: #79d5ff;
+  background-color: #ffffff;
+}
+
+#nav-tree .selected {
+  background-color: #e0f3ff;
+  border-radius: 4px;
+}
+
+#nav-tree .children_ul {
+  margin-left: 12px;
+}
+
+:root {
+    --nav-bg: #e0f3ff;
+    --nav-text: #3d6f97;
+    --nav-hover: #0b57e4;
+    --border-radius: 0px;
+}
+
+/* ***************************** */
+/* Main horizontal navigation bar*/
+/* ***************************** */
+.sm-dox {
+    background: var(--nav-bg);
+    /*Forehead above the nav bar*/
+    border-radius: var(--border-radius);
+    box-shadow: 0 0px 0px rgba(0,0,0,0.25);
+}
+
+.sm-dox a {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--nav-text);
+    padding: 0.75rem 1.25rem;
+    margin: 0.25rem;
+    border-radius: 0px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sm-dox a:hover {
+    background: var(--nav-hover);
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    padding: 0.75rem 1.25rem;
+    margin: 0.25rem;
+    border-radius: 0px;
+
+    transform: translateX(0px);
+    box-shadow: 0 2px 8px rgba(239, 246, 255, 0.815);
+}
+
+/* Submenu item */
+.sm-dox ul {
+    background: var(--nav-bg);
+}
+
+.sm-dox ul a {
+
+    padding-left: 25px; /* Indent on hover */
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--nav-text);
+    background-color: var(--nav-bg);
+}
+
+.sm-dox ul a:hover {
+    color: #ffffff;
+    background: var(--nav-hover);
+    padding-left: 25px; /* Indent on hover */
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Target both up and down arrows */
+.sm-dox .smd-arrow-up,
+.sm-dox .smd-arrow-down,
+.sm-dox .sm-up,
+.sm-dox .sm-down,
+.sm-dox [class*="arrow"],
+.sm-dox [class*="scroll"] {
+    /* Reset any defaults */
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Child menu stays "hovered" when grandchild is open */
+.sm-dox li:has(ul:hover) > a {
+    color: #3498db !important;
+}
