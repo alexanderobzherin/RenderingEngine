@@ -107,7 +107,7 @@ public:
 	 * @param height Image height
 	 * @param pixelsRGBA Vector of RGBA pixel data (4 bytes per pixel)
 	 */
-	ImageData(unsigned int width, unsigned int height, std::vector<unsigned int> const& pixelsRGBA);
+	ImageData(unsigned int width, unsigned int height, std::vector<std::uint8_t> const& pixelsRGBA);
 
 	/**
 	 * @brief Destructor that frees memory.
@@ -220,11 +220,11 @@ protected:
 	/**
 	 * @brief Loads image data from a 32-bit RGBA buffer.
 	 */
-	void LoadImageDataRGBA(std::vector<unsigned int> const& pixels);
+	void LoadImageDataRGBA(std::vector<std::uint8_t> const& pixels);
 	/**
 	 * @brief Loads image data from a 24-bit RGB buffer.
 	 */
-	void LoadImageDataRGB(std::vector<unsigned int> const& pixels);
+	void LoadImageDataRGB(std::vector<std::uint8_t> const& pixels);
 
 	/**
 	 * @brief Loads image from a PNG file.

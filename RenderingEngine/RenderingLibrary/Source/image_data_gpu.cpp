@@ -27,6 +27,16 @@ ImageDataGpu::ImageDataGpu(std::vector<uint8_t> const& fileBytes, IRenderer* ren
 	mImageData = std::make_unique<ImageData>(fileBytes);
 }
 
+rendering_engine::ImageDataGpu::ImageDataGpu(ImageData imageData, IRenderer* renderer)
+	:
+	mPath{},
+	mRenderer{ renderer },
+	mImageData{ nullptr },
+	mGpuHandle{ nullptr }
+{
+	mImageData = std::make_unique<ImageData>(imageData);
+}
+
 rendering_engine::ImageDataGpu::~ImageDataGpu()
 {
 }
@@ -75,7 +85,7 @@ bool ImageDataGpu::IsOnGPU() const
 	{
 		return false;
 	}
-	mGpuHandle->IsTextureLoadedInGPU();
+	return mGpuHandle->IsTextureLoadedInGPU();
 }
 
 size_t rendering_engine::ImageDataGpu::GetSizeInRAM() const

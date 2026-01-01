@@ -9,6 +9,7 @@
 #include "texture_cache.hpp"
 
 #include <stdexcept>
+#include <iostream>
 
 namespace rendering_engine
 {
@@ -135,7 +136,8 @@ void VulkanRenderResources::CreateUniformBuffers()
         mRenderer->CreateBuffer(matVarBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             mMaterialParametersBuffers[i], mMaterialParametersMemory[i]);
-    }    
+    }
+    std::cout << "Mat UBO buf[0]=" << (void*)mMaterialParametersBuffers[0] << "\n";
 }
 
 void VulkanRenderResources::CreateDescriptorPool()
@@ -211,6 +213,10 @@ void VulkanRenderResources::CreateDescriptorSet()
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         unsigned int dstBinding = 0;
+
+        VkDescriptorBufferInfo matVarBufferInfo{};
+        VkWriteDescriptorSet matVarDescSet;
+
         std::vector<VkWriteDescriptorSet> descriptorWrites;
 
         // Transfotmations descriptor set
@@ -241,12 +247,11 @@ void VulkanRenderResources::CreateDescriptorSet()
         if (!materialParameters.buffer.empty())
         {
             ++dstBinding;
-            VkDescriptorBufferInfo matVarBufferInfo{};
+
             matVarBufferInfo.buffer = mMaterialParametersBuffers[i];
             matVarBufferInfo.offset = 0;
             matVarBufferInfo.range = materialParameters.buffer.size();
 
-            VkWriteDescriptorSet matVarDescSet;
             matVarDescSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             matVarDescSet.pNext = nullptr;
             matVarDescSet.dstSet = mDescriptorSets[i];

@@ -16,6 +16,7 @@ namespace rendering_engine
 class IRenderer;
 class ITextureRenderResources;
 class ImageDataGpu;
+class ImageData;
 
 /**
  * @class TextureCache
@@ -46,6 +47,8 @@ public:
      * @param pathToFolder Absolute or relative path to the folder containing texture files.
      */
     void LoadTexturesFromFolder(std::string pathToFolder);
+
+    void LoadTexture(std::string textureName, ImageData imageData);
 
     /**
      * @brief Loads all textures from the packed asset archive.
@@ -92,6 +95,7 @@ public:
      */
     std::string UploadTextureToRAM(std::string textureFileName, std::vector<uint8_t> const& fileBytes);
     
+    std::string UploadTextureToRAM(std::string textureName, ImageData imageData);
     /**
      * @brief Uploads a texture (previously loaded into RAM) to GPU.
      *

@@ -2,6 +2,7 @@
 
 #include "texture_cache.hpp"
 #include "image_data_gpu.hpp"
+#include "image_data.hpp"
 #include "i_renderer.hpp"
 #include <string>
 #include <vector>
@@ -43,6 +44,16 @@ void TextureCache::LoadTexturesFromFolder(std::string pathToFolder)
 		{
 			UploadTextureToGPU(textureName);
 		}
+	}
+}
+
+void TextureCache::LoadTexture(std::string textureName, ImageData imageData)
+{
+	// Upload to RAM with textureName + binaryFileData
+	auto textureNameUploaded = UploadTextureToRAM(textureName, imageData);
+	if (!textureNameUploaded.empty())
+	{
+		UploadTextureToGPU(textureNameUploaded);
 	}
 }
 
@@ -114,6 +125,21 @@ std::string TextureCache::UploadTextureToRAM(std::string textureFileName, std::v
 		return std::string{};
 	}
 	mTextures[textureName] = std::make_shared<ImageDataGpu>(fileBytes, mRenderer);
+
+	size_t size = mTextures.at(textureName)->GetSizeInRAM();
+	mTotalSizeRAM += size;
+
+	return textureName;
+}
+
+std::string TextureCache::UploadTextureToRAM(std::string textureName, ImageData imageData)
+{
+	// If texture is already loaded into RAM yet, do not add again.
+	if (auto search = mTextures.find(textureName); search != mTextures.end())
+	{
+		return std::string{};
+	}
+	mTextures[textureName] = std::make_shared<ImageDataGpu>(imageData, mRenderer);
 
 	size_t size = mTextures.at(textureName)->GetSizeInRAM();
 	mTotalSizeRAM += size;

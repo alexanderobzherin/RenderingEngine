@@ -117,7 +117,7 @@ codec_error_exit(j_common_ptr cinfo)
 
 static bool
 DoReadJpegFile(struct jpeg_decompress_struct* cinfo,
-	char const* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector);
+	char const* filename, unsigned int& width, unsigned int& height, std::vector<std::uint8_t>& rgbImageDataVector);
 
 /*
  * Sample routine for JPEG decompression.  We assume that the source file name
@@ -132,7 +132,7 @@ DoReadJpegFile(struct jpeg_decompress_struct* cinfo,
   * @param rgbImageDataVector [out] Output vector of RGB pixel data (3 bytes per pixel).
   * @return true on success, false on failure.
   */
-static bool ReadJpegFile(char const* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector)
+static bool ReadJpegFile(char const* filename, unsigned int& width, unsigned int& height, std::vector<std::uint8_t>& rgbImageDataVector)
 {
 	/* This struct contains the JPEG decompression parameters and pointers to
 	 * working space (which is allocated as needed by the JPEG library).
@@ -151,7 +151,7 @@ static bool ReadJpegFile(char const* filename, unsigned int& width, unsigned int
  */
 
 bool
-DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char const* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbImageDataVector)
+DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char const* filename, unsigned int& width, unsigned int& height, std::vector<std::uint8_t>& rgbImageDataVector)
 {
 	/* We use our private extension JPEG error handler.
 	 * Note that this struct must live as long as the main JPEG parameter
@@ -316,7 +316,7 @@ static bool ReadJpegFromMemory(
 	size_t memorySize,
 	unsigned int& width,
 	unsigned int& height,
-	std::vector<unsigned int>& rgbImageDataVector)
+	std::vector<std::uint8_t>& rgbImageDataVector)
 {
 	struct jpeg_decompress_struct cinfo;
 	struct codec_error_mgr jerr;

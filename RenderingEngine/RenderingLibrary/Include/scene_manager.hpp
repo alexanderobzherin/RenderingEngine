@@ -21,6 +21,7 @@ class Scene;
 class TextureCache;
 class ModelCache;
 class MaterialCache;
+class TextRenderer;
 
 struct RenderResourceContext;
 
@@ -115,6 +116,8 @@ public:
 	 */
 	static std::unique_ptr<Scene> CreateScene(const std::string& name, SceneManager& sm);
 
+	std::shared_ptr<TextRenderer> GetTextRenderer();
+
 private:
 
 	static std::unordered_map<std::string, Factory>& GetMap()
@@ -135,6 +138,7 @@ private:
 	std::shared_ptr<TextureCache> mTextureCache;
 	std::shared_ptr<ModelCache> mModelCache;
 	std::shared_ptr<MaterialCache> mMaterialCache;
+	std::shared_ptr<TextRenderer> mTextRenderer;
 };
 /**
  * @brief Template-based auto-registrar for scenes.

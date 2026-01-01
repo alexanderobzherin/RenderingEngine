@@ -63,6 +63,12 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/quad_2d.hpp
 	${PROJECT_SOURCE_DIR}/Include/static_mesh.hpp
 	
+	# Text rendering system
+	${PROJECT_SOURCE_DIR}/Include/font_resources.hpp
+	${PROJECT_SOURCE_DIR}/Include/text_renderer.hpp
+	${PROJECT_SOURCE_DIR}/Include/text_block_2d.hpp
+	${PROJECT_SOURCE_DIR}/Include/texture_atlas_maker.hpp
+
 	# Scene organization
 	${PROJECT_SOURCE_DIR}/Include/scene.hpp
 	${PROJECT_SOURCE_DIR}/Include/scene_manager.hpp
@@ -75,8 +81,6 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/camera_2d.hpp
 
 	${PROJECT_SOURCE_DIR}/Include/utility.hpp
-	${PROJECT_SOURCE_DIR}/Include/text_renderer.hpp
-	${PROJECT_SOURCE_DIR}/Include/texture_atlas_maker.hpp
 	${PROJECT_SOURCE_DIR}/Include/app_time.hpp
 	${PROJECT_SOURCE_DIR}/Include/app_clock.hpp
 	
@@ -126,6 +130,12 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/quad_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/static_mesh.cpp
 
+	# Text rendering system
+	${PROJECT_SOURCE_DIR}/Source/font_resources.cpp
+	${PROJECT_SOURCE_DIR}/Source/text_renderer.cpp
+	${PROJECT_SOURCE_DIR}/Source/text_block_2d.cpp
+	${PROJECT_SOURCE_DIR}/Source/texture_atlas_maker.cpp
+
 	# Scene organization
 	${PROJECT_SOURCE_DIR}/Source/scene.cpp
 	${PROJECT_SOURCE_DIR}/Source/scene_manager.cpp
@@ -137,8 +147,6 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/camera_2d.cpp
 
     ${PROJECT_SOURCE_DIR}/Source/utility.cpp
-	${PROJECT_SOURCE_DIR}/Source/text_renderer.cpp
-	${PROJECT_SOURCE_DIR}/Source/texture_atlas_maker.cpp
 	${PROJECT_SOURCE_DIR}/Source/app_time.cpp
 	${PROJECT_SOURCE_DIR}/Source/app_clock.cpp
 	

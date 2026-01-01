@@ -163,7 +163,7 @@ static void SaveTextureFilePng(rendering_engine::ImageData const& imageData, cha
  * @param rgbaImageDataVector [out] Filled with 4-byte-per-pixel RGBA data.
  * @return true if the image was successfully read, false otherwise.
  */
-static bool ReadPngFile(char const* filename, unsigned int& width, unsigned int& height, std::vector<unsigned int>& rgbaImageDataVector)
+static bool ReadPngFile(char const* filename, unsigned int& width, unsigned int& height, std::vector<std::uint8_t>& rgbaImageDataVector)
 {
     png_image image; /* The control structure used by libpng */
 
@@ -258,7 +258,7 @@ static bool ReadPngFromMemory(
     size_t memorySize,
     unsigned int& width,
     unsigned int& height,
-    std::vector<unsigned int>& rgbaImageDataVector)
+    std::vector<std::uint8_t>& rgbaImageDataVector)
 {
     png_image image;
     memset(&image, 0, sizeof(image));

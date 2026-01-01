@@ -5,6 +5,7 @@
 #include "texture_cache.hpp"
 #include "model_cache.hpp"
 #include "material_cache.hpp"
+#include "text_renderer.hpp"
 #include "utility.hpp"
 
 namespace rendering_engine
@@ -42,22 +43,29 @@ void SceneManager::Initialize()
 	// 3. Materials
 	mTextureCache = std::make_shared<TextureCache>(mRenderer);
 	mModelCache = std::make_shared<ModelCache>(mRenderer);
-	const auto modelsFolder = Utility::GetModelsFolderPath();
 	mModelCache->CreateQuad2D();
+
+	mMaterialCache = std::make_shared<MaterialCache>(mRenderer);
+	mMaterialCache->CreateBuildInMaterials();
+
+	mTextRenderer = std::make_shared<TextRenderer>(GetRenderResourceContext());
+	mTextRenderer->StoreFontAtlasesInFiles(true);
 
 	if (Utility::IsPackageProvided())
 	{
 		mTextureCache->LoadTexturesFromPackage();
 		mModelCache->LoadModelsFromPackage();
+		mTextRenderer->LoadFontsFromPackage();
 	}
 	else
 	{
 		const auto textureFolder = Utility::GetTextureFolderPath();
 		mTextureCache->LoadTexturesFromFolder(textureFolder.string());
+		const auto modelsFolder = Utility::GetModelsFolderPath();
 		mModelCache->LoadModelsFromFolder(modelsFolder.string());
+		const auto fontsFolder = Utility::GetFontsFolderPath();
+		mTextRenderer->LoadFontsFromFolder(fontsFolder.string());
 	}
-	mMaterialCache = std::make_shared<MaterialCache>(mRenderer);
-	mMaterialCache->CreateBuildInMaterials();
 
 	if(!GetMap().empty())
 	{
@@ -152,6 +160,11 @@ std::unique_ptr<Scene> SceneManager::CreateScene(const std::string& name, SceneM
 		scene = (it->second)(sm);
 	}
 	return scene;
+}
+
+std::shared_ptr<TextRenderer> SceneManager::GetTextRenderer()
+{
+	return mTextRenderer;
 }
 
 } // namespace rendering_engine

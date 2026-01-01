@@ -77,6 +77,8 @@ protected:
      */
     void SetMeshName(const std::string& meshName);
 
+    void SetMaterialVec4(const std::string& name, const glm::vec4& value);
+
 protected:
     RenderResourceContext mRenderContext;
     std::unique_ptr<IRenderResources> mRenderResources;

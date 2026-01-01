@@ -43,6 +43,7 @@ enum class ShadingModel
  */
 struct MaterialSettings
 {
+    std::string parentMaterialName; // to reuse same shader code
     std::string materialName;
     MaterialDomain materialDomain;
     BlendMode blendMode;

@@ -4,48 +4,36 @@
 // Distributed under the terms of the zlib License. See LICENSE.md for details.
 #pragma once
 
-#include <cstdint>
-#include <iostream>
-#include <map>
-#include <algorithm>
-#include "image_data.hpp"
-#include "boost/filesystem.hpp"
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_GLYPH_H
-#include FT_TYPES_H
-#include FT_OUTLINE_H
-#include FT_RENDER_H
+#include <string>
+#include "render_resource_context.hpp"
+
+#include <memory>
+#include <unordered_map>
 
 namespace rendering_engine
 {
+class FontResources;
 
 class TextRenderer
 {
 public:
-    TextRenderer( std::string const pathToFont, unsigned int const size );
+    TextRenderer(RenderResourceContext rrc);
     ~TextRenderer();
 
-    ImageData CreateGlyphBitmap( char const character );
-    //Not effective method. It is not using texAtlas.
-    ImageData CreateStringBitmap( std::string text );
+    void LoadFontsFromFolder(std::string pathToFolder);
+    void LoadFontsFromPackage();
+    const RenderResourceContext& GetRenderResourceContext() const;
 
-    static ImageData CreateGlyphBitmap( std::string const pathToFont, char const character );
+    std::shared_ptr<FontResources> GetFontResources(std::string fontName);
+
+    void StoreFontAtlasesInFiles(bool in);
 
 private:
-    TextRenderer(TextRenderer const&);
-    TextRenderer operator=(TextRenderer const &);
+    RenderResourceContext mRenderResourceContext;
 
-protected:
-    FT_Error   mErrorResult = FT_Err_Ok;
-    FT_Library mLibrary = 0;
-    FT_Face    mFace = 0;
+    std::unordered_map<std::string, std::shared_ptr<FontResources>> mFontResources;
 
-    std::map<char, ImageData> mGlyphBitmaps;
-    ImageData mGlyphTextureAtlas;
-
-    //TO DO evaluate to store all needed data for each character
-    std::map<char, std::pair<unsigned int, unsigned int>> mTexAtlasData;
+    bool bStoreFontAtlasesInFiles = false;
 };
 
-} //namespace rendering_engine
+} // namespace rendering_engine

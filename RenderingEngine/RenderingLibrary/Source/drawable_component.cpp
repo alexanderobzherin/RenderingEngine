@@ -7,6 +7,8 @@
 #include "material_cache.hpp"
 #include "material.hpp"
 
+#include <cstring>
+
 namespace rendering_engine
 {
 
@@ -33,6 +35,22 @@ void DrawableComponent::Shutdown()
 	if (mRenderResources)
 	{
 		mRenderResources->Shutdown();
+	}
+}
+
+void DrawableComponent::SetMaterialVec4(const std::string& name, const glm::vec4& value)
+{
+	for (const auto& entry : mMaterialParameters.layout)
+	{
+		if (entry.name == name && entry.type == MaterialParameterLayoutEntry::Type::Vec4)
+		{
+			std::memcpy(
+				mMaterialParameters.buffer.data() + entry.offset,
+				&value,
+				sizeof(glm::vec4)
+			);
+			return;
+		}
 	}
 }
 

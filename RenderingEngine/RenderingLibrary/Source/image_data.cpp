@@ -67,7 +67,7 @@ ImageData::ImageData(std::vector<uint8_t> const& fileBytes)
 		fileBytes[2] == 'N' &&
 		fileBytes[3] == 'G')
 	{
-		std::vector<unsigned int> pixelsRGBA;
+		std::vector<std::uint8_t> pixelsRGBA;
 
 		if (!ReadPngFromMemory(fileBytes.data(), fileBytes.size(), mWidth, mHeight, pixelsRGBA))
 			throw std::runtime_error("PNG memory decode failed");
@@ -83,7 +83,7 @@ ImageData::ImageData(std::vector<uint8_t> const& fileBytes)
 		fileBytes[1] == 0xD8 &&
 		fileBytes[2] == 0xFF)
 	{
-		std::vector<unsigned int> pixelsRGB;
+		std::vector<std::uint8_t> pixelsRGB;
 
 		if (!ReadJpegFromMemory(fileBytes.data(), fileBytes.size(), mWidth, mHeight, pixelsRGB))
 			throw std::runtime_error("JPEG memory decode failed");
@@ -97,7 +97,7 @@ ImageData::ImageData(std::vector<uint8_t> const& fileBytes)
 	throw std::runtime_error("Unsupported image format in memory buffer");
 }
 
-ImageData::ImageData(unsigned int width, unsigned int height, std::vector<unsigned int> const& pixelsRGBA)
+ImageData::ImageData(unsigned int width, unsigned int height, std::vector<std::uint8_t> const& pixelsRGBA)
 	:
 ImageData::ImageData(width, height)
 {
@@ -270,7 +270,7 @@ bool ImageData::LoadTextureJpegFile(char const* filename)
 	CleanAllocatedMemory();
 	unsigned int width = 0;
 	unsigned int height = 0;
-	std::vector<unsigned int> rgbImageDataVector;
+	std::vector<std::uint8_t> rgbImageDataVector;
 
 	bool result = ReadJpegFile(filename, width, height, rgbImageDataVector);
 	if(result && (rgbImageDataVector.size() == (3U * width * height)))
@@ -294,7 +294,7 @@ bool ImageData::LoadTexturePngFile(char const* filename)
 	CleanAllocatedMemory();
 	unsigned int width = 0;
 	unsigned int height = 0;
-	std::vector<unsigned int> rgbaImageDataVector;
+	std::vector<std::uint8_t> rgbaImageDataVector;
 
 	bool result = ReadPngFile(filename, width, height, rgbaImageDataVector);
 
@@ -338,7 +338,7 @@ void ImageData::CleanAllocatedMemory()
 	mHeight = 0U;
 }
 
-void ImageData::LoadImageDataRGBA(std::vector<unsigned int> const& pixels)
+void ImageData::LoadImageDataRGBA(std::vector<std::uint8_t> const& pixels)
 {
 	//Check for data numbers matching
 	if( (GetHeight() * GetWidth() * 4) != pixels.size() )
@@ -364,7 +364,7 @@ void ImageData::LoadImageDataRGBA(std::vector<unsigned int> const& pixels)
 	}
 }
 
-void ImageData::LoadImageDataRGB(std::vector<unsigned int> const& pixels)
+void ImageData::LoadImageDataRGB(std::vector<std::uint8_t> const& pixels)
 {
 	//Check for data numbers matching
 	if( (GetHeight() * GetWidth() * 3) != pixels.size() )

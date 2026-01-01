@@ -15,7 +15,15 @@ void VulkanMaterialResources::Initialize(Material * material)
 {
 	mDescriptorSetLayout = mRenderer->CreateDescriptorSetLayout(material);
 	
-	const auto matName = material->GetMaterialSettings().materialName;
+	std::string matName;
+	if (material->GetMaterialSettings().parentMaterialName.empty())
+	{
+		matName = material->GetMaterialSettings().materialName;
+	}
+	else
+	{
+		matName = material->GetMaterialSettings().parentMaterialName;
+	}
 
 	std::vector<char> spvVert;
 	std::vector<char> spvFrag;

@@ -15,24 +15,26 @@
 
 namespace rendering_engine
 {
+
+struct GlyphMetrics;
 class TextureAtlasMaker
 {
 public:
-	TextureAtlasMaker( std::map<char, ImageData> images );
+	TextureAtlasMaker(std::map<char, ImageData> images);
 	~TextureAtlasMaker() = default;
 
 	bool CreateTextureAtlas( std::map<char, std::pair<unsigned int, unsigned int>>& texAtlasData, ImageData& texAtlasImage );
+	static ImageData CreateTextureAtlas(std::unordered_map<std::uint32_t, std::pair<GlyphMetrics, ImageData>>& ioFontAtlas);
 
 protected:
 	//Calculate cell dimensions of one cell as max width (x component) and height (y component) in pixels
 	void FindCellDimensions(unsigned int& outputWidth, unsigned int& outputHeight);
+
+	static void FindCellDimensions(unsigned int& outputWidth, unsigned int& outputHeight, std::unordered_map<std::uint32_t, std::pair<GlyphMetrics, ImageData>>& fontAtlas);
 	//Calculate number of rows and columns, trying to aim a square form
 	void CalculateGridDimensions(unsigned int& outputNumberOfColumns, unsigned int& outputNumberOfRows);
-	//Log informaion to txt file
-	void LogMetaData(const std::string& message)
-	{
-		mMetaDataOutputStream << message << std::endl;
-	}
+
+	static void CalculateGridDimensions(unsigned int& outputNumberOfColumns, unsigned int& outputNumberOfRows, std::unordered_map<std::uint32_t, std::pair<GlyphMetrics, ImageData>>& fontAtlas);
 
 private:
 	TextureAtlasMaker( TextureAtlasMaker const& );
@@ -41,9 +43,6 @@ private:
 protected:
 	//container of images
 	std::map<char, ImageData> mImageCollection;
-
-	static const char* const mMetaDataFileName;
-	std::ofstream mMetaDataOutputStream;
 
 	static const Color sDefaultPaletteBackgroundColor;
 };

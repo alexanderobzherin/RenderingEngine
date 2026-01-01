@@ -9,6 +9,7 @@ path const Utility::sDefaultShadersBinaryRelativePath = {"/Content/Shaders/"};
 path const Utility::sContentRelativePathFolder = path{} / "Content";
 path const Utility::sTextureRelativePathFolder = sContentRelativePathFolder / "Textures";
 path const Utility::sModelsRelativePathFolder = sContentRelativePathFolder / "Models";
+path const Utility::sFontsRelativePathFolder = sContentRelativePathFolder / "Fonts";
 path const Utility::sShadersRelativePathFolder = sContentRelativePathFolder / "Shaders";
 path const Utility:: sAppConfigFilePath = path{} / "Config" / "app_config.json";
 
@@ -189,6 +190,11 @@ boost::filesystem::path Utility::ResolveProjectRoot()
 	return exeDir;
 }
 
+boost::filesystem::path Utility::GetContentFolderPath()
+{
+	return ResolveProjectRoot() / sContentRelativePathFolder;
+}
+
 boost::filesystem::path Utility::GetTextureFolderPath()
 {
 	return ResolveProjectRoot() / sTextureRelativePathFolder;
@@ -197,6 +203,11 @@ boost::filesystem::path Utility::GetTextureFolderPath()
 boost::filesystem::path Utility::GetModelsFolderPath()
 {
 	return ResolveProjectRoot() / sModelsRelativePathFolder;
+}
+
+boost::filesystem::path Utility::GetFontsFolderPath()
+{
+	return ResolveProjectRoot() / sFontsRelativePathFolder;
 }
 
 boost::filesystem::path Utility::GetShadersFolderPath()

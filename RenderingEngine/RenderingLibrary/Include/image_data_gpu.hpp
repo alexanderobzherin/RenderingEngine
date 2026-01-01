@@ -46,6 +46,8 @@ public:
      */
     ImageDataGpu(std::vector<uint8_t> const& fileBytes, IRenderer* renderer);
 
+    ImageDataGpu(ImageData imageData, IRenderer* renderer);
+
     /**
      * @brief Destructor. Frees GPU memory if allocated.
      */

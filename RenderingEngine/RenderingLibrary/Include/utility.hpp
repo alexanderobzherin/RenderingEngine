@@ -115,11 +115,17 @@ public:
 	/// @brief Resolves project root folder (handles Release/Debug/Binaries layouts).
 	static boost::filesystem::path ResolveProjectRoot();
 
+	/// @brief Returns absolute path to Content.
+	static boost::filesystem::path GetContentFolderPath();
+
 	/// @brief Returns absolute path to Content/Textures.
 	static boost::filesystem::path GetTextureFolderPath();
 
 	/// @brief Returns absolute path to Content/Models.
 	static boost::filesystem::path GetModelsFolderPath();
+
+	/// @brief Returns absolute path to Content/Fonts.
+	static boost::filesystem::path GetFontsFolderPath();
 
 	/// @brief Returns absolute path to Content/Shaders.
 	static boost::filesystem::path GetShadersFolderPath();
@@ -162,6 +168,7 @@ public:
 		static boost::filesystem::path const sContentPackEntriesFilePath;
 		static boost::filesystem::path const sTextureRelativePathFolder;
 		static boost::filesystem::path const sModelsRelativePathFolder;
+		static boost::filesystem::path const sFontsRelativePathFolder;
 		static boost::filesystem::path const sShadersRelativePathFolder;
 		static boost::filesystem::path const sAppConfigFilePath;
 		
