@@ -77,6 +77,12 @@ protected:
      */
     void SetMeshName(const std::string& meshName);
 
+    void SetMaterialFloat(const std::string& name, float value);
+
+    void SetMaterialVec2(const std::string& name, const glm::vec2& value);
+
+    void SetMaterialVec3(const std::string& name, const glm::vec3& value);
+
     void SetMaterialVec4(const std::string& name, const glm::vec4& value);
 
 protected:

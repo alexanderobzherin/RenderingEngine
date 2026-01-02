@@ -4,6 +4,7 @@
 
 #include "font_resources.hpp"
 
+
 namespace rendering_engine
 {
 /*

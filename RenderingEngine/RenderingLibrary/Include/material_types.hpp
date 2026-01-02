@@ -39,6 +39,18 @@ enum class ShadingModel
 };
 
 /**
+ * @brief Describes the layout of a single packed parameter inside a uniform buffer.
+ */
+struct MaterialParameterLayoutEntry
+{
+    std::string name;
+    size_t offset;
+    size_t size;
+    enum class Type { Float, Vec2, Vec3, Vec4 };
+    Type type;
+};
+
+/**
  * @brief Settings required to define a material instance.
  */
 struct MaterialSettings
@@ -48,18 +60,8 @@ struct MaterialSettings
     MaterialDomain materialDomain;
     BlendMode blendMode;
     ShadingModel shadingModel;
-};
 
-/**
- * @brief Describes the layout of a single packed parameter inside a uniform buffer.
- */
-struct MaterialParameterLayoutEntry
-{
-    std::string name;
-    size_t offset;
-    size_t size;
-    enum class Type { Float, Vec3, Vec4 };
-    Type type;
+    const std::vector<MaterialParameterLayoutEntry>* parameterLayout = nullptr;
 };
 
 /**
@@ -69,6 +71,14 @@ struct PackedMaterialData
 {
     std::vector<uint8_t> buffer;
     std::vector<MaterialParameterLayoutEntry> layout;
+};
+
+static const std::vector<MaterialParameterLayoutEntry> Font2DLayout =
+{
+    { "FontColor",   0, 16, MaterialParameterLayoutEntry::Type::Vec4 },
+    { "GlyphSize",   16, 8, MaterialParameterLayoutEntry::Type::Vec2 },
+    { "GlyphOffset", 24, 8, MaterialParameterLayoutEntry::Type::Vec2 },
+    { "UvRect",      32, 16, MaterialParameterLayoutEntry::Type::Vec4 },
 };
 
 } // namespace rendering_engine

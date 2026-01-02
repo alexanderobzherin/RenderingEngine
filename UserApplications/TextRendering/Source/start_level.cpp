@@ -39,10 +39,11 @@ void StartLevel::Initialize()
 	const std::string fontName = "RobotoMono-Bold";
 	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
 	mTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
-	mTextBlock->DrawFontAtlas();
+	//mTextBlock->DrawFontAtlas();
 	mTextBlock->Initialize();
+	mTextBlock->SetText("Text Rendering");
 	mTextBlock->SetPosition(glm::vec2(-200.0f, -150.0f));
-	mTextBlock->SetTextColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	//mTextBlock->SetTextColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 }
 void StartLevel::Update(float deltaTime)
 {

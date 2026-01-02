@@ -170,6 +170,7 @@ void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t 
     materialSettings.materialDomain = MaterialDomain::Sprite2D;
     materialSettings.shadingModel = ShadingModel::Unlit;
     materialSettings.blendMode = BlendMode::Opaque;
+    materialSettings.parameterLayout = &Font2DLayout;
 
     materialCache->AddMaterial(materialSettings);
     Material* material = materialCache->GetMaterial(materialName);

@@ -19,26 +19,15 @@ TextBlock2D::TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, std::string
 
 void TextBlock2D::Initialize()
 {
-    // For now assumeing we need only one quad, one material and one texture atlas
-
     SetMeshName("Quad2D");
-    
-    auto fontResources = mTextRenderer->GetFontResources(mFontName);
-    
-    if (!fontResources)
-    {
-        return;
-    }
 
-    // Set Material[s] according this font resource
+    auto fontResources = mTextRenderer->GetFontResources(mFontName);
     auto fontAtlasMaterialName = fontResources->GetFontAtlasMaterialName(std::uint32_t{ 0x0020 });
     SetMaterialName(fontAtlasMaterialName);
 
     Drawable2D::Initialize();
 
     //Set scale in respect to texture size, in future in computed string batch demensions
-    
-
 }
 void TextBlock2D::Update(float deltaTime)
 {
@@ -70,7 +59,52 @@ void TextBlock2D::SetText(std::string text)
     mText = text;
 
     auto fontResources = mTextRenderer->GetFontResources(mFontName);
-    fontResources->EnsureGlyphs(DecodeUtf8(mText));
+    auto codeBytes = DecodeUtf8(mText);
+    fontResources->EnsureGlyphs(codeBytes);
+
+
+
+    // Set Material[s] according this font resource
+    auto fontAtlasMaterialName = fontResources->GetFontAtlasMaterialName(codeBytes[0]);
+    const auto fontAtlasTextureName = fontResources->GetFontAtlasTextureName(codeBytes[0]);
+    auto textureCache = mTextRenderer->GetRenderResourceContext().textureCache;
+    const auto& texture = textureCache->GetTextureResources(fontAtlasTextureName);
+
+    const auto atlasWidth = texture->GetCpuImageData().GetWidth();
+    const auto atlasHeight = texture->GetCpuImageData().GetHeight();
+
+    SetMaterialName(fontAtlasMaterialName);
+
+    // Setting glyph parameters
+    auto glyphMetrics = fontResources->GetGlyphMetrics(codeBytes[0]);
+
+    // 1. vec4 fontColor
+    const glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    SetMaterialVec4("FontColor", color);
+
+    // 2. vec2 glyphSize - size of glyph quad in pixels
+    const glm::vec2 glyphSize = glm::vec2(glyphMetrics.width, glyphMetrics.height);
+    SetMaterialVec2("GlyphSize", glyphSize);
+    
+    // 3. vec2 glyphOffset - bearing offset relative to baseline
+    const glm::vec2 glyphOffset = glm::vec2(glyphMetrics.bearingX, glyphMetrics.bearingY);
+    SetMaterialVec2("GlyphOffset", glyphOffset);
+
+    // 4. vec4 uvRect (u0, v0, u1, v1)
+    /*  
+        u0 = atlasX / atlasWidth;
+        v0 = atlasY / atlasHeight;
+        u1 = (atlasX + width)  / atlasWidth;
+        v1 = (atlasY + height) / atlasHeight;
+    */
+    
+    const float u0 = static_cast<float>(glyphMetrics.atlasX) / static_cast<float>(atlasWidth);
+    const float v0 = static_cast<float>(glyphMetrics.atlasY) / static_cast<float>(atlasHeight);
+    const float u1 = static_cast<float>(glyphMetrics.atlasX + glyphMetrics.width) / static_cast<float>(atlasWidth);
+    const float v1 = static_cast<float>(glyphMetrics.atlasY + glyphMetrics.height) / static_cast<float>(atlasHeight);
+
+    const glm::vec4 uvRect = glm::vec4(u0, v0, u1, v1);
+    SetMaterialVec4("UvRect", uvRect);
 }
 
 void TextBlock2D::SetTextColor(glm::vec4 color)

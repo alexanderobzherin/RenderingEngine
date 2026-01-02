@@ -87,6 +87,14 @@ public:
      * @param name Name of the parameter.
      * @param value glm::vec3 value to set.
      */
+    void SetVec2(const std::string& name, glm::vec2 value);
+
+    /**
+     * @brief Sets a vec3 parameter for the material.
+     *
+     * @param name Name of the parameter.
+     * @param value glm::vec3 value to set.
+     */
     void SetVec3(const std::string& name, glm::vec3 value);
 
     /**
@@ -110,6 +118,7 @@ private:
 
 private:
     std::unordered_map<std::string, float> mFloatParameters;
+    std::unordered_map<std::string, glm::vec2> mVec2Parameters;
     std::unordered_map<std::string, glm::vec3> mVec3Parameters;
     std::unordered_map<std::string, glm::vec4> mVec4Parameters;
 
@@ -118,6 +127,7 @@ private:
 
     IRenderer* mRenderer;
     std::unique_ptr<IMaterialRenderResources> mGpuHandle;
+    const std::vector<MaterialParameterLayoutEntry>* mParameterLayout;
 };
 
 } // namespace rendering_engine
