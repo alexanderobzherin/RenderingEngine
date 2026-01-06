@@ -11,6 +11,8 @@
 #include <memory>
 #include <vector>
 
+#include <glm/glm.hpp>
+
 namespace rendering_engine
 {
 class IRenderer;
@@ -67,6 +69,12 @@ public:
 	 * quad mesh without external model files.
 	 */
 	void CreateQuad2D();
+
+	void LoadCustomMesh(std::string meshName, 
+						std::vector<glm::vec2> positions2D,
+						std::vector<glm::vec2> texCoords,
+						std::vector<glm::vec4> colors,
+						std::vector<std::uint32_t> indices);
 
 	/**
 	 * @brief Load a single model from file into RAM.

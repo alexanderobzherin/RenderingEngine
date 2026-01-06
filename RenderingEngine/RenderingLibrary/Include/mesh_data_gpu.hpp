@@ -96,6 +96,11 @@ public:
 	 */
 	void CreateQuad2D();
 
+	void LoadCustomMesh(std::vector<glm::vec2> positions2D,
+						std::vector<glm::vec2> texCoords,
+						std::vector<glm::vec4> colors,
+						std::vector<std::uint32_t> indices);
+
 	/**
 	 * @brief Get the size (in bytes) of the vertex buffer on GPU.
 	 * @return Size in bytes of the GPU vertex buffer.

@@ -37,8 +37,8 @@ FontResources::FontResources(RenderResourceContext rrc, std::string filepath, un
     }
 
     mFontMetrics.lineHeight = mFace->size->metrics.height >> 6;
-    mFontMetrics.ascender = mFace->ascender;
-    mFontMetrics.descender = mFace->descender;
+    mFontMetrics.ascender = mFace->size->metrics.ascender >> 6;
+    mFontMetrics.descender = mFace->size->metrics.descender >> 6;
 }
 
 FontResources::FontResources(RenderResourceContext rrc, std::string fontName, std::vector<uint8_t> const& fileBytes, unsigned int const fontSize)
@@ -68,8 +68,8 @@ FontResources::FontResources(RenderResourceContext rrc, std::string fontName, st
     }
 
     mFontMetrics.lineHeight = mFace->size->metrics.height >> 6;
-    mFontMetrics.ascender = mFace->ascender;
-    mFontMetrics.descender = mFace->descender;
+    mFontMetrics.ascender = mFace->size->metrics.ascender >> 6;
+    mFontMetrics.descender = mFace->size->metrics.descender >> 6;
 }
 
 FontResources::~FontResources()
@@ -116,7 +116,7 @@ std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmap(std::uint32_
     
     glyphMetrics.bearingX = mFace->glyph->bitmap_left;
     glyphMetrics.bearingY = mFace->glyph->bitmap_top;
-    glyphMetrics.advanceX = mFace->glyph->advance.x;
+    glyphMetrics.advanceX = mFace->glyph->advance.x >> 6;
 
     std::vector<std::uint8_t> buffer;
     for (int i = 0; i < (mFace->glyph->bitmap.width * mFace->glyph->bitmap.rows); ++i)

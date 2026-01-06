@@ -192,6 +192,18 @@ void MeshDataGpu::CreateQuad2D()
 	mMeshType = MeshType::Sprite2D;
 }
 
+void MeshDataGpu::LoadCustomMesh(std::vector<glm::vec2> positions2D, std::vector<glm::vec2> texCoords, std::vector<glm::vec4> colors, std::vector<std::uint32_t> indices)
+{
+	mPositions2D = positions2D;
+	mTexCoords = texCoords;
+	mColor = colors;
+	mIndices = indices;
+
+	CalculateMeshParameters();
+
+	mMeshType = MeshType::Sprite2D;
+}
+
 size_t MeshDataGpu::GetGpuVertexBufferSize() const
 {
 	size_t result = 0;

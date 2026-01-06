@@ -75,6 +75,17 @@ void ModelCache::CreateQuad2D()
 	mTotalSizeRAM += sizeIndices;
 }
 
+void ModelCache::LoadCustomMesh(std::string meshName, std::vector<glm::vec2> positions2D, std::vector<glm::vec2> texCoords, std::vector<glm::vec4> colors, std::vector<std::uint32_t> indices)
+{
+	mModels[meshName] = std::make_shared<MeshDataGpu>(mRenderer);
+	mModels[meshName]->LoadCustomMesh(positions2D, texCoords, colors, indices);
+
+	const size_t sizeVertices = mModels.at(meshName)->GetCpuVertexBufferSize();
+	mTotalSizeRAM += sizeVertices;
+	const size_t sizeIndices = mModels.at(meshName)->GetCpuIndexBufferSize();
+	mTotalSizeRAM += sizeIndices;
+}
+
 std::string ModelCache::UploadModelToRAM(std::string path)
 {
 	auto filePath = boost::filesystem::path(path);

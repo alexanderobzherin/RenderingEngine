@@ -6,12 +6,13 @@
 
 #include "drawable_2d.hpp"
 #include "rendering_engine_export.hpp"
+#include "vertex_declarations.hpp"
 
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <iostream>
-
+#include <unordered_map>
 #include <glm/glm.hpp>
 
 namespace rendering_engine
@@ -24,9 +25,17 @@ width, height - quad size
 penX += advanceX
 */
 class TextRenderer;
+class FontResources;
 
 class RE_API TextBlock2D : public Drawable2D 
 {
+struct Mesh
+{
+	std::vector<glm::vec2> positions2D;
+	std::vector<glm::vec2> texCoords;
+	std::vector<glm::vec4> colors;
+	std::vector<std::uint32_t> indices;
+};
 public:
 	TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, std::string fontName);
 
@@ -43,19 +52,32 @@ public:
 	 */
 	void Draw(const Camera2D& camera) override;
 
-	void SetFont(std::string fontName);
 	void SetText(std::string text);
 	void SetTextColor(glm::vec4 color);
 
 	void DrawFontAtlas();
 
 protected:
+	void SetFont(std::string fontName);
     std::vector<std::uint32_t> DecodeUtf8(const std::string& text);
 
+	void ConstructMesh(const std::vector<std::uint32_t>& byteCodes);
+
+	std::string CodepointToUtf8(std::uint32_t codePoint);
+
+private:
+	static std::uint64_t sNumOfTextBlocks;
+	std::string mTextBlockID;
+
+	/*Stores material used in string and corresponding name of created mesh*/
+	std::unordered_map<std::string, std::string> mMaterialMesh;
+
 	std::shared_ptr<TextRenderer> mTextRenderer;
+	std::shared_ptr<FontResources> mFontResources;
 	glm::vec4 mColor;
 	std::string mFontName;
 
 	std::string mText;
+
 };
 }

@@ -40,8 +40,8 @@ void StartLevel::Initialize()
 	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
 	mTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
 	//mTextBlock->DrawFontAtlas();
-	mTextBlock->Initialize();
 	mTextBlock->SetText("Text Rendering");
+	mTextBlock->Initialize();
 	mTextBlock->SetPosition(glm::vec2(-200.0f, -150.0f));
 	//mTextBlock->SetTextColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 }

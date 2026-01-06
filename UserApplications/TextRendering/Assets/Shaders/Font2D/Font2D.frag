@@ -23,4 +23,5 @@ void main()
     float coverage = texture(texSampler, fragUV).r;
     vec4 color = fragFontColor;
     outColor = vec4(color.rgb * coverage, color.a * coverage);
+    // outColor = vec4(0.0f, 1.0f, 1.0f, 1.0f);
 }
