@@ -66,6 +66,8 @@ protected:
     void CreateFontAtlasFromList(std::vector<std::uint32_t> codePoints);
     void CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t end);
 
+    bool HasGlyph(uint32_t codePoint) const;
+
 private:
 	FontResources(FontResources const&);
 	FontResources operator=(FontResources const&);

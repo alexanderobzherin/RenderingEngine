@@ -75,10 +75,7 @@ struct PackedMaterialData
 
 static const std::vector<MaterialParameterLayoutEntry> Font2DLayout =
 {
-    { "FontColor",   0, 16, MaterialParameterLayoutEntry::Type::Vec4 },
-    { "GlyphSize",   16, 8, MaterialParameterLayoutEntry::Type::Vec2 },
-    { "GlyphOffset", 24, 8, MaterialParameterLayoutEntry::Type::Vec2 },
-    { "UvRect",      32, 16, MaterialParameterLayoutEntry::Type::Vec4 },
+    { "FontColor",   0, 16, MaterialParameterLayoutEntry::Type::Vec4 }
 };
 
 } // namespace rendering_engine

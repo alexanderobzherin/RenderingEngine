@@ -36,6 +36,23 @@ struct Mesh
 	std::vector<glm::vec4> colors;
 	std::vector<std::uint32_t> indices;
 };
+
+struct GlyphQuad
+{
+	float x0;
+	float y0;
+	float x1;
+	float y1;
+
+	float u0;
+	float v0;
+	float u1;
+	float v1;
+
+	std::string fontAtlasMaterialName;
+	std::uint32_t advanceX;
+};
+
 public:
 	TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, std::string fontName);
 
@@ -53,6 +70,7 @@ public:
 	void Draw(const Camera2D& camera) override;
 
 	void SetText(std::string text);
+	void SetMaxLineLength(float maxLineLength);
 	void SetTextColor(glm::vec4 color);
 
 	void DrawFontAtlas();
@@ -60,10 +78,16 @@ public:
 protected:
 	void SetFont(std::string fontName);
     std::vector<std::uint32_t> DecodeUtf8(const std::string& text);
+	std::string CodepointToUtf8(std::uint32_t codePoint);
 
 	void ConstructMesh(const std::vector<std::uint32_t>& byteCodes);
+	GlyphQuad MakeGlyphQuad(std::uint32_t glyph, float penX, float penY);
+	void PushQuad(std::string meshName,
+		std::unordered_map<std::string, TextBlock2D::Mesh>& meshes,
+		GlyphQuad glyphQuad,
+		float horizontalShift = 0.0f);
 
-	std::string CodepointToUtf8(std::uint32_t codePoint);
+
 
 private:
 	static std::uint64_t sNumOfTextBlocks;
@@ -78,6 +102,7 @@ private:
 	std::string mFontName;
 
 	std::string mText;
+	float mMaxLineLength = 0.0f;
 
 };
 }

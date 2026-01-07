@@ -143,6 +143,10 @@ void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t 
     std::unordered_map<std::uint32_t, std::pair<GlyphMetrics, ImageData>> glyphs;
     for (auto glyph = begin; glyph <= end; ++glyph)
     {
+        if (!HasGlyph(glyph))
+        {
+            continue;
+        }
         // Creating bitmaps of glyphs should be considered to dome multythreaded
         glyphs[glyph] = CreateGlyphBitmap(glyph);
     }
@@ -190,6 +194,11 @@ void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t 
     mFontAtlases[materialName] = textureName;
 }
 
+bool FontResources::HasGlyph(uint32_t codePoint) const
+{
+    return FT_Get_Char_Index(mFace, codePoint) != 0;
+}
+
 const FontMetrics& FontResources::GetFontMetrics() const
 {
     return mFontMetrics;
@@ -232,6 +241,13 @@ std::string FontResources::GetFontAtlasMaterialName(std::uint32_t codePoint) con
 
 void FontResources::CreateFontAtlasFromList(std::vector<std::uint32_t> codePoints)
 {
+    for (std::uint32_t codePoint : codePoints)
+    {
+        if (!HasGlyph(codePoint))
+        {
+            continue;
+        }
+    }
 }
 
 } // namespace rendering_engine
