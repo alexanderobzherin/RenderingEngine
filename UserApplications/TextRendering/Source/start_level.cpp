@@ -6,6 +6,7 @@
 #include "quad_2d.hpp"
 #include "text_block_2d.hpp"
 #include "text_renderer.hpp"
+#include "i_application.hpp"
 
 using namespace rendering_engine;
 
@@ -27,27 +28,51 @@ void StartLevel::Initialize()
 	mActiveCamera2D = std::make_shared<Camera2D>(*mSceneManager.GetApplication());
 	mActiveCamera2D->Initialize();
 
-	mDrawables2D.push_back(new Quad2D(mSceneManager.GetRenderResourceContext()));
-	mQuad2D = static_cast<Quad2D*>(mDrawables2D.back());
-	mQuad2D->SetMeshName("Quad2D");
-	mQuad2D->SetMaterialName("Quad2D");
-
-	mQuad2D->Initialize();
-	mQuad2D->SetScale(glm::vec2(200, 150));
-	mQuad2D->SetPosition(glm::vec2(200.0f, -150.0f));
+	const std::string textEng_TextRendering = "Text Rendering";
+	const std::string textEng_FeatureDesc = "Text Rendering is a feature of the rendering engine that provides the ability to draw strings containing text, digits, and characters. It is a necessary feature for displaying blocks of text, widgets, buttons, annotations, et cetera.";
+	
+	const float screenWidth = static_cast<float>(GetSceneManager().GetApplication()->GetScreenSettings().width);
+	// x:0.0f - center
+	const float thirdPart = screenWidth / 3.0f;
+	const float leftColumnStart = 0.0f - (screenWidth / 2.0f);
+	const float centerColumnStart = leftColumnStart + thirdPart;
+	const float rightColumnStart = leftColumnStart + (thirdPart * 2.0f);
 
 	const std::string fontName = "RobotoMono-Regular";
 	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
-	mTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
-	//mTextBlock->DrawFontAtlas();
+	TextBlock2D* textBlock_Left = static_cast<TextBlock2D*>(mDrawables2D.back());
 
-	const std::string textEng_TextRendering = "Text Rendering";
-	const std::string textEng_FeatureDesc = "Text Rendering is a feature \n of the rendering engine that provides the ability to draw strings containing text, digits, and characters. It is a necessary feature for displaying blocks of text, widgets, buttons, annotations, et cetera.";
-	mTextBlock->SetText(textEng_FeatureDesc);
+	textBlock_Left->SetMaxLineLength(thirdPart);
+	textBlock_Left->SetTextAlign(TextAlign::Left);
+	textBlock_Left->SetText(textEng_FeatureDesc);
 
-	mTextBlock->Initialize();
-	mTextBlock->SetPosition(glm::vec2(-400.0f, -150.0f));
-	mTextBlock->SetTextColor(glm::vec4(0.7882f, 0.8862f, 1.0f, 1.0f));
+	textBlock_Left->Initialize();
+	textBlock_Left->SetPosition(glm::vec2(leftColumnStart, -150.0f));
+	textBlock_Left->SetTextColor(glm::vec4(1.0f, 0.0, 0.0f, 1.0f));
+
+	// Center column
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
+	TextBlock2D* textBlock_Center = static_cast<TextBlock2D*>(mDrawables2D.back());
+
+	textBlock_Center->SetMaxLineLength(thirdPart);
+	textBlock_Center->SetTextAlign(TextAlign::Center);
+	textBlock_Center->SetText(textEng_FeatureDesc);
+
+	textBlock_Center->Initialize();
+	textBlock_Center->SetPosition(glm::vec2(centerColumnStart, -150.0f));
+	textBlock_Center->SetTextColor(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
+
+	// Right column
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
+	TextBlock2D* textBlock_Right = static_cast<TextBlock2D*>(mDrawables2D.back());
+
+	textBlock_Right->SetMaxLineLength(thirdPart);
+	textBlock_Right->SetTextAlign(TextAlign::Right);
+	textBlock_Right->SetText(textEng_FeatureDesc);
+
+	textBlock_Right->Initialize();
+	textBlock_Right->SetPosition(glm::vec2(rightColumnStart, -150.0f));
+	textBlock_Right->SetTextColor(glm::vec4(0.0f, 0.0, 1.0f, 1.0f));
 }
 void StartLevel::Update(float deltaTime)
 {

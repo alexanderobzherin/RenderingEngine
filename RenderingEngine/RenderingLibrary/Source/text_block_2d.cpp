@@ -80,6 +80,11 @@ void TextBlock2D::SetTextColor(glm::vec4 color)
     SetMaterialVec4("FontColor", color);
 }
 
+void TextBlock2D::SetTextAlign(TextAlign textAlign)
+{
+    mTextAlign = textAlign;
+}
+
 void TextBlock2D::DrawFontAtlas()
 {
     SetMeshName("Quad2D");
@@ -203,85 +208,104 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
     const std::uint32_t space{ 0x20 };
     const std::uint32_t newLine{ 0x0A };
 
-    float curLineLength = 0.0f;
-    float nextWordLength = 0.0f;
-
-    for (std::uint32_t glyph : byteCodes)
+    const bool wordWrappingRequested = mMaxLineLength > 0.0f;
+    if (!wordWrappingRequested)
     {
-        if (glyph == newLine)
+        for (std::uint32_t glyph : byteCodes)
         {
-            penX = 0.0f;
-            penY += fontMetrics.lineHeight;
-            continue;
-        }
-        if (glyph == space)
-        {
-            nextWordLength = 0.0f;
-        }
+            if (glyph == newLine)
+            {
+                penX = 0.0f;
+                penY += fontMetrics.lineHeight;
+                continue;
+            }
 
-        const bool wordWrappingRequested = mMaxLineLength > 0.0f;
-        if (!wordWrappingRequested)
-        {
             GlyphQuad glyphQuad = MakeGlyphQuad(glyph, penX, penY);
             const std::string meshName = mMaterialMesh[glyphQuad.fontAtlasMaterialName];
             PushQuad(meshName, meshes, glyphQuad);
             penX += glyphQuad.advanceX;
         }
+    }
+    else
+    {
+        // Identify, if glyph belongs to Hebrew/Arabic/Aramaic range -
+        // mTextAlign = TextAlign::Right;
 
+        bool isStringComplete = false;
 
-        //const GlyphMetrics& glyphMetrics = mFontResources->GetGlyphMetrics(glyph);
-        //auto fontAtlasMaterialName = mFontResources->GetFontAtlasMaterialName(glyph);
-        //const auto fontAtlasTextureName = mFontResources->GetFontAtlasTextureName(glyph);
-        //auto textureCache = mTextRenderer->GetRenderResourceContext().textureCache;
-        //const auto& fontAtlas = textureCache->GetTextureResources(fontAtlasTextureName);
+        // This variable describe the index we stay until new word is added.
+        std::uint32_t currentIndex = 0;
+        bool isLastGlyphProcessed = false;
+        float lineLength = 0.0f;
+        std::uint32_t nextGlyphIndex = 0;
 
-        //// Positions
-        //const float x0 = penX + glyphMetrics.bearingX;
-        //const float y0 = penY - glyphMetrics.bearingY; // y0 - top
-        //const float y1 = y0 + glyphMetrics.height; // y1 - bottom
-        //const float x1 = x0 + glyphMetrics.width;
+        std::vector<GlyphQuad> line;
+        std::vector<GlyphQuad> nextWord;
 
-        //nextWordLength += x1;
+        while (!isStringComplete)
+        {
+            std::string stringProcessed;
 
-        //uint32_t vertexBase = meshes.at(mMaterialMesh[fontAtlasMaterialName]).positions2D.size();
+            while (nextGlyphIndex < byteCodes.size())
+            {
+                if (byteCodes[nextGlyphIndex] == space)
+                    break;
 
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).positions2D.push_back(glm::vec2(x0, y0));
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).positions2D.push_back(glm::vec2(x1, y0));
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).positions2D.push_back(glm::vec2(x1, y1));
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).positions2D.push_back(glm::vec2(x0, y1));
+                const std::string curGlyph = CodepointToUtf8(byteCodes[nextGlyphIndex]);
+                stringProcessed.append(curGlyph);
+                GlyphQuad glyphQuad = MakeGlyphQuad(byteCodes[nextGlyphIndex], penX, penY);
+                penX += glyphQuad.advanceX;
+                nextWord.push_back(glyphQuad);
+                ++nextGlyphIndex;
+                isLastGlyphProcessed = nextGlyphIndex >= byteCodes.size();
+            }
 
-        //// UVs
-        //const auto atlasWidth = fontAtlas->GetCpuImageData().GetWidth();
-        //const auto atlasHeight = fontAtlas->GetCpuImageData().GetHeight();
+            const bool isNewWordFitLine = penX <= mMaxLineLength;
 
-        //const float u0 = static_cast<float>(glyphMetrics.atlasX) / static_cast<float>(atlasWidth);
-        //const float v0 = static_cast<float>(glyphMetrics.atlasY) / static_cast<float>(atlasHeight);
-        //const float u1 = static_cast<float>(glyphMetrics.atlasX + glyphMetrics.width) / static_cast<float>(atlasWidth);
-        //const float v1 = static_cast<float>(glyphMetrics.atlasY + glyphMetrics.height) / static_cast<float>(atlasHeight);
+            if (line.empty() || isNewWordFitLine)
+            {
+                if (!line.empty())
+                {
+                    //Insert SPACE
+                    GlyphQuad glyphQuad = MakeGlyphQuad(space, penX, penY);
+                    stringProcessed.append(" ");
+                    penX += glyphQuad.advanceX;
+                    nextWord.push_back(glyphQuad);
+                    ++nextGlyphIndex;
+                }
+                // Add new word to the line
+                std::copy(nextWord.begin(), nextWord.end(), std::back_inserter(line));
+                nextWord.clear();
+                lineLength = penX;
+                currentIndex = nextGlyphIndex;
+                isStringComplete = isLastGlyphProcessed;
+            }
 
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).texCoords.push_back(glm::vec2(u0, v0));
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).texCoords.push_back(glm::vec2(u1, v0));
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).texCoords.push_back(glm::vec2(u1, v1));
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).texCoords.push_back(glm::vec2(u0, v1));
+            if (!isNewWordFitLine || isLastGlyphProcessed)
+            {
+                nextWord.clear();
+                // Finalize current line and switch to next. Push quads for all line, setting horizontal alignment
+                for (auto& quad : line)
+                {
+                    float horizontalShift = 0.0f;
+                    if (mTextAlign == TextAlign::Center)
+                    {
+                        horizontalShift = (mMaxLineLength - lineLength) / 2.0f;
+                    }
+                    if (mTextAlign == TextAlign::Right)
+                    {
+                        horizontalShift = (mMaxLineLength - lineLength);
+                    }
+                    const std::string meshName = mMaterialMesh[quad.fontAtlasMaterialName];
+                    PushQuad(meshName, meshes, quad, horizontalShift);
+                }
+                line.clear();
 
-        //// Colors
-
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-        //// Indices
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).indices.push_back(vertexBase + 0);
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).indices.push_back(vertexBase + 1);
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).indices.push_back(vertexBase + 2);
-
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).indices.push_back(vertexBase + 2);
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).indices.push_back(vertexBase + 3);
-        //meshes.at(mMaterialMesh[fontAtlasMaterialName]).indices.push_back(vertexBase + 0);
-
-        //// Advance pen
-        //penX += glyphMetrics.advanceX;
+                penX = 0.0f;
+                penY += fontMetrics.lineHeight;
+                nextGlyphIndex = currentIndex;
+            }
+        }
     }
 
     // Once meshes are ready, request its upload from ModelCache
@@ -350,10 +374,17 @@ void TextBlock2D::PushQuad(std::string meshName, std::unordered_map<std::string,
 {
     const uint32_t vertexBase = meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.size();
 
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(glm::vec2(glyphQuad.x0 + horizontalShift, glyphQuad.y0));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(glm::vec2(glyphQuad.x1 + horizontalShift, glyphQuad.y0));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(glm::vec2(glyphQuad.x1 + horizontalShift, glyphQuad.y1));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(glm::vec2(glyphQuad.x0 + horizontalShift, glyphQuad.y1));
+    const glm::vec2 shift(horizontalShift, 0.0f);
+
+    const glm::vec2 vert_0 = glm::vec2(glyphQuad.x0, glyphQuad.y0) + shift;
+    const glm::vec2 vert_1 = glm::vec2(glyphQuad.x1, glyphQuad.y0) + shift;
+    const glm::vec2 vert_2 = glm::vec2(glyphQuad.x1, glyphQuad.y1) + shift;
+    const glm::vec2 vert_3 = glm::vec2(glyphQuad.x0, glyphQuad.y1) + shift;
+
+    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_0);
+    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_1);
+    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_2);
+    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_3);
 
     // UVs
     meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v0));

@@ -27,8 +27,16 @@ penX += advanceX
 class TextRenderer;
 class FontResources;
 
+enum TextAlign
+{
+	Left = 0,
+	Center,
+	Right
+};
+
 class RE_API TextBlock2D : public Drawable2D 
 {
+
 struct Mesh
 {
 	std::vector<glm::vec2> positions2D;
@@ -72,6 +80,7 @@ public:
 	void SetText(std::string text);
 	void SetMaxLineLength(float maxLineLength);
 	void SetTextColor(glm::vec4 color);
+	void SetTextAlign(TextAlign textAlign);
 
 	void DrawFontAtlas();
 
@@ -103,6 +112,6 @@ private:
 
 	std::string mText;
 	float mMaxLineLength = 0.0f;
-
+	TextAlign mTextAlign = TextAlign::Left;
 };
 }

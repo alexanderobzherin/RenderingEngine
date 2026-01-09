@@ -31,8 +31,8 @@ public:
 	void Update(float deltaTime) override;
 
 private:
-	Quad2D* mQuad2D;
-	TextBlock2D* mTextBlock;
+
+	TextBlock2D* mTextBlockUpdating;
 };
 
 } //application
