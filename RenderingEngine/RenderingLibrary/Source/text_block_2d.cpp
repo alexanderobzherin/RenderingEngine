@@ -7,6 +7,14 @@
 #include "image_data.hpp"
 #include "model_cache.hpp"
 
+#include "drawable_component.hpp"
+
+#include "i_renderer.hpp"
+#include "i_render_resources.hpp"
+#include "model_cache.hpp"
+#include "material_cache.hpp"
+#include "material.hpp"
+
 namespace rendering_engine
 {
 std::uint64_t TextBlock2D::sNumOfTextBlocks = 0;
@@ -228,8 +236,12 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
     }
     else
     {
-        // Identify, if glyph belongs to Hebrew/Arabic/Aramaic range -
-        // mTextAlign = TextAlign::Right;
+        if (mRenderResources)
+        {
+            mRenderResources->Shutdown();
+            mRenderResources.reset();
+        }
+        mRenderResources = std::unique_ptr<IRenderResources>(mRenderContext.renderer->ProvideRenderResources());
 
         bool isStringComplete = false;
 
@@ -326,6 +338,8 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
     
     SetMeshName(mMaterialMesh.begin()->second);
     SetMaterialName(mMaterialMesh.begin()->first);
+
+    Initialize();
 }
 
 TextBlock2D::GlyphQuad TextBlock2D::MakeGlyphQuad(std::uint32_t glyph, float penX, float penY)

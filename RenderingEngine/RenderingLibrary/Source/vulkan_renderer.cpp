@@ -161,6 +161,8 @@ bool VulkanRenderer::BeginFrame()
 
     vkResetFences(mLogicalDevice, 1, &mInFlightFences[mCurrentFrame]);
 
+    ProcessDeferredDestruction();
+
     vkResetCommandBuffer(mCommandBuffers[mCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
 
     return true;
@@ -560,6 +562,18 @@ void VulkanRenderer::GenerateMipmaps(VkImage image, VkFormat imageFormat, int32_
         1, &barrier);
 
     EndSingleTimeCommand(commandBuffer);
+}
+
+void VulkanRenderer::AddDeferredDestroy(DeferredItem deferredItem)
+{
+    switch (deferredItem.type)
+    {
+        case DeferredType::Buffer:         if (deferredItem.buffer == VK_NULL_HANDLE) return; break;
+        case DeferredType::Memory:         if (deferredItem.memory == VK_NULL_HANDLE) return; break;
+        case DeferredType::DescriptorPool: if (deferredItem.descriptorPool == VK_NULL_HANDLE) return; break;
+    default: break;
+    }
+    mDestroyObjects.push_back(deferredItem);
 }
 
 void VulkanRenderer::CreateInstance()
@@ -1761,6 +1775,34 @@ void VulkanRenderer::EndSingleTimeCommand(VkCommandBuffer commandBuffer)
     vkQueueWaitIdle(mGraphicsQueue);
 
     vkFreeCommandBuffers(mLogicalDevice, mCommandPool, 1, &commandBuffer);
+}
+
+void VulkanRenderer::ProcessDeferredDestruction()
+{
+    for (const auto& object : mDestroyObjects)
+    {
+        switch (object.type)
+        {
+            case DeferredType::Buffer:
+            {
+                vkDestroyBuffer(mLogicalDevice, object.buffer, nullptr);
+                break;
+            } 
+            case DeferredType::Memory:
+            {
+                vkFreeMemory(mLogicalDevice, object.memory, nullptr);
+                break;
+            }
+            case DeferredType::DescriptorPool:
+            {
+                vkDestroyDescriptorPool(mLogicalDevice, object.descriptorPool, nullptr);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    mDestroyObjects.clear();
 }
 
 template<typename T>

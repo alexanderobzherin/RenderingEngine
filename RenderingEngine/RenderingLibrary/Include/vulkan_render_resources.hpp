@@ -111,6 +111,8 @@ private:
 
     VkDescriptorPool mDescriptorPool;
     std::vector<VkDescriptorSet> mDescriptorSets;
+
+
 };
 
 } // namespace rendering_engine

@@ -16,13 +16,14 @@ DrawableComponent::DrawableComponent(RenderResourceContext renderContext)
 	:
 	mRenderContext(renderContext),
 	mMaterial(nullptr),
-	mMeshData(nullptr)
+	mMeshData(nullptr),
+	mRenderResources(nullptr)
 {
-	mRenderResources = std::unique_ptr<IRenderResources>(mRenderContext.renderer->ProvideRenderResources());
 }
 
 void DrawableComponent::Initialize()
 {
+	mRenderResources = std::unique_ptr<IRenderResources>(mRenderContext.renderer->ProvideRenderResources());
 	mMaterial = mRenderContext.materialCache->GetMaterial(mMaterialName);
 	mMaterialParameters = mMaterial->PackMaterialParameters();
 	mMeshData = mRenderContext.meshCache->GetMeshResources(mMeshName).get();

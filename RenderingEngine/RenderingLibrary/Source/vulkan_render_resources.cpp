@@ -52,21 +52,51 @@ void VulkanRenderResources::SubmitResources(Transformations3D& transformations, 
 
 void VulkanRenderResources::Shutdown()
 {
-    auto logicalDevice = mRenderer->GetLogicalDevice();
-
-    vkDestroyDescriptorPool(logicalDevice, mDescriptorPool, nullptr);
+    DeferredItem descriptorPool;
+    descriptorPool.type = DeferredType::DescriptorPool;
+    descriptorPool.descriptorPool = mDescriptorPool;
+    mRenderer->AddDeferredDestroy(descriptorPool);
+    mDescriptorPool = VK_NULL_HANDLE;
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        vkDestroyBuffer(logicalDevice, mTransformationBuffers[i], nullptr);
-        vkFreeMemory(logicalDevice, mTransformationBuffersMemory[i], nullptr);
+        if (!mTransformationBuffers.empty())
+        {   
+            DeferredItem tBuffer;
+            tBuffer.type = DeferredType::Buffer;
+            tBuffer.buffer = mTransformationBuffers[i];
+            mRenderer->AddDeferredDestroy(tBuffer);
+
+            DeferredItem tMem;
+            tMem.type = DeferredType::Memory;
+            tMem.memory = mTransformationBuffersMemory[i];
+            mRenderer->AddDeferredDestroy(tMem);
+
+            mTransformationBuffers[i] = VK_NULL_HANDLE;
+            mTransformationBuffersMemory[i] = VK_NULL_HANDLE;
+        }
 
         if (!mMaterialParametersBuffers.empty())
         {
-            vkDestroyBuffer(logicalDevice, mMaterialParametersBuffers[i], nullptr);
-            vkFreeMemory(logicalDevice, mMaterialParametersMemory[i], nullptr);
+            DeferredItem matBuffer;
+            matBuffer.type = DeferredType::Buffer;
+            matBuffer.buffer = mMaterialParametersBuffers[i];
+            mRenderer->AddDeferredDestroy(matBuffer);
+
+            DeferredItem matMem;
+            matMem.type = DeferredType::Memory;
+            matMem.memory = mMaterialParametersMemory[i];
+            mRenderer->AddDeferredDestroy(matMem);
+
+            mMaterialParametersBuffers[i] = VK_NULL_HANDLE;
+            mMaterialParametersMemory[i] = VK_NULL_HANDLE;
         }
     }
+
+    mTransformationBuffers.clear();
+    mTransformationBuffersMemory.clear();
+    mMaterialParametersBuffers.clear();
+    mMaterialParametersMemory.clear();
 }
 
 void VulkanRenderResources::OnRenderResourcesRelease()

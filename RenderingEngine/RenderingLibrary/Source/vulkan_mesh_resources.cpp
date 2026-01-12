@@ -124,13 +124,29 @@ bool VulkanMeshResources::IsOnGPU() const
 
 void VulkanMeshResources::Shutdown()
 {
-    auto logicalDevice = mRenderer->GetLogicalDevice();
+    DeferredItem indexBuffer;
+    indexBuffer.type = DeferredType::Buffer;
+    indexBuffer.buffer = mIndexBuffer;
+    mRenderer->AddDeferredDestroy(indexBuffer);
+    mIndexBuffer = VK_NULL_HANDLE;
 
-    vkDestroyBuffer(logicalDevice, mIndexBuffer, nullptr);
-    vkFreeMemory(logicalDevice, mIndexBufferMemory, nullptr);
+    DeferredItem indexBufferMemory;
+    indexBufferMemory.type = DeferredType::Memory;
+    indexBufferMemory.memory = mIndexBufferMemory;
+    mRenderer->AddDeferredDestroy(indexBufferMemory);
+    mIndexBufferMemory = VK_NULL_HANDLE;
 
-    vkDestroyBuffer(logicalDevice, mVertexBuffer, nullptr);
-    vkFreeMemory(logicalDevice, mVertexBufferMemory, nullptr);
+    DeferredItem vertexBuffer;
+    vertexBuffer.type = DeferredType::Buffer;
+    vertexBuffer.buffer = mVertexBuffer;
+    mRenderer->AddDeferredDestroy(vertexBuffer);
+    mVertexBuffer = VK_NULL_HANDLE;
+
+    DeferredItem vertexBufferMemory;
+    vertexBufferMemory.type = DeferredType::Memory;
+    vertexBufferMemory.memory = mVertexBufferMemory;
+    mRenderer->AddDeferredDestroy(vertexBufferMemory);
+    mVertexBufferMemory = VK_NULL_HANDLE;
 
     bIsOnGPU = false;
 }

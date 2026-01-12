@@ -43,6 +43,34 @@ struct SwapChainSupportDetails
     std::vector<VkPresentModeKHR> presentModes;
 };
 
+enum class DeferredType
+{
+    Buffer,
+    Memory,
+    DescriptorPool,
+    Image,
+    ImageView,
+    Sampler,
+    Pipeline,
+    PipelineLayout,
+};
+
+struct DeferredItem
+{
+DeferredType type;
+union {
+    VkBuffer buffer;
+    VkDeviceMemory memory;
+    VkDescriptorPool descriptorPool;
+    VkImage image;
+    VkImageView imageView;
+    VkSampler sampler;
+    VkPipeline pipeline;
+    VkPipelineLayout pipelineLayout;
+};
+DeferredItem() { buffer = VK_NULL_HANDLE; }
+};
+
 class Material;
 class TextureCache;
 
@@ -209,6 +237,8 @@ public:
     template <typename T>
     static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
 
+    void AddDeferredDestroy(DeferredItem deferredItem);
+
 private:
     void CreateInstance();
     bool CheckValidationLayerSupport();
@@ -277,6 +307,8 @@ private:
     bool HasStencilComponent(VkFormat format);
     void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
 
+    void ProcessDeferredDestruction();
+
 private:
     IWindowSystem& mWindowSystem;
     size_t mCurrentFrame;
@@ -323,6 +355,8 @@ private:
     std::vector<VkFence> mInFlightFences;
     std::vector<VkFence> mImagesInFlight;
     std::vector<IRendererObserver*> mObservers;
+
+    std::vector<DeferredItem> mDestroyObjects;
 };
 
 } //rendering_engine

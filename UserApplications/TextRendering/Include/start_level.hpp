@@ -33,6 +33,8 @@ public:
 private:
 
 	TextBlock2D* mTextBlockUpdating;
+	int mTicking = 0;
+	int mCounter = 0;
 };
 
 } //application

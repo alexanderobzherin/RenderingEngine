@@ -77,6 +77,14 @@ void ModelCache::CreateQuad2D()
 
 void ModelCache::LoadCustomMesh(std::string meshName, std::vector<glm::vec2> positions2D, std::vector<glm::vec2> texCoords, std::vector<glm::vec4> colors, std::vector<std::uint32_t> indices)
 {
+	auto search = mModels.find(meshName);
+	if (search != mModels.end())
+	{
+		mTotalSizeRAM -= search->second->GetCpuVertexBufferSize();
+		mTotalSizeRAM -= search->second->GetCpuIndexBufferSize();
+		ReleaseModelFromGPU(meshName);
+	}
+
 	mModels[meshName] = std::make_shared<MeshDataGpu>(mRenderer);
 	mModels[meshName]->LoadCustomMesh(positions2D, texCoords, colors, indices);
 
