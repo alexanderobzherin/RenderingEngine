@@ -17,7 +17,7 @@
 namespace rendering_engine
 {
 
-#if defined(__FreeBSD__) || defined(NDEBUG)
+#if defined(NDEBUG)
 	const bool enableValidationLayers = false;
 #else
 	const bool enableValidationLayers = true;

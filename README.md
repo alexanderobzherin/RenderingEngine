@@ -64,9 +64,6 @@ This engine builds and runs successfully on:
 - Ubuntu 24.04
 - FreeBSD 14.3
 
-Note on FreeBSD:
-Vulkan validation layers are currently disabled on FreeBSD due to the inability to install them via pkg or build them from ports. Until this is resolved upstream (in the FreeBSD Ports collection), validation layers will remain disabled in the FreeBSD build of the rendering engine.
-
 ## License
 
 This rendering engine is licensed under the [Zlib License](LICENSE.md).
