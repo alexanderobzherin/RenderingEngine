@@ -297,7 +297,9 @@ private:
 
     void CreateCommandBuffers();
 
-    void CreateSyncObjects();
+    //void CreateSyncObjects();
+    void CreateFrameSyncObjects();
+    void CreateSwapchainSyncObjects();
 
     VkShaderModule CreateShaderModule(std::vector<char>& code);
 

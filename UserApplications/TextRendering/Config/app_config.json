@@ -1,6 +1,6 @@
 {
   "appName": "TextRendering",
-  "isFullScreen": false,
+  "isFullScreen": true,
   "screenWidth": 1200,
   "screenHeight": 600
 }

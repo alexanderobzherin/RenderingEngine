@@ -61,7 +61,8 @@ void VulkanRenderer::InitializeRenderer()
     CreateFramebuffers();
 
     CreateCommandBuffers();
-    CreateSyncObjects();
+    CreateFrameSyncObjects();
+    CreateSwapchainSyncObjects();
 }
 
 void VulkanRenderer::DrawFrame()
@@ -101,7 +102,7 @@ void VulkanRenderer::DrawFrame()
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &mCommandBuffers[mCurrentFrame];
 
-    VkSemaphore signalSemaphores[] = { mRenderFinishedSemaphores[mCurrentFrame] };
+    VkSemaphore signalSemaphores[] = { mRenderFinishedSemaphores[imageIndex] };
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
@@ -158,6 +159,12 @@ bool VulkanRenderer::BeginFrame()
             throw std::runtime_error("failed to acquire swap chain image!");
         }
     }
+    
+    if (mImagesInFlight[mImageIndex] != VK_NULL_HANDLE)
+    {
+        vkWaitForFences(mLogicalDevice, 1, &mImagesInFlight[mImageIndex], VK_TRUE, UINT64_MAX);
+    }
+    mImagesInFlight[mImageIndex] = mInFlightFences[mCurrentFrame];
 
     vkResetFences(mLogicalDevice, 1, &mInFlightFences[mCurrentFrame]);
 
@@ -221,7 +228,7 @@ void VulkanRenderer::EndFrame()
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &mCommandBuffers[mCurrentFrame];
 
-    VkSemaphore signalSemaphores[] = { mRenderFinishedSemaphores[mCurrentFrame] };
+    VkSemaphore signalSemaphores[] = { mRenderFinishedSemaphores[mImageIndex] };
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
@@ -271,7 +278,6 @@ void VulkanRenderer::ShutdownRenderer()
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        vkDestroySemaphore(mLogicalDevice, mRenderFinishedSemaphores[i], nullptr);
         vkDestroySemaphore(mLogicalDevice, mImageAvailableSemaphores[i], nullptr);
         vkDestroyFence(mLogicalDevice, mInFlightFences[i], nullptr);
     }
@@ -1048,6 +1054,8 @@ void VulkanRenderer::RecreateSwapChain()
     CreateFramebuffers();
     CreateCommandBuffers();
 
+    CreateSwapchainSyncObjects();
+
     for (auto& observer : mObservers)
     {
         observer->OnRenderResourcesRebuild();
@@ -1635,11 +1643,11 @@ void VulkanRenderer::CreateCommandBuffers()
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
-
+/*
 void VulkanRenderer::CreateSyncObjects()
 {
     mImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    mRenderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    mRenderFinishedSemaphores.resize(mSwapChainImages.size());
     mInFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
     mImagesInFlight.resize(mSwapChainImages.size(), VK_NULL_HANDLE);
 
@@ -1653,10 +1661,53 @@ void VulkanRenderer::CreateSyncObjects()
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         if (vkCreateSemaphore(mLogicalDevice, &semaphoreInfo, nullptr, &mImageAvailableSemaphores[i]) != VK_SUCCESS ||
-            vkCreateSemaphore(mLogicalDevice, &semaphoreInfo, nullptr, &mRenderFinishedSemaphores[i]) != VK_SUCCESS ||
             vkCreateFence(mLogicalDevice, &fenceInfo, nullptr, &mInFlightFences[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create synchronization objects for a frame!");
+        }
+    }
+
+    for (size_t i = 0; i < mSwapChainImages.size(); i++)
+    {
+        if (vkCreateSemaphore(mLogicalDevice, &semaphoreInfo, nullptr, &mRenderFinishedSemaphores[i]) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create render finished semaphore for swapchain image!");
+        }
+    }
+}
+*/
+
+void VulkanRenderer::CreateFrameSyncObjects()
+{
+    mImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    mInFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
+    VkSemaphoreCreateInfo semaphoreInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+    VkFenceCreateInfo fenceInfo{ VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        if (vkCreateSemaphore(mLogicalDevice, &semaphoreInfo, nullptr, &mImageAvailableSemaphores[i]) != VK_SUCCESS ||
+            vkCreateFence(mLogicalDevice, &fenceInfo, nullptr, &mInFlightFences[i]) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create per-frame sync objects!");
+        }
+    }
+}
+
+void VulkanRenderer::CreateSwapchainSyncObjects()
+{
+    mRenderFinishedSemaphores.resize(mSwapChainImages.size());
+    mImagesInFlight.resize(mSwapChainImages.size(), VK_NULL_HANDLE);
+
+    VkSemaphoreCreateInfo semaphoreInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+
+    for (size_t i = 0; i < mSwapChainImages.size(); i++)
+    {
+        if (vkCreateSemaphore(mLogicalDevice, &semaphoreInfo, nullptr, &mRenderFinishedSemaphores[i]) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create per-image renderFinished semaphores!");
         }
     }
 }
@@ -1679,6 +1730,14 @@ VkShaderModule VulkanRenderer::CreateShaderModule(std::vector<char>& code)
 
 void VulkanRenderer::CleanupSwapChain()
 {
+    // destroy swapchain-dependent sync (render-finished per image)
+    for (auto sem : mRenderFinishedSemaphores)
+    {
+        vkDestroySemaphore(mLogicalDevice, sem, nullptr);
+    }
+    mRenderFinishedSemaphores.clear();
+    mImagesInFlight.clear();
+
     vkDestroyImageView(mLogicalDevice, mColorImageView, nullptr);
     vkDestroyImage(mLogicalDevice, mColorImage, nullptr);
     vkFreeMemory(mLogicalDevice, mColorImageMemory, nullptr);
