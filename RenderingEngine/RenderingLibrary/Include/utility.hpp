@@ -33,6 +33,8 @@ struct AppConfig
 	float screenWidth = 800.0f;
 	/** @brief Desired window height in pixels (ignored in full-screen mode). */
 	float screenHeight = 600.0f;
+
+	std::vector<std::string> textScripts;
 };
 
 /**

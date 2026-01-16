@@ -61,6 +61,7 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/drawable_2d.hpp
 	${PROJECT_SOURCE_DIR}/Include/drawable_3d.hpp
 	${PROJECT_SOURCE_DIR}/Include/quad_2d.hpp
+	${PROJECT_SOURCE_DIR}/Include/sprite_2d.hpp
 	${PROJECT_SOURCE_DIR}/Include/static_mesh.hpp
 	
 	# Text rendering system
@@ -128,6 +129,7 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/drawable_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/drawable_3d.cpp
 	${PROJECT_SOURCE_DIR}/Source/quad_2d.cpp
+	${PROJECT_SOURCE_DIR}/Source/sprite_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/static_mesh.cpp
 
 	# Text rendering system

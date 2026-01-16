@@ -14,106 +14,44 @@ namespace rendering_engine
 
 DrawableComponent::DrawableComponent(RenderResourceContext renderContext)
 	:
-	mRenderContext(renderContext),
-	mMaterial(nullptr),
-	mMeshData(nullptr),
-	mRenderResources(nullptr)
+	mRenderContext(renderContext)
 {
 }
 
 void DrawableComponent::Initialize()
 {
-	mRenderResources = std::unique_ptr<IRenderResources>(mRenderContext.renderer->ProvideRenderResources());
-	mMaterial = mRenderContext.materialCache->GetMaterial(mMaterialName);
-	mMaterialParameters = mMaterial->PackMaterialParameters();
-	mMeshData = mRenderContext.meshCache->GetMeshResources(mMeshName).get();
+	for (auto& renderBatch : mRenderBatches)
+	{
+		renderBatch.renderResources = std::unique_ptr<IRenderResources>(mRenderContext.renderer->ProvideRenderResources());
+		Material* material = mRenderContext.materialCache->GetMaterial(renderBatch.materialName);
+		renderBatch.materialParameters = material->PackMaterialParameters();
+		MeshDataGpu* meshData = mRenderContext.meshCache->GetMeshResources(renderBatch.meshName).get();
 
-	mRenderResources->Initialize(mMaterial, mMeshData, mRenderContext.textureCache);
+		renderBatch.renderResources->Initialize(material, meshData, mRenderContext.textureCache);
+	}
 }
 
 void DrawableComponent::Shutdown()
 {
-	if (mRenderResources)
+	for (auto& renderBatch : mRenderBatches)
 	{
-		mRenderResources->Shutdown();
-	}
-}
-
-
-void DrawableComponent::SetMaterialName(const std::string& materialName)
-{
-	mMaterialName = materialName;
-}
-void DrawableComponent::SetMeshName(const std::string& meshName)
-{
-	mMeshName = meshName;
-}
-
-void DrawableComponent::SetMaterialFloat(const std::string& name, float value)
-{
-	for (const auto& entry : mMaterialParameters.layout)
-	{
-		if (entry.name == name &&
-			entry.type == MaterialParameterLayoutEntry::Type::Float)
+		if (renderBatch.renderResources)
 		{
-			std::memcpy(
-				mMaterialParameters.buffer.data() + entry.offset,
-				&value,
-				sizeof(float)
-			);
-			return;
+			renderBatch.renderResources->Shutdown();
 		}
 	}
+	mRenderBatches.clear();
 }
 
-void DrawableComponent::SetMaterialVec2(const std::string& name, const glm::vec2& value)
+void DrawableComponent::AddRenderBatch(std::string meshName, std::string materialName)
 {
-	for (const auto& entry : mMaterialParameters.layout)
-	{
-		if (entry.name == name &&
-			entry.type == MaterialParameterLayoutEntry::Type::Vec2)
-		{
-			std::memcpy(
-				mMaterialParameters.buffer.data() + entry.offset,
-				&value,
-				sizeof(glm::vec2)
-			);
-			return;
-		}
-	}
+	RenderBatch renderBatch;
+	renderBatch.meshName = meshName;
+	renderBatch.materialName = materialName;
+
+	mRenderBatches.push_back(std::move(renderBatch));
 }
 
-void DrawableComponent::SetMaterialVec3(const std::string& name, const glm::vec3& value)
-{
-	for (const auto& entry : mMaterialParameters.layout)
-	{
-		if (entry.name == name &&
-			entry.type == MaterialParameterLayoutEntry::Type::Vec3)
-		{
-			std::memcpy(
-				mMaterialParameters.buffer.data() + entry.offset,
-				&value,
-				sizeof(glm::vec3)
-			);
-			return;
-		}
-	}
-}
 
-void DrawableComponent::SetMaterialVec4(const std::string& name, const glm::vec4& value)
-{
-	for (const auto& entry : mMaterialParameters.layout)
-	{
-		if (entry.name == name && entry.type == MaterialParameterLayoutEntry::Type::Vec4)
-		{
-			std::memcpy(
-				mMaterialParameters.buffer.data() + entry.offset,
-				&value,
-				sizeof(glm::vec4)
-			);
-			return;
-		}
-	}
-}
 
 } // namespace rendering_engine

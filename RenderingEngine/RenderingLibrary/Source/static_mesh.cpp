@@ -4,17 +4,21 @@
 #include "i_render_resources.hpp"
 #include "scene_component.hpp"
 
+#include <unordered_map>
+
 namespace rendering_engine
 {
 
-StaticMesh::StaticMesh(RenderResourceContext renderContext)
+StaticMesh::StaticMesh(RenderResourceContext renderContext, StaticMeshParams params)
 	:
-	Drawable3D(renderContext)
+	Drawable3D(renderContext),
+	mParams(params)
 {
 }
 
 void StaticMesh::Initialize()
 {
+	AddRenderBatch(mParams.meshName, mParams.materials.at(0));
 	Drawable3D::Initialize();
 }
 
@@ -30,7 +34,10 @@ void StaticMesh::Draw(const Camera& camera)
 	transformations.view = camera.ViewMatrix();
 	transformations.proj = camera.ProjectionMatrix();
 
-	mRenderResources->SubmitResources(transformations, mMaterialParameters);
+	for (auto& renderBatch : mRenderBatches)
+	{
+		renderBatch.renderResources->SubmitResources(transformations, renderBatch.materialParameters);
+	}
 }
 
 } // namespace rendering_engine

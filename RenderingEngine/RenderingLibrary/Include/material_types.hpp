@@ -5,8 +5,17 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 #include <cstdint>
+#include <cstring>
+
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace rendering_engine
 {
@@ -71,6 +80,74 @@ struct PackedMaterialData
 {
     std::vector<uint8_t> buffer;
     std::vector<MaterialParameterLayoutEntry> layout;
+
+	void SetMaterialFloat(const std::string& name, float value)
+	{
+		for (const auto& entry : layout)
+		{
+			if (entry.name == name &&
+				entry.type == MaterialParameterLayoutEntry::Type::Float)
+			{
+				std::memcpy(
+					buffer.data() + entry.offset,
+					&value,
+					sizeof(float)
+				);
+				return;
+			}
+		}
+	}
+
+	void SetMaterialVec2(const std::string& name, const glm::vec2& value)
+	{
+		for (const auto& entry : layout)
+		{
+			if (entry.name == name &&
+				entry.type == MaterialParameterLayoutEntry::Type::Vec2)
+			{
+				std::memcpy(
+					buffer.data() + entry.offset,
+					&value,
+					sizeof(glm::vec2)
+				);
+				return;
+			}
+		}
+	}
+
+	void SetMaterialVec3(const std::string& name, const glm::vec3& value)
+	{
+		for (const auto& entry : layout)
+		{
+			if (entry.name == name &&
+				entry.type == MaterialParameterLayoutEntry::Type::Vec3)
+			{
+				std::memcpy(
+					buffer.data() + entry.offset,
+					&value,
+					sizeof(glm::vec3)
+				);
+				return;
+			}
+		}
+	}
+
+	void SetMaterialVec4(const std::string& name, const glm::vec4& value)
+	{
+		for (const auto& entry : layout)
+		{
+			if (entry.name == name && entry.type == MaterialParameterLayoutEntry::Type::Vec4)
+			{
+				std::memcpy(
+					buffer.data() + entry.offset,
+					&value,
+					sizeof(glm::vec4)
+				);
+				return;
+			}
+		}
+	}
+
 };
 
 static const std::vector<MaterialParameterLayoutEntry> Font2DLayout =

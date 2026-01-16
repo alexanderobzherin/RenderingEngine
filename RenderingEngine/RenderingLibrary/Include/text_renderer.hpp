@@ -4,11 +4,12 @@
 // Distributed under the terms of the zlib License. See LICENSE.md for details.
 #pragma once
 
-#include <string>
 #include "render_resource_context.hpp"
 
 #include <memory>
 #include <unordered_map>
+#include <cstdint>
+#include <string>
 
 namespace rendering_engine
 {
@@ -34,6 +35,25 @@ private:
     std::unordered_map<std::string, std::shared_ptr<FontResources>> mFontResources;
 
     bool bStoreFontAtlasesInFiles = false;
+
+    // Script - <Begin, End>
+    static std::unordered_map<std::string, std::pair<std::uint32_t, std::uint32_t>> sScriptRanges;
 };
 
 } // namespace rendering_engine
+
+/*
+latin	    Basic Latin + Latin Extended
+cyrillic	Cyrillic
+greek	    Greek
+
+hebrew	    Hebrew (RTL)
+arabic	    Arabic (RTL + shaping)
+aramaic
+
+han	        CJK ideographs
+hiragana	Japanese Hiragana
+katakana	Japanese Katakana
+hangul	    Korean Hangul
+
+*/

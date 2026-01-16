@@ -150,6 +150,8 @@ void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t 
         // Creating bitmaps of glyphs should be considered to dome multythreaded
         glyphs[glyph] = CreateGlyphBitmap(glyph);
     }
+    if (glyphs.empty())
+        return;
 
     auto fontAtlas = TextureAtlasMaker::CreateTextureAtlas(glyphs);
 

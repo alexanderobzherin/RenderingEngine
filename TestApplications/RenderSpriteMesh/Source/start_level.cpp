@@ -3,7 +3,7 @@
 #include "camera_2d.hpp"
 #include "scene_manager.hpp"
 #include "static_mesh.hpp"
-#include "quad_2d.hpp"
+#include "sprite_2d.hpp"
 
 using namespace rendering_engine;
 
@@ -25,42 +25,40 @@ void StartLevel::Initialize()
 	mActiveCamera2D = std::make_shared<Camera2D>(*mSceneManager.GetApplication());
 	mActiveCamera2D->Initialize();
 
-	mDrawables3D.push_back(new StaticMesh(mSceneManager.GetRenderResourceContext()));
+	StaticMeshParams param1;
+	param1.meshName = "cube";
+	param1.materials = { { 0U, "BasicTexture3D" } };
+	mDrawables3D.push_back(new StaticMesh(mSceneManager.GetRenderResourceContext(), param1));
 	mTestCube = static_cast<StaticMesh*>(mDrawables3D.back());
-	mTestCube->SetMaterialName("BasicTexture3D");
-	mTestCube->SetMeshName("cube");
 	mTestCube->Initialize();
 
-	mDrawables3D.push_back(new StaticMesh(mSceneManager.GetRenderResourceContext()));
+	StaticMeshParams param2;
+	param2.meshName = "D4";
+	param2.materials = { { 0U, "FlatColorFiltering" } };
+	mDrawables3D.push_back(new StaticMesh(mSceneManager.GetRenderResourceContext(), param2));
 	mTestDice1 = static_cast<StaticMesh*>(mDrawables3D.back());
-	mTestDice1->SetMaterialName("FlatColorFiltering");
-	mTestDice1->SetMeshName("D4");
 	mTestDice1->Initialize();
 	mTestDice1->SetPosition(glm::vec3(0.0f, -3.0f, 0.0f));
 
-	mDrawables3D.push_back(new StaticMesh(mSceneManager.GetRenderResourceContext()));
+	mDrawables3D.push_back(new StaticMesh(mSceneManager.GetRenderResourceContext(), param2));
 	mTestDice2 = static_cast<StaticMesh*>(mDrawables3D.back());
-	mTestDice2->SetMaterialName("FlatColorFiltering");
-	mTestDice2->SetMeshName("D4");
 	mTestDice2->Initialize();
 	mTestDice2->SetPosition(glm::vec3(0.0f, 3.0f, 0.0f));
 
-	mDrawables2D.push_back(new Quad2D(mSceneManager.GetRenderResourceContext()));
-	mQuad2D = static_cast<Quad2D*>(mDrawables2D.back());
-	mQuad2D->SetMaterialName("Quad2D");
-	mQuad2D->SetMeshName("Quad2D");
+	const std::string textureName = "PNG_transparency_demonstration_1";
+	mDrawables2D.push_back(new Sprite2D(mSceneManager.GetRenderResourceContext(), textureName));
+	mSprite2D = static_cast<Sprite2D*>(mDrawables2D.back());
 
-	mQuad2D->Initialize();
-	mQuad2D->SetScale(glm::vec2(200, 150));
-	mQuad2D->SetPosition(glm::vec2(-200.0f, -150.0f));
+	mSprite2D->Initialize();
+	mSprite2D->SetPosition(glm::vec2(-200.0f, -150.0f));
 }
 void StartLevel::Update(float deltaTime)
 {
 	Scene::Update(deltaTime);
 
-	float newRot = mQuad2D->GetRotation() + (deltaTime * 10);
+	float newRot = mSprite2D->GetRotation() + (deltaTime * 10);
 
-	mQuad2D->SetRotation(newRot);
+	mSprite2D->SetRotation(newRot);
 
 	mTestCube->SetRotation(glm::vec3(newRot * 0.5f, 0.0f, newRot * 0.5f));
 

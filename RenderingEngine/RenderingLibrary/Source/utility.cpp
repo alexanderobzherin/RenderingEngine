@@ -55,6 +55,22 @@ AppConfig Utility::ReadConfigFile()
 
 		if (appConfigData.contains("screenHeight"))
 			cfg.screenHeight = appConfigData["screenHeight"].get<float>();
+
+		if (appConfigData.contains("text"))
+		{
+			const auto& textNode = appConfigData["text"];
+
+			if (textNode.contains("scripts") && textNode["scripts"].is_array())
+			{
+				for (const auto& script : textNode["scripts"])
+				{
+					if (script.is_string())
+					{
+						cfg.textScripts.push_back(script.get<std::string>());
+					}
+				}
+			}
+		}
 	}
 	catch (const std::exception& e)
 	{

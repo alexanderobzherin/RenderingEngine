@@ -1,4 +1,4 @@
-#include "start_level.hpp"
+﻿#include "start_level.hpp"
 #include "camera.hpp"
 #include "camera_2d.hpp"
 #include "scene_manager.hpp"
@@ -47,7 +47,7 @@ void StartLevel::Initialize()
 	textBlock_Left->SetTextAlign(TextAlign::Left);
 	textBlock_Left->SetText(textEng_FeatureDesc);
 
-	textBlock_Left->SetPosition(glm::vec2(leftColumnStart, -150.0f));
+	textBlock_Left->SetPosition(glm::vec2(leftColumnStart, -280.0f));
 	textBlock_Left->SetTextColor(glm::vec4(1.0f, 0.0, 0.0f, 1.0f));
 
 	// Center column
@@ -58,7 +58,7 @@ void StartLevel::Initialize()
 	textBlock_Center->SetTextAlign(TextAlign::Center);
 	textBlock_Center->SetText(textEng_FeatureDesc);
 
-	textBlock_Center->SetPosition(glm::vec2(centerColumnStart, -150.0f));
+	textBlock_Center->SetPosition(glm::vec2(centerColumnStart, -280.0f));
 	textBlock_Center->SetTextColor(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
 
 	// Right column
@@ -69,7 +69,7 @@ void StartLevel::Initialize()
 	textBlock_Right->SetTextAlign(TextAlign::Right);
 	textBlock_Right->SetText(textEng_FeatureDesc);
 
-	textBlock_Right->SetPosition(glm::vec2(rightColumnStart, -150.0f));
+	textBlock_Right->SetPosition(glm::vec2(rightColumnStart, -280.0f));
 	textBlock_Right->SetTextColor(glm::vec4(0.0f, 0.0, 1.0f, 1.0f));
 
 	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
@@ -78,6 +78,32 @@ void StartLevel::Initialize()
 
 	mTextBlockUpdating->SetPosition(glm::vec2(0.0f, 200.0f));
 	mTextBlockUpdating->SetTextColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+	// Multy material text block
+	std::string multiMaterialText = "This is multi-material text block. Он отображает разные системы письма, а значит uses mutiple batches with differrent materials and font atlases.";
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
+	TextBlock2D* multimaterialTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
+
+	multimaterialTextBlock->SetMaxLineLength(thirdPart);
+	multimaterialTextBlock->SetTextAlign(TextAlign::Center);
+	multimaterialTextBlock->SetText(multiMaterialText);
+
+	multimaterialTextBlock->SetPosition(glm::vec2(centerColumnStart, 0.0f));
+	multimaterialTextBlock->SetTextColor(glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
+
+
+	/// Arabic
+	const std::string arabicFontName = "Amiri-Regular";
+	const std::string textRendering_Arabic = "عرض النص";
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), arabicFontName));
+	TextBlock2D* textRendering_Arabic_TB = static_cast<TextBlock2D*>(mDrawables2D.back());
+
+	textRendering_Arabic_TB->SetMaxLineLength(thirdPart);
+	textRendering_Arabic_TB->SetTextAlign(TextAlign::Right);
+	textRendering_Arabic_TB->SetText(textRendering_Arabic);
+
+	textRendering_Arabic_TB->SetPosition(glm::vec2(leftColumnStart, 0.0f));
+	textRendering_Arabic_TB->SetTextColor(glm::vec4(1.0f, 1.0, 1.0f, 1.0f));
 }
 void StartLevel::Update(float deltaTime)
 {

@@ -2,5 +2,11 @@
   "appName": "@PROJECT_NAME@",
   "isFullScreen": false,
   "screenWidth": 800,
-  "screenHeight": 600
+  "screenHeight": 600,
+
+    "text": {
+    "scripts": [
+      "latin"
+    ]
+  }
 }

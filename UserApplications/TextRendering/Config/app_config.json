@@ -1,6 +1,14 @@
 {
   "appName": "TextRendering",
-  "isFullScreen": true,
+  "isFullScreen": false,
   "screenWidth": 1200,
-  "screenHeight": 600
+  "screenHeight": 600,
+
+    "text": {
+    "scripts": [
+      "latin",
+      "cyrillic",
+      "arabic"
+    ]
+  }
 }

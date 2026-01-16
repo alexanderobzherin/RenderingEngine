@@ -28,7 +28,10 @@ void Quad2D::Draw(const Camera2D& camera)
 	transformations.view = camera.GetWorldView();
 	transformations.proj = camera.GetProjectionMatrix();
 
-	mRenderResources->SubmitResources(transformations, mMaterialParameters);
+	for (auto& renderBatch : mRenderBatches)
+	{
+		renderBatch.renderResources->SubmitResources(transformations, renderBatch.materialParameters);
+	}
 }
 
 } // namespace rendering_engine

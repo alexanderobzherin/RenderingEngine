@@ -45,9 +45,6 @@ public:
 	 */
 	void Draw(const Camera2D& camera) override;
 
-	using DrawableComponent::SetMaterialName; ///< @copydoc DrawableComponent::SetMaterialName
-	using DrawableComponent::SetMeshName; ///< @copydoc DrawableComponent::SetMeshName
-
 	Quad2D(const Quad2D& rhs) = delete;
 	Quad2D& operator=(const Quad2D& rhs) = delete;
 };

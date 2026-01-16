@@ -3,7 +3,7 @@
 #include "render_resource_context.hpp"
 
 #include "font_resources.hpp"
-
+#include "utility.hpp"
 
 namespace rendering_engine
 {
@@ -13,6 +13,12 @@ Cyrillic    0x0400 – 0x04FF
 Hebrew      0x0590 – 0x05FF
 Arabic      0x0600 – 0x06FF
 */
+std::unordered_map<std::string, std::pair<std::uint32_t, std::uint32_t>> TextRenderer::sScriptRanges{
+	{{"latin"}, {0x0020, 0x007E}},
+	{{"cyrillic"}, {0x0400, 0x04FF}},
+	{{"arabic"}, {0x0600, 0x08FF}}
+};				 
+
 TextRenderer::TextRenderer(RenderResourceContext rrc)
 	:
 	mRenderResourceContext(rrc)
@@ -27,7 +33,6 @@ void TextRenderer::LoadFontsFromFolder(std::string pathToFolder)
 {
 	// Load configured languages.
 
-	// For now only ASCII
 	// 1. Check if path is valid and exist
 	boost::filesystem::path pathToDirectory = boost::filesystem::path(pathToFolder);
 	const bool isValidFolderPath = boost::filesystem::exists(boost::filesystem::path(pathToFolder)) && boost::filesystem::is_directory(boost::filesystem::path(pathToFolder));
@@ -56,10 +61,17 @@ void TextRenderer::LoadFontsFromFolder(std::string pathToFolder)
 		mFontResources[fontName] = std::make_shared<FontResources>(mRenderResourceContext, filePath.string(), fontSize);
 		mFontResources[fontName]->StoreFontAtlasesInFiles(bStoreFontAtlasesInFiles);
 
-		// 0x0020 – 0x007E
-		const std::uint32_t rangeBegin = 0x0020;
-		const std::uint32_t rangeEnd = 0x007E;
-		mFontResources[fontName]->LoadGlyphsFromRange(rangeBegin, rangeEnd);
+		AppConfig appConfig = Utility::ReadConfigFile();
+
+		for (const auto& script : appConfig.textScripts)
+		{
+			if (sScriptRanges.find(script) == sScriptRanges.end())
+				continue;
+
+			const std::uint32_t rangeBegin = sScriptRanges[script].first;
+			const std::uint32_t rangeEnd = sScriptRanges[script].second;
+			mFontResources[fontName]->LoadGlyphsFromRange(rangeBegin, rangeEnd);
+		}
 	}
 }
 

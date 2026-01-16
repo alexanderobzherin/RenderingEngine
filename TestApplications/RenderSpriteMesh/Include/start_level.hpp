@@ -15,7 +15,7 @@ namespace rendering_engine
 {
 class SceneManager;
 class StaticMesh;
-class Quad2D;
+class Sprite2D;
 }
 
 namespace application
@@ -33,7 +33,7 @@ private:
 	StaticMesh* mTestCube;
 	StaticMesh* mTestDice1;
 	StaticMesh* mTestDice2;
-	Quad2D* mQuad2D;
+	Sprite2D* mSprite2D;
 
 };
 

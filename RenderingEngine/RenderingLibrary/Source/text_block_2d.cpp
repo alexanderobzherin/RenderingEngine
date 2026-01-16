@@ -54,7 +54,10 @@ void TextBlock2D::Draw(const Camera2D& camera)
     transformations.view = camera.GetWorldView();
     transformations.proj = camera.GetProjectionMatrix();
 
-    mRenderResources->SubmitResources(transformations, mMaterialParameters);
+    for (auto& renderBatch : mRenderBatches)
+    {
+        renderBatch.renderResources->SubmitResources(transformations, renderBatch.materialParameters);
+    }
 }
 
 void TextBlock2D::SetFont(std::string fontName)
@@ -85,7 +88,10 @@ void TextBlock2D::SetMaxLineLength(float maxLineLength)
 
 void TextBlock2D::SetTextColor(glm::vec4 color)
 {
-    SetMaterialVec4("FontColor", color);
+    for (auto& renderBatch : mRenderBatches)
+    {
+        renderBatch.materialParameters.SetMaterialVec4("FontColor", color);
+    }
 }
 
 void TextBlock2D::SetTextAlign(TextAlign textAlign)
@@ -95,10 +101,11 @@ void TextBlock2D::SetTextAlign(TextAlign textAlign)
 
 void TextBlock2D::DrawFontAtlas()
 {
-    SetMeshName("Quad2D");
+    Shutdown();
+    const std::string meshName("Quad2D");
 
     auto fontAtlasMaterialName = mFontResources->GetFontAtlasMaterialName(std::uint32_t{ 0x0020 });
-    SetMaterialName(fontAtlasMaterialName);
+    AddRenderBatch(meshName, fontAtlasMaterialName);
 
     auto fontResources = mTextRenderer->GetFontResources(mFontName);
     auto textureCache = mTextRenderer->GetRenderResourceContext().textureCache;
@@ -236,13 +243,6 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
     }
     else
     {
-        if (mRenderResources)
-        {
-            mRenderResources->Shutdown();
-            mRenderResources.reset();
-        }
-        mRenderResources = std::unique_ptr<IRenderResources>(mRenderContext.renderer->ProvideRenderResources());
-
         bool isStringComplete = false;
 
         // This variable describe the index we stay until new word is added.
@@ -336,8 +336,13 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
 
     // Set mesh name and material name for THIS drawable, so the first font atlas for now only.
     
-    SetMeshName(mMaterialMesh.begin()->second);
-    SetMaterialName(mMaterialMesh.begin()->first);
+    Shutdown();
+    for (const auto& materialMesh : mMaterialMesh)
+    {
+        const std::string meshName = materialMesh.second;
+        const std::string materialName = materialMesh.first;
+        AddRenderBatch(meshName, materialName);
+    }
 
     Initialize();
 }
@@ -407,7 +412,6 @@ void TextBlock2D::PushQuad(std::string meshName, std::unordered_map<std::string,
     meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v1));
 
     // Colors
-
     meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));

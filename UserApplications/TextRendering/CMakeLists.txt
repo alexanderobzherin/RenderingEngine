@@ -86,7 +86,7 @@ if(UNIX)
 	set_target_properties(TextRendering PROPERTIES
 		CXX_STANDARD 17
 		CXX_STANDARD_REQUIRED ON
-		COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
+		COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra;-finput-charset=UTF-8"
 		RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${PROJECT_BINARY_DIR}/Debug"
 		RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Release"
 )
@@ -94,6 +94,7 @@ elseif(WIN32)
 	set_target_properties(TextRendering PROPERTIES
 		CXX_STANDARD 17
 		CXX_STANDARD_REQUIRED ON
+		COMPILE_OPTIONS "/utf-8"
 )
 endif()
 

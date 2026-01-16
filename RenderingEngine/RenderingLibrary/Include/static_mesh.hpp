@@ -8,8 +8,23 @@
 #include "rendering_engine_export.hpp"
 #include "drawable_3d.hpp"
 
+#include <unordered_map>
+#include <string>
+#include <cstdint>
+
 namespace rendering_engine
 {
+struct StaticMeshParams
+{
+	std::string meshName;
+
+	// {slot number, material name}
+	std::unordered_map<uint32_t, std::string> materials;
+
+	bool castShadows = false;
+	bool receiveShadows = false;
+};
+
 /**
  * @class StaticMesh
  * @brief 3D drawable component for rendering static (non-animated) meshes.
@@ -24,7 +39,7 @@ public:
 	 * @brief Constructs a StaticMesh component associated with a given render context.
 	 * @param renderContext Rendering resource context for material and mesh initialization.
 	 */
-	StaticMesh(RenderResourceContext renderContext);
+	StaticMesh(RenderResourceContext renderContext, StaticMeshParams params);
 
 	/**
 	 * @copydoc DrawableComponent::Initialize
@@ -41,11 +56,11 @@ public:
 	 */
 	void Draw(const Camera& camera) override;
 
-	using DrawableComponent::SetMaterialName; ///< @copydoc DrawableComponent::SetMaterialName
-	using DrawableComponent::SetMeshName; ///< @copydoc DrawableComponent::SetMeshName
-
 	StaticMesh(const StaticMesh& rhs) = delete;
 	StaticMesh& operator=(const StaticMesh& rhs) = delete;
+
+protected:
+	StaticMeshParams mParams;
 };
 
 

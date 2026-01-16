@@ -22,6 +22,14 @@ class TextureCache;
 class MaterialCache;
 class MeshDataGpu;
 
+struct RenderBatch
+{
+    std::string meshName;
+    std::string materialName;
+    std::unique_ptr<IRenderResources> renderResources = nullptr;
+    PackedMaterialData materialParameters;
+};
+
 /**
  * @class DrawableComponent
  * @brief Abstract base for all drawable (renderable) objects in the engine.
@@ -65,36 +73,12 @@ public:
     DrawableComponent& operator=(const DrawableComponent&) = delete;
 
 protected:
-    /**
-     * @brief Sets the material to use (by name).
-     * @param materialName Name of the material.
-     */
-    void SetMaterialName(const std::string& materialName);
-
-    /**
-     * @brief Sets the mesh to use (by name).
-     * @param meshName Name of the mesh.
-     */
-    void SetMeshName(const std::string& meshName);
-
-    void SetMaterialFloat(const std::string& name, float value);
-
-    void SetMaterialVec2(const std::string& name, const glm::vec2& value);
-
-    void SetMaterialVec3(const std::string& name, const glm::vec3& value);
-
-    void SetMaterialVec4(const std::string& name, const glm::vec4& value);
+    void AddRenderBatch(std::string meshName, std::string materialName);
 
 protected:
     RenderResourceContext mRenderContext;
-    std::unique_ptr<IRenderResources> mRenderResources;
-
-    std::string mMaterialName;
-    std::string mMeshName;
-
-    Material* mMaterial;
-    PackedMaterialData mMaterialParameters;
-    MeshDataGpu* mMeshData;
+        
+    std::vector<RenderBatch> mRenderBatches;
 };
 
 }

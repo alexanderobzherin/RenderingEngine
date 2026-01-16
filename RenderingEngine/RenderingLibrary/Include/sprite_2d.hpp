@@ -1,0 +1,52 @@
+// This file is part of the Rendering Engine project.
+// Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+// Copyright (c) 2025 Alexander Obzherin
+// Distributed under the terms of the zlib License. See LICENSE.md for details.
+
+#pragma once
+
+#include "rendering_engine_export.hpp"
+#include "drawable_2d.hpp"
+
+namespace rendering_engine
+{
+/**
+	* @class Sprite2D
+	* @brief 2D drawable component for rendering textured quad.
+	*
+	* @note Not copyable or assignable.
+	* @see Quad2D, Drawable2D, DrawableComponent, SceneComponent2D, Camera2D
+	*/
+class RE_API Sprite2D : public Drawable2D
+{
+public:
+   /**
+	* @brief Constructs the Sprite2D with a render context.
+	* @param renderContext Resource context.
+	* 
+	*/
+	Sprite2D(RenderResourceContext renderContext, std::string textureName);
+
+   /**
+    * @copydoc DrawableComponent::Initialize
+    */
+	void Initialize() override;
+
+   /**
+	* @copydoc DrawableComponent::Update
+	*/
+	void Update(float deltaTime) override;
+
+   /**
+	* @copydoc Drawable2D::Draw
+	*/
+	void Draw(const Camera2D& camera) override;
+
+	Sprite2D(const Sprite2D& rhs) = delete;
+	Sprite2D& operator=(const Sprite2D& rhs) = delete;
+
+protected:
+	std::string mTextureName;
+};
+
+} // namespace rendering_engine
