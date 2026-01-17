@@ -146,6 +146,11 @@ set(quad2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_vert.spv")
 set(quad2D_frag_source "${PATH_TO_SOURCE_SHADER}/Quad2D/Quad2D.frag")
 set(quad2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_frag.spv")
 
+set(font2D_vert_source "${PATH_TO_SOURCE_SHADER}/Font2D/Font2D.vert")
+set(font2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Font2D/Font2D_vert.spv")
+set(font2D_frag_source "${PATH_TO_SOURCE_SHADER}/Font2D/Font2D.frag")
+set(font2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Font2D/Font2D_frag.spv")
+
 if(WIN32)
 add_custom_command(
 	TARGET @PROJECT_NAME@  
@@ -183,6 +188,9 @@ add_custom_command(
 
 	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_vert_source} -o ${quad2D_vert_spv}
 	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_frag_source} -o ${quad2D_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${font2D_vert_source} -o ${font2D_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${font2D_frag_source} -o ${font2D_frag_spv}
 
 	# Compile custom user shader from json files via calling MaterialCompiler
 	# TO DO
