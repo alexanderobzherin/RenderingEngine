@@ -1,0 +1,205 @@
+# This file is part of the Rendering Engine project.
+# Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+# Copyright (c) 2025 Alexander Obzherin
+# Distributed under the terms of the zlib License. See LICENSE.md for details.
+cmake_minimum_required(VERSION 3.16)
+
+#set the project name
+project(TextShaping LANGUAGES CXX)
+
+#set header files
+set(HEADER_FILES
+	${PROJECT_SOURCE_DIR}/Include/level_register.hpp
+	${PROJECT_SOURCE_DIR}/Include/start_level.hpp
+)
+
+#set source files
+set(SRC_FILES
+    ${PROJECT_SOURCE_DIR}/Source/main.cpp
+	${PROJECT_SOURCE_DIR}/Source/start_level.cpp
+)
+
+include_directories(${PROJECT_SOURCE_DIR}/Include/)
+include_directories(${PROJECT_SOURCE_DIR}/Assets/Shaders/)
+include_directories(${PROJECT_SOURCE_DIR}/Config/)
+
+option(RE_DEV_MODE "Build using RenderingEngine directly from source tree (Windows only)" ON)
+
+set(RENDERING_ENGINE_SDK_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine")
+if(WIN32)
+	if(RE_DEV_MODE)
+		message(STATUS "RenderingEngine: Developer Mode (Windows)")
+
+		# Engine headers in source tree
+		include_directories(
+			${CMAKE_CURRENT_LIST_DIR}/../../RenderingEngine/RenderingLibrary/Include
+		)
+
+		# Vulkan SDK
+		if(DEFINED ENV{VULKAN_SDK})
+			include_directories("$ENV{VULKAN_SDK}/Include")
+			message(STATUS "DevMode: Vulkan headers from $ENV{VULKAN_SDK}/Include")
+		else()
+			message(FATAL_ERROR "VULKAN_SDK environment variable is not set!")
+		endif()
+
+		# vcpkg for glfw, freetype, etc.
+		if(DEFINED ENV{VCPKG_ROOT})
+			include_directories("$ENV{VCPKG_ROOT}/installed/x64-windows-static-md/include")
+		endif()
+	else()
+		message(STATUS "RenderingEngine: SDK-user Mode (Windows)")
+		set(RENDERING_ENGINE_ROOT
+		"${RENDERING_ENGINE_SDK_ROOT}"
+		CACHE PATH "Path to installed RenderingEngine SDK")
+		list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_ROOT}")
+		find_package(RenderingEngine REQUIRED)
+	endif()
+elseif(UNIX)
+	if(RE_DEV_MODE)
+		message(STATUS "RenderingEngine: Developer Mode (Unix)")
+		set(RENDERING_ENGINE_ROOT
+			"${CMAKE_CURRENT_LIST_DIR}/../../Build/Installed/RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine"
+			CACHE PATH "Path to installed RenderingEngine SDK")
+	else()
+		message(STATUS "RenderingEngine: SDK-user Mode (Unix)")
+		set(RENDERING_ENGINE_ROOT
+		"${RENDERING_ENGINE_SDK_ROOT}"
+		CACHE PATH "Path to installed RenderingEngine SDK")
+	endif()
+	list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_ROOT}")
+	find_package(RenderingEngine REQUIRED)
+endif()
+
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
+
+#add the executable
+add_executable(TextShaping ${HEADER_FILES} ${SRC_FILES})
+
+target_include_directories(TextShaping PUBLIC
+${PROJECT_SOURCE_DIR}/Assets/Shaders/
+)
+
+if(UNIX)
+	set_target_properties(TextShaping PROPERTIES
+		CXX_STANDARD 17
+		CXX_STANDARD_REQUIRED ON
+		COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra;-finput-charset=UTF-8"
+		RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${PROJECT_BINARY_DIR}/Debug"
+		RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Release"
+)
+elseif(WIN32)
+	set_target_properties(TextShaping PROPERTIES
+		CXX_STANDARD 17
+		CXX_STANDARD_REQUIRED ON
+		COMPILE_OPTIONS "/utf-8"
+)
+endif()
+
+if(WIN32 AND RE_DEV_MODE)
+	target_link_libraries(TextShaping 
+		PRIVATE
+		RenderingEngine
+	)
+else()	
+	target_link_libraries(TextShaping 
+		PRIVATE
+			RenderingEngine::RenderingEngine 
+	)
+endif()
+
+set(PATH_TO_COMPILED_SHADER_PATH "${PROJECT_BINARY_DIR}/Content/Shaders")
+set(SHADER_COMPILER $ENV{glslc})
+
+# Shader compilation
+set(BUILDIN_SOURCE_SHADER_PATH "${PROJECT_SOURCE_DIR}/Assets/Shaders")
+set(PATH_TO_SOURCE_TEXTURES "${PROJECT_SOURCE_DIR}/Assets/Textures")
+set(PATH_TO_SOURCE_MODELS "${PROJECT_SOURCE_DIR}/Assets/Models")
+set(PATH_TO_SOURCE_FONTS "${PROJECT_SOURCE_DIR}/Assets/Fonts")
+set(PATH_TO_APP_CONFIG "${PROJECT_SOURCE_DIR}/Config")
+file(COPY ${PATH_TO_SOURCE_TEXTURES} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${PATH_TO_SOURCE_MODELS} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${PATH_TO_SOURCE_FONTS} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${BUILDIN_SOURCE_SHADER_PATH} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${PATH_TO_APP_CONFIG} DESTINATION "${PROJECT_BINARY_DIR}")
+set(PATH_TO_SOURCE_SHADER "${PROJECT_BINARY_DIR}/Content/Shaders")
+
+#Set paths to buildin shaders
+set(basic_texture_3d_vert_source "${PATH_TO_SOURCE_SHADER}/BasicTexture3D/BasicTexture3D.vert")
+set(basic_texture_3d_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/BasicTexture3D/BasicTexture3D_vert.spv")
+set(basic_texture_3d_frag_source "${PATH_TO_SOURCE_SHADER}/BasicTexture3D/BasicTexture3D.frag")
+set(basic_texture_3d_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/BasicTexture3D/BasicTexture3D_frag.spv")
+
+set(flat_color_filtering_vert_source "${PATH_TO_SOURCE_SHADER}/FlatColorFiltering/FlatColorFiltering.vert")
+set(flat_color_filtering_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/FlatColorFiltering/FlatColorFiltering_vert.spv")
+set(flat_color_filtering_frag_source "${PATH_TO_SOURCE_SHADER}/FlatColorFiltering/FlatColorFiltering.frag")
+set(flat_color_filtering_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/FlatColorFiltering/FlatColorFiltering_frag.spv")
+
+set(test_triangle_vert_source "${PATH_TO_SOURCE_SHADER}/TestTriangle/TestTriangle.vert")
+set(test_triangle_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestTriangle/TestTriangle_vert.spv")
+set(test_triangle_frag_source "${PATH_TO_SOURCE_SHADER}/TestTriangle/TestTriangle.frag")
+set(test_triangle_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestTriangle/TestTriangle_frag.spv")
+
+set(quad2D_vert_source "${PATH_TO_SOURCE_SHADER}/Quad2D/Quad2D.vert")
+set(quad2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_vert.spv")
+set(quad2D_frag_source "${PATH_TO_SOURCE_SHADER}/Quad2D/Quad2D.frag")
+set(quad2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_frag.spv")
+
+set(font2D_vert_source "${PATH_TO_SOURCE_SHADER}/Font2D/Font2D.vert")
+set(font2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Font2D/Font2D_vert.spv")
+set(font2D_frag_source "${PATH_TO_SOURCE_SHADER}/Font2D/Font2D.frag")
+set(font2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Font2D/Font2D_frag.spv")
+
+if(WIN32)
+add_custom_command(
+	TARGET TextShaping  
+	PRE_BUILD
+
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_SOURCE_TEXTURES}
+            ${PROJECT_BINARY_DIR}/Content/Textures
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_SOURCE_MODELS}
+            ${PROJECT_BINARY_DIR}/Content/Models
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_SOURCE_FONTS}
+            ${PROJECT_BINARY_DIR}/Content/Fonts
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${BUILDIN_SOURCE_SHADER_PATH}
+            ${PROJECT_BINARY_DIR}/Content/Shaders
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_APP_CONFIG}
+            ${PROJECT_BINARY_DIR}/Config
+
+	# Compile buildin shaders
+	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_vert_source} -o ${basic_texture_3d_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_frag_source} -o ${basic_texture_3d_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${flat_color_filtering_vert_source} -o ${flat_color_filtering_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${flat_color_filtering_frag_source} -o ${flat_color_filtering_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${test_triangle_vert_source} -o ${test_triangle_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${test_triangle_frag_source} -o ${test_triangle_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_vert_source} -o ${quad2D_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_frag_source} -o ${quad2D_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${font2D_vert_source} -o ${font2D_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${font2D_frag_source} -o ${font2D_frag_spv}
+
+	# Compile custom user shader from json files via calling MaterialCompiler
+	# TO DO
+
+	TARGET TextShaping POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:TextShaping>
+            $<TARGET_FILE_DIR:TextShaping>
+    COMMAND_EXPAND_LISTS
+)
+endif()

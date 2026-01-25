@@ -30,7 +30,10 @@ void StartLevel::Initialize()
 
 	const std::string textEng_TextRendering = "Text Rendering";
 	const std::string textEng_FeatureDesc = 
-		"Text Rendering is a feature of the rendering engine that provides the ability to draw strings containing text, digits, and characters. It is a necessary feature for displaying blocks of text, widgets, buttons, annotations, et cetera.";
+		"Text Rendering is a feature of the rendering engine" 
+		"that provides the ability to draw strings containing" 
+		"text, digits, and characters. It is a necessary feature" 
+		"for displaying blocks of text, widgets, buttons, annotations, et cetera.";
 	
 	const float screenWidth = static_cast<float>(GetSceneManager().GetApplication()->GetScreenSettings().width);
 	// x:0.0f - center
@@ -79,7 +82,7 @@ void StartLevel::Initialize()
 	mTextBlockUpdating->SetPosition(glm::vec2(0.0f, 200.0f));
 	mTextBlockUpdating->SetTextColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	// Multy material text block
+	// Multi material text block
 	std::string multiMaterialText = "This is multi-material text block. Он отображает разные системы письма, а значит uses mutiple batches with differrent materials and font atlases.";
 	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
 	TextBlock2D* multimaterialTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
@@ -92,18 +95,41 @@ void StartLevel::Initialize()
 	multimaterialTextBlock->SetTextColor(glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
 
 
-	/// Arabic
+	const std::string hebrewFontName = "FrankRuhlLibre-Regular";
 	const std::string arabicFontName = "Amiri-Regular";
-	const std::string textRendering_Arabic = "عرض النص";
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), arabicFontName));
-	TextBlock2D* textRendering_Arabic_TB = static_cast<TextBlock2D*>(mDrawables2D.back());
+	const std::string aramaicFontName = "NotoSansSyriac-Regular";
+	const std::string textHebrew_FeatureDesc =
+		"עיבוד טקסט הוא יכולת של מנוע \n"
+		"הגרפיקה המאפשרת שרטוט מחרוזות \n"
+		"הכוללות אותיות, ספרות ותווים. זוהי \n"
+		"יכולת חיונית להצגת בלוקי טקסט, \n"
+		"ווידג'טים, כפתורים, הערות וכדומה. \n";
 
-	textRendering_Arabic_TB->SetMaxLineLength(thirdPart);
-	textRendering_Arabic_TB->SetTextAlign(TextAlign::Right);
-	textRendering_Arabic_TB->SetText(textRendering_Arabic);
+	const std::string textArabic_FeatureDesc =
+		"عرض النص هو ميزة في محرك الرسوميات \n"
+		"تتيح رسم سلاسل تحتوي على حروف وأرقام \n"
+		"ورموز. تُعد هذه الميزة ضرورية لعرض كتل \n"
+		"نصية، وعناصر واجهة، وأزرار، وتعليقات، \n"
+		"وغيرها. \n";
 
-	textRendering_Arabic_TB->SetPosition(glm::vec2(leftColumnStart, 0.0f));
-	textRendering_Arabic_TB->SetTextColor(glm::vec4(1.0f, 1.0, 1.0f, 1.0f));
+	const std::string textAramaic_FeatureDesc =
+		"ܡܚܙܘܝܘܬܐ ܕܟܬܒܐ ܗ̱ܝ ܝܘܠܦܢܐ ܕܡܥܢܓܐ \n"
+		"ܕܓܪܦܝܩܐ ܕܡܬܠܝܦܐ ܠܡܚܙܘܝܘ ܫܪ̈ܫܝܐ  \n"
+		"ܕܒܗܘܢ ܐܘܬܘܬ̈ܐ، ܡܢ̈ܝ̈ܢܐ ܘܣܝܡ̈ܐ. ܗ̱ܝ  \n"
+		"ܝܘܠܦܢܐ ܚܫܝܚܬܐ ܠܡܚܙܘܝܘ ܓܘܫܡ̈ܐ  \n"
+		"ܕܟܬܒܐ، ܡܕܒܪ̈ܢܐ، ܟܘܦ̈ܝܐ، ܡܦܪ̈ܫܢܘܬܐ  \n"
+		"ܘܐܚܪ̈ܢܐ. \n";
+
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), hebrewFontName));
+	TextBlock2D* textBlock_Shaped_FeatureDesc = static_cast<TextBlock2D*>(mDrawables2D.back());
+
+	textBlock_Shaped_FeatureDesc->SetMaxLineLength(thirdPart);
+	textBlock_Shaped_FeatureDesc->SetTextAlign(TextAlign::Right);
+	textBlock_Shaped_FeatureDesc->SetTextShapeEnabled(true);
+	textBlock_Shaped_FeatureDesc->SetText(textHebrew_FeatureDesc);
+
+	textBlock_Shaped_FeatureDesc->SetPosition(glm::vec2(rightColumnStart, -30.0f));
+	textBlock_Shaped_FeatureDesc->SetTextColor(glm::vec4(1.0f, 1.0, 1.0f, 1.0f));
 }
 void StartLevel::Update(float deltaTime)
 {

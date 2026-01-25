@@ -205,6 +205,7 @@ target_link_libraries(RenderingEngine
 		Vulkan::Vulkan
 		glfw
 		freetype
+		harfbuzz::harfbuzz
 		JPEG::JPEG
 		PNG::PNG
 		assimp::assimp
@@ -214,7 +215,10 @@ target_link_libraries(RenderingEngine
 )
 
 if(WIN32)
-    target_link_libraries(RenderingEngine PRIVATE freetype)
+    target_link_libraries(RenderingEngine 
+	PRIVATE 
+	freetype
+	harfbuzz::harfbuzz)
 else()
     target_link_libraries(RenderingEngine PRIVATE ${FREETYPE2_LIBRARIES})
 endif()

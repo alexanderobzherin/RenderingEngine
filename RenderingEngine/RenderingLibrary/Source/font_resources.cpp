@@ -7,6 +7,9 @@
 #include "material.hpp"
 #include "utility.hpp"
 
+#include FT_FREETYPE_H
+#include FT_TRUETYPE_TABLES_H
+
 namespace rendering_engine
 {
 
@@ -78,13 +81,45 @@ FontResources::~FontResources()
 	FT_Done_FreeType(mLibrary);
 }
 
-void FontResources::LoadGlyphsFromRange(std::uint32_t begin, std::uint32_t end)
+void FontResources::LoadGlyphsFromCodePointRange(std::uint32_t begin, std::uint32_t end)
 {
     CreateFontAtlasFromRange(begin, end);
 }
 
-void FontResources::EnsureGlyphs(std::vector<std::uint32_t> codePoints)
+void FontResources::EnsureGlyphs(const std::vector<std::uint32_t>& codePoints)
 {
+    if (codePoints.empty())
+        return;
+
+    std::vector<GlyphIndex> glyphs;
+    for (auto codePoint : codePoints)
+    {
+        glyphs.push_back(GetIndexFromCodePoint(codePoint));
+    }
+
+    EnsureGlyphs(glyphs);
+}
+
+void FontResources::EnsureGlyphs(const std::vector<GlyphIndex>& glyphIndexes)
+{
+    if (glyphIndexes.empty())
+        return;
+
+    std::vector<GlyphIndex> lackingGlyphs;
+    for (const auto& glyphIndex : glyphIndexes)
+    {
+        auto found = mGlyphsByIndex.find(glyphIndex.index);
+        if (found == mGlyphsByIndex.end())
+        {
+            GlyphIndex gi;
+            gi.index = glyphIndex.index;
+            lackingGlyphs.push_back(gi);
+        }
+    }
+    if (!lackingGlyphs.empty())
+    {
+        CreateFontAtlasFromList(lackingGlyphs);
+    }
 }
 
 void FontResources::StoreFontAtlasesInFiles(bool in)
@@ -92,11 +127,9 @@ void FontResources::StoreFontAtlasesInFiles(bool in)
     bStoreFontAtlasesInFiles = in;
 }
 
-std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmap(std::uint32_t codePoint)
+std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmapBy(GlyphIndex glyphIndex)
 {
-    FT_UInt glyphIndex = 0;
-    glyphIndex = FT_Get_Char_Index(mFace, static_cast<FT_ULong>(codePoint));
-    mErrorResult = FT_Load_Glyph(mFace, glyphIndex, FT_LOAD_DEFAULT);
+    mErrorResult = FT_Load_Glyph(mFace, glyphIndex.index, FT_LOAD_DEFAULT);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to load glyph!" };
@@ -113,7 +146,7 @@ std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmap(std::uint32_
     glyphMetrics.atlasY = 0;
     glyphMetrics.width = mFace->glyph->bitmap.width;
     glyphMetrics.height = mFace->glyph->bitmap.rows;
-    
+
     glyphMetrics.bearingX = mFace->glyph->bitmap_left;
     glyphMetrics.bearingY = mFace->glyph->bitmap_top;
     glyphMetrics.advanceX = mFace->glyph->advance.x >> 6;
@@ -131,6 +164,14 @@ std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmap(std::uint32_
     return std::pair(glyphMetrics, ImageData(mFace->glyph->bitmap.width, mFace->glyph->bitmap.rows, buffer));
 }
 
+std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmapBy(std::uint32_t codePoint)
+{
+    GlyphIndex glyphIndex;
+    glyphIndex.index = static_cast<std::uint32_t>(FT_Get_Char_Index(mFace, static_cast<FT_ULong>(codePoint)));
+
+    return CreateGlyphBitmapBy(glyphIndex);
+}
+
 void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t end)
 {
     if (begin > end)
@@ -141,14 +182,14 @@ void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t 
 
     // 1. Create font atlas in range of [begin; end]
     std::unordered_map<std::uint32_t, std::pair<GlyphMetrics, ImageData>> glyphs;
-    for (auto glyph = begin; glyph <= end; ++glyph)
+    for (auto codePoint = begin; codePoint <= end; ++codePoint)
     {
-        if (!HasGlyph(glyph))
+        if (!HasGlyph(codePoint))
         {
             continue;
         }
         // Creating bitmaps of glyphs should be considered to dome multythreaded
-        glyphs[glyph] = CreateGlyphBitmap(glyph);
+        glyphs[codePoint] = CreateGlyphBitmapBy(codePoint);
     }
     if (glyphs.empty())
         return;
@@ -190,7 +231,8 @@ void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t 
     // 4 Upload to container mFontAtlases
     for (auto& it : glyphs)
     {
-        mGlyphs[it.first] = std::pair<GlyphMetrics, std::string>(it.second.first, materialName);
+        const std::uint32_t glyphIndex = static_cast<std::uint32_t>(FT_Get_Char_Index(mFace, static_cast<FT_ULong>(it.first)));
+        mGlyphsByIndex[glyphIndex] = std::pair<GlyphMetrics, std::string>(it.second.first, materialName);
     }
 
     mFontAtlases[materialName] = textureName;
@@ -206,19 +248,19 @@ const FontMetrics& FontResources::GetFontMetrics() const
     return mFontMetrics;
 }
 
-GlyphMetrics FontResources::GetGlyphMetrics(std::uint32_t codePoint) const
+GlyphMetrics FontResources::GetGlyphMetrics(GlyphIndex glyphIndex) const
 {
-    auto search = mGlyphs.find(codePoint);
-    if (search == mGlyphs.end())
+    auto search = mGlyphsByIndex.find(glyphIndex.index);
+    if (search == mGlyphsByIndex.end())
     {
         return GlyphMetrics();
     }
     return search->second.first;
 }
 
-std::string FontResources::GetFontAtlasTextureName(std::uint32_t codePoint) const
+std::string FontResources::GetFontAtlasTextureName(GlyphIndex glyphIndex) const
 {
-    auto matName = GetFontAtlasMaterialName(codePoint);
+    auto matName = GetFontAtlasMaterialName(glyphIndex);
     if (matName.empty())
     {
         return std::string();
@@ -231,25 +273,84 @@ std::string FontResources::GetFontAtlasTextureName(std::uint32_t codePoint) cons
     return search->second;
 }
 
-std::string FontResources::GetFontAtlasMaterialName(std::uint32_t codePoint) const
+std::string FontResources::GetFontAtlasMaterialName(GlyphIndex glyphIndex) const
 {
-    auto search = mGlyphs.find(codePoint);
-    if (search == mGlyphs.end())
+    auto search = mGlyphsByIndex.find(glyphIndex.index);
+    if (search == mGlyphsByIndex.end())
     {
         return std::string();
     }
     return search->second.second;
 }
 
-void FontResources::CreateFontAtlasFromList(std::vector<std::uint32_t> codePoints)
+GlyphIndex FontResources::GetIndexFromCodePoint(std::uint32_t codePoint) const
 {
-    for (std::uint32_t codePoint : codePoints)
+    GlyphIndex result;
+    result.index = FT_Get_Char_Index(mFace, codePoint);
+    return result;
+}
+
+FT_Face FontResources::GetFontFace()
+{
+    return mFace;
+}
+
+void FontResources::CreateFontAtlasFromList(const std::vector<GlyphIndex>& glyphIndexes)
+{
+    // 1. Create font atlas from list
+    std::unordered_map<std::uint32_t, std::pair<GlyphMetrics, ImageData>> glyphs;
+    for (auto glyphIndex : glyphIndexes)
     {
-        if (!HasGlyph(codePoint))
-        {
+        auto found = mGlyphsByIndex.find(glyphIndex.index);
+        if (found != mGlyphsByIndex.end())
             continue;
-        }
+        // Creating bitmaps of glyphs should be considered to dome multithreaded
+        glyphs[glyphIndex.index] = CreateGlyphBitmapBy(glyphIndex);
     }
+    if (glyphs.empty())
+        return;
+
+    auto fontAtlas = TextureAtlasMaker::CreateTextureAtlas(glyphs);
+
+    // 2. Upload texture via TextureCache
+
+    auto textureCache = mRenderResourceContext.textureCache;
+    const std::string textureName = mFontName + "_FontAtlas_" + std::to_string(mFontAtlases.size());
+    if (bStoreFontAtlasesInFiles)
+    {
+        const std::string fileName = textureName + ".png";
+        auto fullPath = Utility::GetContentFolderPath() / fileName;
+        fontAtlas.WritePngFile(fullPath.string().c_str());
+    }
+    textureCache->LoadTexture(textureName, fontAtlas);
+
+    // 3. Create a material via MaterialCache and add texture to it
+    auto materialCache = mRenderResourceContext.materialCache;
+    const std::string materialName = textureName + "_Mat";
+    MaterialSettings materialSettings;
+    materialSettings.parentMaterialName = std::string{ "Font2D" };
+    materialSettings.materialName = materialName;
+    materialSettings.materialDomain = MaterialDomain::Sprite2D;
+    materialSettings.shadingModel = ShadingModel::Unlit;
+    materialSettings.blendMode = BlendMode::Opaque;
+    materialSettings.parameterLayout = &Font2DLayout;
+
+    materialCache->AddMaterial(materialSettings);
+    Material* material = materialCache->GetMaterial(materialName);
+    material->SetVec4("FontColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    material->AddTexture(textureName);
+
+    // material->SetFloat >> Add custom material parameters for UV manipulation
+    material->InitializeRenderResources();
+
+    // 4 Upload to container mFontAtlases
+    for (auto& it : glyphs)
+    {
+        mGlyphsByIndex[it.first] = std::pair<GlyphMetrics, std::string>(it.second.first, materialName);
+    }
+
+    mFontAtlases[materialName] = textureName;
 }
 
 } // namespace rendering_engine

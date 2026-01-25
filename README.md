@@ -50,6 +50,7 @@ The following libraries are required:
 - [libpng](http://www.libpng.org/)
 - [Assimp](https://github.com/assimp/assimp)
 - [FreeType](https://freetype.org/)
+- [HarfBuzz](https://harfbuzz.github.io/)
 - [nlohmann/json](https://json.nlohmann.me/)
 
 All listed dependencies use permissive or industry-standard licenses suitable for commercial and non-commercial use.

@@ -26,6 +26,7 @@ penX += advanceX
 */
 class TextRenderer;
 class FontResources;
+struct GlyphIndex;
 
 enum TextAlign
 {
@@ -61,6 +62,16 @@ struct GlyphQuad
 	std::uint32_t advanceX;
 };
 
+struct ShapedGlyph
+{
+	std::uint32_t glyphIndex;   // FT glyph index (font-specific)
+	std::uint32_t cluster;
+	float xAdvance;        // pen movement AFTER this glyph
+	float yAdvance;
+	float xOffset;         // offset FROM current pen position
+	float yOffset;
+};
+
 public:
 	TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, std::string fontName);
 
@@ -81,6 +92,7 @@ public:
 	void SetMaxLineLength(float maxLineLength);
 	void SetTextColor(glm::vec4 color);
 	void SetTextAlign(TextAlign textAlign);
+	void SetTextShapeEnabled(bool);
 
 	void DrawFontAtlas();
 
@@ -89,14 +101,23 @@ protected:
     std::vector<std::uint32_t> DecodeUtf8(const std::string& text);
 	std::string CodepointToUtf8(std::uint32_t codePoint);
 
-	void ConstructMesh(const std::vector<std::uint32_t>& byteCodes);
-	GlyphQuad MakeGlyphQuad(std::uint32_t glyph, float penX, float penY);
+	std::vector<ShapedGlyph> ShapeText(const std::string& text);
+
+	void ConstructMesh(const std::vector<std::uint32_t>& codePoints);
+	void ShapeTextAndConstructMesh();
+	GlyphQuad MakeGlyphQuad(GlyphIndex glyphIndext, float penX, float penY);
 	void PushQuad(std::string meshName,
 		std::unordered_map<std::string, TextBlock2D::Mesh>& meshes,
 		GlyphQuad glyphQuad,
 		float horizontalShift = 0.0f);
+	void UploadMeshes(const std::unordered_map<std::string, TextBlock2D::Mesh>& meshes);
 
+	template <typename T>
+	std::unordered_map<std::string, TextBlock2D::Mesh> PrepareMeshSlots(const std::vector<T>& glyphs);
 
+	std::vector<std::string> SplitString(const std::string& text, std::string separator);
+
+	bool IsTextShapingRequired(std::uint32_t codePoint) const;
 
 private:
 	static std::uint64_t sNumOfTextBlocks;
@@ -113,5 +134,7 @@ private:
 	std::string mText;
 	float mMaxLineLength = 0.0f;
 	TextAlign mTextAlign = TextAlign::Left;
+
+	bool bIsTextShapeEnabled;
 };
 }

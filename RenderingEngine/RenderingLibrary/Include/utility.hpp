@@ -35,6 +35,7 @@ struct AppConfig
 	float screenHeight = 600.0f;
 
 	std::vector<std::string> textScripts;
+	bool testShapingEnabled = false;
 };
 
 /**

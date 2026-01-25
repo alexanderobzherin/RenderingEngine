@@ -21,7 +21,7 @@ cd vcpkg
 #### 2. Install required libraries:
 
 ```bash
-.\vcpkg install --triplet x64-windows-static-md glfw3 glm boost-filesystem libpng libjpeg-turbo freetype assimp nlohmann-json gtest
+.\vcpkg install --triplet x64-windows-static-md glfw3 glm boost-filesystem libpng libjpeg-turbo freetype harfbuzz assimp nlohmann-json gtest
 ```
 
 #### 3. Set the VCPKG_ROOT environment variable to the folder where you cloned vcpkg:
@@ -43,7 +43,7 @@ Variable value: ```Path\To\glslc.exe```
 
 ```bash
 sudo apt update
-sudo apt install cmake build-essential libglfw3-dev libglm-dev libboost-filesystem-dev libgtest-dev libjpeg-dev libpng-dev libassimp-dev libfreetype6-dev pkg-config nlohmann-json3-dev
+sudo apt install cmake build-essential libglfw3-dev libglm-dev libboost-filesystem-dev libgtest-dev libjpeg-dev libpng-dev libassimp-dev libfreetype6-dev libharfbuzz-dev pkg-config nlohmann-json3-dev
 ```
 
 #### 2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
@@ -67,7 +67,7 @@ sudo apt install vulkan-sdk
 1. Install dependencies:
 
 ```bash
-sudo pkg install pkgconf glfw glm boost-libs libjpeg-turbo png googletest assimp freetype2 vulkan-loader vulkan-headers shaderc nlohmann-json
+sudo pkg install pkgconf glfw glm boost-libs libjpeg-turbo png googletest assimp freetype2 harfbuzz vulkan-loader vulkan-headers shaderc nlohmann-json
 ```
 Some of these packages may be built from ports, but this does not affect the build process or functionality, so you may use either pkg or make install clean under /usr/ports/...
 

@@ -7,17 +7,76 @@
 
 namespace rendering_engine
 {
-/*
-Latin       0x0020 – 0x007E
-Cyrillic    0x0400 – 0x04FF
-Hebrew      0x0590 – 0x05FF
-Arabic      0x0600 – 0x06FF
-*/
+std::vector<std::uint32_t> sFontSizesPreload{10, 14, 16};
 std::unordered_map<std::string, std::pair<std::uint32_t, std::uint32_t>> TextRenderer::sScriptRanges{
-	{{"latin"}, {0x0020, 0x007E}},
-	{{"cyrillic"}, {0x0400, 0x04FF}},
-	{{"arabic"}, {0x0600, 0x08FF}}
-};				 
+	// European
+	{{"Latin"}, {0x0020, 0x007E}},
+	{{"Cyrillic"}, {0x0400, 0x04FF}},
+	{{"Greek"}, {0x0370, 0x03FF}},
+
+	// Asian
+	{{"Han"}, {0x4E00, 0x9FFF}},
+	{{"HanExtensionA"}, {0x3400, 0x4DBF}},
+
+	{{"Hiragana"}, {0x3040, 0x309F}},
+	{{"Katakana"}, {0x30A0, 0x30FF}},
+	{{"KatakanaPhoneticExtensions"}, {0x31F0, 0x31FF}},
+
+	{{"Hangul"}, {0xAC00, 0xD7AF}},
+
+	// Requires shaping
+	// East
+	{{"Hebrew"}, {0x0590, 0x05FF}},
+	{{"Arabic"}, {0x0600, 0x06FF}},
+	{{"ArabicSupplement"}, {0x0750, 0x077F}},
+	{{"ArabicExtended-A"}, {0x08A0, 0x08FF}},
+	{{"Aramaic"}, {0x0700, 0x074F}},
+	{{"Thaana"}, {0x0780, 0x07BF}}, 
+
+	// Indic
+	{{"Devanagari"}, {0x0900, 0x097F}},
+	{{"Bengali"}, {0x0980, 0x09FF}},	
+	{{"Gurmukhi"}, {0x0A00, 0x0A7F}},	
+	{{"Gujarati"}, {0x0A80, 0x0AFF}},	
+	{{"Oriya"}, {0x0B00, 0x0B7F}},		
+	{{"Tamil"}, {0x0B80, 0x0BFF}},		
+	{{"Telugu"}, {0x0C00, 0x0C7F}},		
+	{{"Kannada"}, {0x0C80, 0x0CFF}},	
+	{{"Malayalam"}, {0x0D00, 0x0D7F}},	
+	{{"Sinhala"}, {0x0D80, 0x0DFF}},	
+
+	// Southeast Asian
+	{{"Thai"}, {0x0E00, 0x0E7F}},		
+	{{"Lao"}, {0x0E80, 0x0EFF}},		
+	{{"Myanmar"}, {0x1000, 0x109F}},	
+	{{"Khmer"}, {0x1780, 0x17FF}},		
+
+	// Tibetan
+	{{"Tibetan"}, {0x0F00, 0x0FFF}}		
+};
+std::vector<std::string> TextRenderer::sScriptsRequiresShaping{
+	{"Hebrew"}, 
+	{"Arabic"},
+	{"ArabicSupplement"},
+	{"ArabicExtended-A"},
+	{"Aramaic"},
+	{"Thaana"},
+	{"Devanagari"},
+	{"Bengali"},
+	{"Gurmukhi"},
+	{"Gujarati"},
+	{"Oriya"},
+	{"Tamil"},
+	{"Telugu"},
+	{"Kannada"},
+	{"Malayalam"},
+	{"Sinhala"},
+	{"Thai"},
+	{"Lao"},
+	{"Myanmar"},
+	{"Khmer"},
+	{"Tibetan"}
+};
 
 TextRenderer::TextRenderer(RenderResourceContext rrc)
 	:
@@ -62,6 +121,7 @@ void TextRenderer::LoadFontsFromFolder(std::string pathToFolder)
 		mFontResources[fontName]->StoreFontAtlasesInFiles(bStoreFontAtlasesInFiles);
 
 		AppConfig appConfig = Utility::ReadConfigFile();
+		bTextShapingEnabled = appConfig.testShapingEnabled;
 
 		for (const auto& script : appConfig.textScripts)
 		{
@@ -70,7 +130,7 @@ void TextRenderer::LoadFontsFromFolder(std::string pathToFolder)
 
 			const std::uint32_t rangeBegin = sScriptRanges[script].first;
 			const std::uint32_t rangeEnd = sScriptRanges[script].second;
-			mFontResources[fontName]->LoadGlyphsFromRange(rangeBegin, rangeEnd);
+			mFontResources[fontName]->LoadGlyphsFromCodePointRange(rangeBegin, rangeEnd);
 		}
 	}
 }
@@ -97,6 +157,23 @@ std::shared_ptr<FontResources> TextRenderer::GetFontResources(std::string fontNa
 void TextRenderer::StoreFontAtlasesInFiles(bool in)
 {
 	bStoreFontAtlasesInFiles = in;
+}
+
+std::vector<std::string> TextRenderer::GetScriptsRequiredShaping()
+{
+	return sScriptsRequiresShaping;
+}
+
+std::pair<std::uint32_t, std::uint32_t> TextRenderer::GetScriptRange(std::string script)
+{
+	std::pair<std::uint32_t, std::uint32_t> result{0, 0};
+
+	auto search = sScriptRanges.find(script);
+	{
+		if (search != sScriptRanges.end())
+			return sScriptRanges[script];
+	}
+	return result;
 }
 
 } //namespace rendering_engine

@@ -15,19 +15,35 @@
 #include "material_cache.hpp"
 #include "material.hpp"
 
+#include <hb.h>
+#include <hb-ft.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+#include FT_TYPES_H
+#include FT_OUTLINE_H
+#include FT_RENDER_H
+
 namespace rendering_engine
 {
 std::uint64_t TextBlock2D::sNumOfTextBlocks = 0;
 
+template<>
+std::unordered_map<std::string, TextBlock2D::Mesh> TextBlock2D::PrepareMeshSlots(const std::vector<std::uint32_t>& glyphs);
+
+template<>
+std::unordered_map<std::string, TextBlock2D::Mesh> TextBlock2D::PrepareMeshSlots(const std::vector<ShapedGlyph>& glyphs);
 
 TextBlock2D::TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, std::string fontName)
     :
     Drawable2D(textRenderer->GetRenderResourceContext()),
     mTextRenderer(textRenderer),
-    mColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
+    mColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
+    bIsTextShapeEnabled(false)
 {
     SetFont(fontName);
     mFontResources = mTextRenderer->GetFontResources(mFontName);
+    bIsTextShapeEnabled = mTextRenderer->IsTextShapingEnabled();
     if (!mFontResources)
     {
         throw std::runtime_error("FontResources is not initialized for this TextBlock2D.");
@@ -42,6 +58,7 @@ void TextBlock2D::Initialize()
 {
     Drawable2D::Initialize();
 }
+
 void TextBlock2D::Update(float deltaTime)
 {
     Drawable2D::Update(deltaTime);
@@ -73,12 +90,32 @@ void TextBlock2D::SetText(std::string text)
         return;
     }
     mText = text;
+    
+    auto codeBytes = DecodeUtf8(mText);
+    bool isTextShapeRequired = false;
+    if (bIsTextShapeEnabled)
+    {
+        for (auto codeByte : codeBytes)
+        {
+            if (IsTextShapingRequired(codeByte))
+            {
+                isTextShapeRequired = true;
+                break;
+            }
+        }
+    }
 
     auto fontResources = mTextRenderer->GetFontResources(mFontName);
-    auto codeBytes = DecodeUtf8(mText);
-    fontResources->EnsureGlyphs(codeBytes);
-
-    ConstructMesh(codeBytes);
+    
+    if (bIsTextShapeEnabled && isTextShapeRequired)
+    {
+        ShapeTextAndConstructMesh();
+    }
+    else
+    {
+        fontResources->EnsureGlyphs(codeBytes);
+        ConstructMesh(codeBytes);
+    }
 }
 
 void TextBlock2D::SetMaxLineLength(float maxLineLength)
@@ -99,17 +136,24 @@ void TextBlock2D::SetTextAlign(TextAlign textAlign)
     mTextAlign = textAlign;
 }
 
+void TextBlock2D::SetTextShapeEnabled(bool in)
+{
+    bIsTextShapeEnabled = in;
+}
+
 void TextBlock2D::DrawFontAtlas()
 {
     Shutdown();
     const std::string meshName("Quad2D");
 
-    auto fontAtlasMaterialName = mFontResources->GetFontAtlasMaterialName(std::uint32_t{ 0x0020 });
+    const std::uint32_t space{ 0x20 };
+    GlyphIndex spaceGI = mFontResources->GetIndexFromCodePoint(space);
+    auto fontAtlasMaterialName = mFontResources->GetFontAtlasMaterialName(spaceGI);
     AddRenderBatch(meshName, fontAtlasMaterialName);
 
     auto fontResources = mTextRenderer->GetFontResources(mFontName);
     auto textureCache = mTextRenderer->GetRenderResourceContext().textureCache;
-    auto fontAtlasTextureName = fontResources->GetFontAtlasTextureName(std::uint32_t{ 0x0020 });
+    auto fontAtlasTextureName = fontResources->GetFontAtlasTextureName(spaceGI);
 
     const auto& texture = textureCache->GetTextureResources(fontAtlasTextureName);
 
@@ -189,31 +233,9 @@ std::vector<std::uint32_t> TextBlock2D::DecodeUtf8(const std::string& text)
     return result;
 }
 
-void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
+void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& codePoints)
 {
-    // Prepare map of used material names with corresponding mesh names.
-    for (auto glyph : byteCodes)
-    {
-        if (glyph == 0x000A || glyph == 0x000D || glyph == 0x0009)
-        {
-            continue;
-        }
-
-        auto fontAtlasMaterialName = mFontResources->GetFontAtlasMaterialName(glyph);
-        const auto search = mMaterialMesh.find(fontAtlasMaterialName);
-        if (search == mMaterialMesh.end())
-        {
-            const std::string meshName = mTextBlockID + "_" + std::to_string(mMaterialMesh.size());
-            mMaterialMesh[fontAtlasMaterialName] = meshName;
-        }
-    }
-
-    // Prepare map of used mesh names with mesh structures
-    std::unordered_map<std::string, TextBlock2D::Mesh> meshes;
-    for (const auto& mesh : mMaterialMesh)
-    {
-        meshes[mesh.second] = TextBlock2D::Mesh();
-    }
+    auto meshes = PrepareMeshSlots(codePoints);
 
     const FontMetrics& fontMetrics = mFontResources->GetFontMetrics();
     // Pen position (baseline)
@@ -226,7 +248,7 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
     const bool wordWrappingRequested = mMaxLineLength > 0.0f;
     if (!wordWrappingRequested)
     {
-        for (std::uint32_t glyph : byteCodes)
+        for (std::uint32_t glyph : codePoints)
         {
             if (glyph == newLine)
             {
@@ -235,7 +257,8 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
                 continue;
             }
 
-            GlyphQuad glyphQuad = MakeGlyphQuad(glyph, penX, penY);
+            GlyphIndex glyphIndex = mFontResources->GetIndexFromCodePoint(glyph);
+            GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX, penY);
             const std::string meshName = mMaterialMesh[glyphQuad.fontAtlasMaterialName];
             PushQuad(meshName, meshes, glyphQuad);
             penX += glyphQuad.advanceX;
@@ -258,18 +281,19 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
         {
             std::string stringProcessed;
 
-            while (nextGlyphIndex < byteCodes.size())
+            while (nextGlyphIndex < codePoints.size())
             {
-                if (byteCodes[nextGlyphIndex] == space)
+                if (codePoints[nextGlyphIndex] == space)
                     break;
 
-                const std::string curGlyph = CodepointToUtf8(byteCodes[nextGlyphIndex]);
+                const std::string curGlyph = CodepointToUtf8(codePoints[nextGlyphIndex]);
                 stringProcessed.append(curGlyph);
-                GlyphQuad glyphQuad = MakeGlyphQuad(byteCodes[nextGlyphIndex], penX, penY);
+                GlyphIndex glyphIndex = mFontResources->GetIndexFromCodePoint(codePoints[nextGlyphIndex]);
+                GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX, penY);
                 penX += glyphQuad.advanceX;
                 nextWord.push_back(glyphQuad);
                 ++nextGlyphIndex;
-                isLastGlyphProcessed = nextGlyphIndex >= byteCodes.size();
+                isLastGlyphProcessed = nextGlyphIndex >= codePoints.size();
             }
 
             const bool isNewWordFitLine = penX <= mMaxLineLength;
@@ -279,7 +303,8 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
                 if (!line.empty())
                 {
                     //Insert SPACE
-                    GlyphQuad glyphQuad = MakeGlyphQuad(space, penX, penY);
+                    GlyphIndex glyphIndex = mFontResources->GetIndexFromCodePoint(space);
+                    GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX, penY);
                     stringProcessed.append(" ");
                     penX += glyphQuad.advanceX;
                     nextWord.push_back(glyphQuad);
@@ -320,40 +345,104 @@ void TextBlock2D::ConstructMesh(const std::vector<std::uint32_t>& byteCodes)
         }
     }
 
-    // Once meshes are ready, request its upload from ModelCache
-    auto modelCache = mTextRenderer->GetRenderResourceContext().meshCache;
-
-    for (auto& material : mMaterialMesh) 
-    {
-        auto meshName = material.second;
-        auto mesh = meshes.at(meshName);
-        modelCache->LoadCustomMesh(meshName,
-                                   mesh.positions2D,
-                                   mesh.texCoords,
-                                   mesh.colors,
-                                   mesh.indices);
-    }
-
-    // Set mesh name and material name for THIS drawable, so the first font atlas for now only.
-    
-    Shutdown();
-    for (const auto& materialMesh : mMaterialMesh)
-    {
-        const std::string meshName = materialMesh.second;
-        const std::string materialName = materialMesh.first;
-        AddRenderBatch(meshName, materialName);
-    }
+    UploadMeshes(meshes);
 
     Initialize();
 }
 
-TextBlock2D::GlyphQuad TextBlock2D::MakeGlyphQuad(std::uint32_t glyph, float penX, float penY)
+void TextBlock2D::ShapeTextAndConstructMesh()
+{
+    auto textRuns = SplitString(mText, "\n");
+
+    std::vector<std::vector<ShapedGlyph>> linesOfShapedGlyphs;
+    std::vector<ShapedGlyph> preShapedGlyphs;
+ 
+    for (const auto& textRun : textRuns)
+    {
+        auto shapedTextRun = ShapeText(textRun);
+        linesOfShapedGlyphs.push_back(shapedTextRun);
+        std::copy(shapedTextRun.begin(), shapedTextRun.end(), std::back_inserter(preShapedGlyphs));
+    }
+    std::vector<GlyphIndex> ensureGlyphs;
+    for (const auto& shapedGlyph : preShapedGlyphs)
+    {
+        GlyphIndex gi;
+        gi.index = shapedGlyph.glyphIndex;
+        ensureGlyphs.push_back(gi);
+    }
+    mFontResources->EnsureGlyphs(ensureGlyphs);
+
+    auto meshes = PrepareMeshSlots(preShapedGlyphs);
+
+    const FontMetrics& fontMetrics = mFontResources->GetFontMetrics();
+
+    const bool alignmentRequested = mMaxLineLength > 0.0f;
+
+    // Pen position (baseline)
+    float penX = 0.0f;
+    float penY = 0.0f;
+
+    float maximumLineLengh = 0.0f;
+    std::vector<float> lineLengths;
+    if (mTextAlign == TextAlign::Center || mTextAlign == TextAlign::Right)
+    {
+        for (auto& line : linesOfShapedGlyphs)
+        {
+            float lineLength = 0.0f;
+            for (const auto& glyph : line)
+            {
+                lineLength += glyph.xAdvance;
+            }
+            lineLengths.push_back(lineLength);
+            if (lineLength > maximumLineLengh)
+            {
+                maximumLineLengh = lineLength;
+            }
+        }
+        mMaxLineLength = (mMaxLineLength > maximumLineLengh ? mMaxLineLength : maximumLineLengh);
+    }
+
+    int curLine = 0;
+    for (auto& line : linesOfShapedGlyphs)
+    {
+        for (const auto& glyph : line)
+        {
+            GlyphIndex glyphIndex;
+            glyphIndex.index = glyph.glyphIndex;
+
+            GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX + glyph.xOffset, penY + glyph.yOffset);
+            const std::string meshName = mMaterialMesh[glyphQuad.fontAtlasMaterialName];
+
+            float horizontalShift = 0.0f;
+            if (mTextAlign == TextAlign::Center)
+            {
+                horizontalShift = (mMaxLineLength - lineLengths[curLine]) / 2.0f;
+            }
+            if (mTextAlign == TextAlign::Right)
+            {
+                horizontalShift = (mMaxLineLength - lineLengths[curLine]);
+            }
+            PushQuad(meshName, meshes, glyphQuad, horizontalShift);
+            penX += glyph.xAdvance;
+        }
+
+        penX = 0.0f;
+        penY += fontMetrics.lineHeight;
+        ++curLine;
+    }
+
+    UploadMeshes(meshes);
+
+    Initialize();
+}
+
+TextBlock2D::GlyphQuad TextBlock2D::MakeGlyphQuad(GlyphIndex glyphIndex, float penX, float penY)
 {
     GlyphQuad result;
 
-    const GlyphMetrics& glyphMetrics = mFontResources->GetGlyphMetrics(glyph);
-    auto fontAtlasMaterialName = mFontResources->GetFontAtlasMaterialName(glyph);
-    const auto fontAtlasTextureName = mFontResources->GetFontAtlasTextureName(glyph);
+    const GlyphMetrics& glyphMetrics = mFontResources->GetGlyphMetrics(glyphIndex);
+    auto fontAtlasMaterialName = mFontResources->GetFontAtlasMaterialName(glyphIndex);
+    const auto fontAtlasTextureName = mFontResources->GetFontAtlasTextureName(glyphIndex);
     auto textureCache = mTextRenderer->GetRenderResourceContext().textureCache;
     const auto& fontAtlas = textureCache->GetTextureResources(fontAtlasTextureName);
 
@@ -427,6 +516,62 @@ void TextBlock2D::PushQuad(std::string meshName, std::unordered_map<std::string,
     meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 0);
 }
 
+void TextBlock2D::UploadMeshes(const std::unordered_map<std::string, TextBlock2D::Mesh>& meshes)
+{
+    // Once meshes are ready, request its upload from ModelCache
+    auto modelCache = mTextRenderer->GetRenderResourceContext().meshCache;
+
+    for (auto& material : mMaterialMesh)
+    {
+        auto meshName = material.second;
+        auto mesh = meshes.at(meshName);
+        modelCache->LoadCustomMesh(meshName,
+            mesh.positions2D,
+            mesh.texCoords,
+            mesh.colors,
+            mesh.indices);
+    }
+
+    // Set mesh name and material name for THIS drawable, so the first font atlas for now only.
+
+    Shutdown();
+    for (const auto& materialMesh : mMaterialMesh)
+    {
+        const std::string meshName = materialMesh.second;
+        const std::string materialName = materialMesh.first;
+        AddRenderBatch(meshName, materialName);
+    }
+}
+
+std::vector<std::string> TextBlock2D::SplitString(const std::string& text, std::string separator)
+{
+    std::vector<std::string> result;
+    std::string_view sv(text);
+    size_t start = 0, end = 0;
+
+    while ((start = sv.find_first_not_of(separator, end)) != std::string_view::npos) {
+        end = sv.find(separator, start);
+        result.emplace_back(sv.substr(start, end - start));
+    }
+
+    return result;
+}
+
+bool TextBlock2D::IsTextShapingRequired(std::uint32_t codePoint) const
+{
+    auto scriptsRequiredShaping = mTextRenderer->GetScriptsRequiredShaping();
+    for (const auto& script : scriptsRequiredShaping)
+    {
+        auto range = mTextRenderer->GetScriptRange(script);
+        if (codePoint >= range.first && codePoint <= range.second)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 std::string TextBlock2D::CodepointToUtf8(std::uint32_t codePoint)
 {
     std::string out;
@@ -451,6 +596,115 @@ std::string TextBlock2D::CodepointToUtf8(std::uint32_t codePoint)
     }
 
     return out;
+}
+
+std::vector<TextBlock2D::ShapedGlyph> TextBlock2D::ShapeText(const std::string& text)
+{
+    std::vector<TextBlock2D::ShapedGlyph> result;
+
+    hb_buffer_t* buf;
+    buf = hb_buffer_create();
+    hb_buffer_add_utf8(buf, text.c_str(), -1, 0, -1);
+
+    // If you know the direction, script, and language
+    /*
+    hb_buffer_set_direction(buf, HB_DIRECTION_LTR);
+    hb_buffer_set_script(buf, HB_SCRIPT_LATIN);
+    hb_buffer_set_language(buf, hb_language_from_string("en", -1));
+    */
+
+    // If you don't know the direction, script, and language
+    hb_buffer_guess_segment_properties(buf);
+
+    auto* fontFace = mFontResources->GetFontFace();
+    hb_font_t* font = hb_ft_font_create_referenced(fontFace);
+
+    hb_shape(font, buf, NULL, 0);
+
+    unsigned int glyph_count;
+    hb_glyph_info_t* glyph_info = hb_buffer_get_glyph_infos(buf, &glyph_count);
+    hb_glyph_position_t* glyph_pos = hb_buffer_get_glyph_positions(buf, &glyph_count);
+
+    for (unsigned int i = 0; i < glyph_count; i++)
+    {
+        ShapedGlyph shapedGlyph;
+        shapedGlyph.glyphIndex = glyph_info[i].codepoint;
+        shapedGlyph.xOffset = glyph_pos[i].x_offset / 64.0f;
+        shapedGlyph.yOffset = glyph_pos[i].y_offset / 64.0f;
+        shapedGlyph.xAdvance = glyph_pos[i].x_advance / 64.0f;
+        shapedGlyph.yAdvance = glyph_pos[i].y_advance / 64.0f;
+        shapedGlyph.cluster = glyph_info[i].cluster;
+        result.push_back(shapedGlyph);
+    }
+
+    return result;
+}
+
+template<>
+std::unordered_map<std::string, TextBlock2D::Mesh> TextBlock2D::PrepareMeshSlots(const std::vector<std::uint32_t>& glyphs)
+{
+    mMaterialMesh.clear();
+    // Prepare map of used material names with corresponding mesh names.
+    for (auto codePoint : glyphs)
+    {
+        if (codePoint == 0x000A || codePoint == 0x000D || codePoint == 0x0009)
+        {
+            continue;
+        }
+
+        GlyphIndex glyphIndex = mFontResources->GetIndexFromCodePoint(codePoint);
+        auto fontAtlasMaterialName = mFontResources->GetFontAtlasMaterialName(glyphIndex);
+        const auto search = mMaterialMesh.find(fontAtlasMaterialName);
+        if (search == mMaterialMesh.end())
+        {
+            const std::string meshName = mTextBlockID + "_" + std::to_string(mMaterialMesh.size());
+            mMaterialMesh[fontAtlasMaterialName] = meshName;
+        }
+    }
+
+    // Prepare map of used mesh names with mesh structures
+    std::unordered_map<std::string, TextBlock2D::Mesh> meshes;
+    for (const auto& mesh : mMaterialMesh)
+    {
+        meshes[mesh.second] = TextBlock2D::Mesh();
+    }
+    return meshes;
+}
+
+template<>
+std::unordered_map<std::string, TextBlock2D::Mesh> TextBlock2D::PrepareMeshSlots(const std::vector<ShapedGlyph>& glyphs)
+{
+    mMaterialMesh.clear();
+    // Prepare map of used material names with corresponding mesh names.
+    for (const auto& glyph : glyphs)
+    {
+        const std::uint32_t linefeed = 0x000A;
+        const std::uint32_t carriageReturn = 0x000D;
+        const std::uint32_t tab = 0x0009;
+        if (glyph.glyphIndex == linefeed || glyph.glyphIndex == carriageReturn || glyph.glyphIndex == tab)
+        {
+            continue;
+        }
+
+        GlyphIndex glyphIndex;
+        glyphIndex.index = glyph.glyphIndex;
+        auto fontAtlasMaterialName = mFontResources->GetFontAtlasMaterialName(glyphIndex);
+        const auto search = mMaterialMesh.find(fontAtlasMaterialName);
+        if (search == mMaterialMesh.end())
+        {
+            const std::string meshName = mTextBlockID + "_" + std::to_string(mMaterialMesh.size());
+            mMaterialMesh[fontAtlasMaterialName] = meshName;
+        }
+    }
+
+    // Prepare map of used mesh names with mesh structures
+    std::unordered_map<std::string, TextBlock2D::Mesh> meshes;
+    for (const auto& mesh : mMaterialMesh)
+    {
+        meshes[mesh.second] = TextBlock2D::Mesh();
+    }
+
+    return meshes;
 }
 
 } // namespace rendering_engine

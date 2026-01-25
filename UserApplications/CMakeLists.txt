@@ -5,3 +5,4 @@
 
 
 add_subdirectory(TextRendering)
+add_subdirectory(TextShaping)

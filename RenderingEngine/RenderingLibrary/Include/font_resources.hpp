@@ -21,6 +21,11 @@
 
 namespace rendering_engine
 {
+struct GlyphIndex
+{
+    std::uint32_t index;
+};
+
 struct GlyphMetrics
 {
     // Atlas placement
@@ -52,18 +57,22 @@ public:
     FontResources(RenderResourceContext rrc, std::string fontName, std::vector<uint8_t> const& fileBytes, unsigned int const fontSize);
 	~FontResources();
 
-    void LoadGlyphsFromRange(std::uint32_t begin, std::uint32_t end);
-    void EnsureGlyphs(std::vector<std::uint32_t> codePoints);
+    void LoadGlyphsFromCodePointRange(std::uint32_t begin, std::uint32_t end);
+    void EnsureGlyphs(const std::vector<std::uint32_t>& codePoints);
+    void EnsureGlyphs(const std::vector<GlyphIndex>& glyphIndexes);
     void StoreFontAtlasesInFiles(bool in);
 
     const FontMetrics& GetFontMetrics() const;
-    GlyphMetrics GetGlyphMetrics(std::uint32_t codePoint) const;
-    std::string GetFontAtlasTextureName(std::uint32_t codePoint) const;
-    std::string GetFontAtlasMaterialName(std::uint32_t codePoint) const;
+    GlyphMetrics GetGlyphMetrics(GlyphIndex glyphIndex) const;
+    std::string GetFontAtlasTextureName(GlyphIndex glyphIndex) const;
+    std::string GetFontAtlasMaterialName(GlyphIndex glyphIndex) const;
+    GlyphIndex GetIndexFromCodePoint(std::uint32_t codePoint) const;
+    FT_Face GetFontFace();
 
 protected:
-    std::pair<GlyphMetrics, ImageData> CreateGlyphBitmap(std::uint32_t codePoint);
-    void CreateFontAtlasFromList(std::vector<std::uint32_t> codePoints);
+    std::pair<GlyphMetrics, ImageData> CreateGlyphBitmapBy(GlyphIndex glyphIndex);
+    std::pair<GlyphMetrics, ImageData> CreateGlyphBitmapBy(std::uint32_t codePoint);
+    void CreateFontAtlasFromList(const std::vector<GlyphIndex>& glyphIndexes);
     void CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t end);
 
     bool HasGlyph(uint32_t codePoint) const;
@@ -83,10 +92,10 @@ protected:
     FontMetrics mFontMetrics;
 
     // Font atlases stored as unordered map where:
-    // key - std::uint32_t - glyph's corresponding byte code
+    // key - std::uint32_t - glyph's corresponding index
     // value - GlyphMetrics - metrics belong to particular glyph
     //       - std::string - material name, to which TextBlock can refer to.
-    std::unordered_map<std::uint32_t, std::pair<GlyphMetrics, std::string>> mGlyphs;
+    std::unordered_map<std::uint32_t, std::pair<GlyphMetrics, std::string>> mGlyphsByIndex;
 
     // Next container store names of created material name and corresponding font atlas textures name 
     std::unordered_map<std::string, std::string> mFontAtlases;

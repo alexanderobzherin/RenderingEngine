@@ -1,0 +1,13 @@
+{
+  "appName": "TextShaping",
+  "isFullScreen": false,
+  "screenWidth": 900,
+  "screenHeight": 1080,
+
+    "text": {
+    "scripts": [
+      "latin"
+    ],
+    "textShapingEnabled": true
+    }
+}

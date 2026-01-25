@@ -86,6 +86,8 @@ find_package(assimp CONFIG REQUIRED)
 
 find_package(nlohmann_json CONFIG QUIET)
 
+find_package(harfbuzz CONFIG REQUIRED)
+
 if(WIN32)
 find_package(freetype CONFIG REQUIRED)
 else()

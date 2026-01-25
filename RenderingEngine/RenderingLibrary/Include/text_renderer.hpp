@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace rendering_engine
 {
@@ -28,6 +29,13 @@ public:
     std::shared_ptr<FontResources> GetFontResources(std::string fontName);
 
     void StoreFontAtlasesInFiles(bool in);
+    inline bool IsTextShapingEnabled()
+    {
+        return bTextShapingEnabled;
+    }
+
+    std::vector<std::string> GetScriptsRequiredShaping();
+    std::pair<std::uint32_t, std::uint32_t> GetScriptRange(std::string script);
 
 private:
     RenderResourceContext mRenderResourceContext;
@@ -36,24 +44,13 @@ private:
 
     bool bStoreFontAtlasesInFiles = false;
 
+    bool bTextShapingEnabled = false;
+
     // Script - <Begin, End>
     static std::unordered_map<std::string, std::pair<std::uint32_t, std::uint32_t>> sScriptRanges;
+    static std::vector<std::string> sScriptsRequiresShaping;
+    static std::vector<std::uint32_t> sFontSizesPreload;
 };
 
 } // namespace rendering_engine
 
-/*
-latin	    Basic Latin + Latin Extended
-cyrillic	Cyrillic
-greek	    Greek
-
-hebrew	    Hebrew (RTL)
-arabic	    Arabic (RTL + shaping)
-aramaic
-
-han	        CJK ideographs
-hiragana	Japanese Hiragana
-katakana	Japanese Katakana
-hangul	    Korean Hangul
-
-*/

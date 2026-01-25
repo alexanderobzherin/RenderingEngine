@@ -70,6 +70,8 @@ AppConfig Utility::ReadConfigFile()
 					}
 				}
 			}
+			if(textNode.contains("textShapingEnabled"))
+				cfg.testShapingEnabled = textNode["textShapingEnabled"].get<bool>();
 		}
 	}
 	catch (const std::exception& e)
