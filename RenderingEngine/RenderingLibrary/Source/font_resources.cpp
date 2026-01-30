@@ -6,34 +6,32 @@
 #include "material_cache.hpp"
 #include "material.hpp"
 #include "utility.hpp"
+#include "text_renderer.hpp"
 
 #include FT_FREETYPE_H
 #include FT_TRUETYPE_TABLES_H
 
 namespace rendering_engine
 {
+std::uint32_t FontResources::sMaxGlyphsPerFontAtlas = 1024;
 
-FontResources::FontResources(RenderResourceContext rrc, std::string filepath, unsigned int const fontSize)
+FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRenderer, std::string filepath, unsigned int const fontSize)
 	:
     mRenderResourceContext(rrc),
+    mTextRenderer(textRenderer),
+    mFontSize(fontSize),
 	mErrorResult(FT_Err_Ok),
-	mLibrary(0),
 	mFace(0)
 {
     mFontName = boost::filesystem::path(filepath).stem().string();
-    mErrorResult = FT_Init_FreeType(&mLibrary);
-    if (mErrorResult)
-    {
-        throw std::runtime_error{ "Failed to initialize FreeType library!" };
-    }
 
-    mErrorResult = FT_New_Face(mLibrary, filepath.c_str(), 0, &mFace);
+    mErrorResult = FT_New_Face(mTextRenderer->GetFontLibrary(), filepath.c_str(), 0, &mFace);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to create new face!" };
     }
 
-    mErrorResult = FT_Set_Char_Size(mFace, fontSize << 6, fontSize << 6, 90, 90);
+    mErrorResult = FT_Set_Char_Size(mFace, mFontSize << 6, mFontSize << 6, 90, 90);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to set char size!" };
@@ -44,27 +42,22 @@ FontResources::FontResources(RenderResourceContext rrc, std::string filepath, un
     mFontMetrics.descender = mFace->size->metrics.descender >> 6;
 }
 
-FontResources::FontResources(RenderResourceContext rrc, std::string fontName, std::vector<uint8_t> const& fileBytes, unsigned int const fontSize)
+FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRenderer, std::string fontName, std::vector<uint8_t> const& fileBytes, unsigned int const fontSize)
     :
     mRenderResourceContext(rrc),
+    mTextRenderer(textRenderer),
     mErrorResult(FT_Err_Ok),
-    mLibrary(0),
     mFace(0),
-    mFontName(fontName)
+    mFontName(fontName),
+    mFontSize(fontSize)
 {
-    mErrorResult = FT_Init_FreeType(&mLibrary);
-    if (mErrorResult)
-    {
-        throw std::runtime_error{ "Failed to initialize FreeType library!" };
-    }
-
-    mErrorResult = FT_New_Memory_Face(mLibrary, &fileBytes[0], fileBytes.size(), 0, &mFace);
+    mErrorResult = FT_New_Memory_Face(mTextRenderer->GetFontLibrary(), &fileBytes[0], fileBytes.size(), 0, &mFace);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to create new face!" };
     }
 
-    mErrorResult = FT_Set_Char_Size(mFace, fontSize << 6, fontSize << 6, 90, 90);
+    mErrorResult = FT_Set_Char_Size(mFace, mFontSize << 6, mFontSize << 6, 90, 90);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to set char size!" };
@@ -78,12 +71,18 @@ FontResources::FontResources(RenderResourceContext rrc, std::string fontName, st
 FontResources::~FontResources()
 {
 	FT_Done_Face(mFace);
-	FT_Done_FreeType(mLibrary);
 }
 
 void FontResources::LoadGlyphsFromCodePointRange(std::uint32_t begin, std::uint32_t end)
 {
-    CreateFontAtlasFromRange(begin, end);
+    auto distance = end - begin;
+    std::uint32_t start = begin;
+    while (start < end) 
+    {
+        std::uint32_t currentEnd = std::min(start + sMaxGlyphsPerFontAtlas - 1, end);
+        CreateFontAtlasFromRange(start, currentEnd);
+        start += sMaxGlyphsPerFontAtlas;
+    } 
 }
 
 void FontResources::EnsureGlyphs(const std::vector<std::uint32_t>& codePoints)
@@ -199,7 +198,7 @@ void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t 
     // 2. Upload texture via TextureCache
 
     auto textureCache = mRenderResourceContext.textureCache;
-    const std::string textureName = mFontName + "_FontAtlas_" + std::to_string(mFontAtlases.size());
+    const std::string textureName = mFontName + "_" + std::to_string(mFontSize) + "_FontAtlas_" + std::to_string(mFontAtlases.size());
     if (bStoreFontAtlasesInFiles)
     {
         const std::string fileName = textureName + ".png";
@@ -315,7 +314,7 @@ void FontResources::CreateFontAtlasFromList(const std::vector<GlyphIndex>& glyph
     // 2. Upload texture via TextureCache
 
     auto textureCache = mRenderResourceContext.textureCache;
-    const std::string textureName = mFontName + "_FontAtlas_" + std::to_string(mFontAtlases.size());
+    const std::string textureName = mFontName + "_" + std::to_string(mFontSize) + "_FontAtlas_" + std::to_string(mFontAtlases.size());
     if (bStoreFontAtlasesInFiles)
     {
         const std::string fileName = textureName + ".png";

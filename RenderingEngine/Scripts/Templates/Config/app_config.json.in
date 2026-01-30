@@ -8,6 +8,8 @@
     "scripts": [
       "latin"
     ],
-    "textShapingEnabled": false
+    "fontSizePreload": [
+      10
+    ]
   }
 }

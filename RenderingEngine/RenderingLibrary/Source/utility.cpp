@@ -66,12 +66,26 @@ AppConfig Utility::ReadConfigFile()
 				{
 					if (script.is_string())
 					{
-						cfg.textScripts.push_back(script.get<std::string>());
+						auto found = std::find(cfg.textScripts.begin(), cfg.textScripts.end(), script);
+						if(found == cfg.textScripts.end())
+						{
+							cfg.textScripts.push_back(script.get<std::string>());
+						}
 					}
 				}
 			}
-			if(textNode.contains("textShapingEnabled"))
-				cfg.testShapingEnabled = textNode["textShapingEnabled"].get<bool>();
+
+			if (textNode.contains("fontSizePreload") && textNode["fontSizePreload"].is_array())
+			{
+				for (const auto& fontSize : textNode["fontSizePreload"])
+				{
+					auto found = std::find(cfg.fontSizePreload.begin(), cfg.fontSizePreload.end(), fontSize);
+					if (found == cfg.fontSizePreload.end())
+					{
+						cfg.fontSizePreload.push_back(fontSize.get<int>());
+					}
+				}
+			}
 		}
 	}
 	catch (const std::exception& e)
@@ -345,5 +359,6 @@ std::vector<uint8_t> Utility::ReadPackedFile(const std::string& entryPath)
 
 	return data;
 }
+
 
 }

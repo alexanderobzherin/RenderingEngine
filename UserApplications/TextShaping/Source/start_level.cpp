@@ -217,10 +217,13 @@ void StartLevel::Update(float deltaTime)
 }
 void StartLevel::AddTextBlock(const std::string& fontName, const std::string& text, glm::vec2 pos, bool textShapeEnabled, glm::vec4 color)
 {
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
+	TextBlock2D::Properties tbprop;
+	tbprop.fontName = fontName;
+	tbprop.textShapeEnabled = textShapeEnabled;
+
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), tbprop));
 	TextBlock2D* notShapedTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
 
-	notShapedTextBlock->SetTextShapeEnabled(textShapeEnabled);
 	notShapedTextBlock->SetText(text);
 
 	notShapedTextBlock->SetPosition(pos);

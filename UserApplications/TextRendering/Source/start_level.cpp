@@ -29,12 +29,16 @@ void StartLevel::Initialize()
 	mActiveCamera2D->Initialize();
 
 	const std::string textEng_TextRendering = "Text Rendering";
-	const std::string textEng_FeatureDesc = 
-		"Text Rendering is a feature of the rendering engine" 
-		"that provides the ability to draw strings containing" 
-		"text, digits, and characters. It is a necessary feature" 
-		"for displaying blocks of text, widgets, buttons, annotations, et cetera.";
-	
+	const std::string textEng_FeatureDesc =
+		"Text Rendering is a feature of\n"
+		"the rendering engine that\n"
+		"provides the ability to draw\n" 
+		"strings containing text, digits,\n" 
+		"and characters. It is a necessary \n"
+		"feature for displaying blocks of\n"
+		"text, widgets, buttons,\n"
+		"annotations, et cetera.";
+
 	const float screenWidth = static_cast<float>(GetSceneManager().GetApplication()->GetScreenSettings().width);
 	// x:0.0f - center
 	const float thirdPart = screenWidth / 3.0f;
@@ -42,58 +46,67 @@ void StartLevel::Initialize()
 	const float centerColumnStart = leftColumnStart + thirdPart;
 	const float rightColumnStart = leftColumnStart + (thirdPart * 2.0f);
 
-	const std::string fontName = "RobotoMono-Regular";
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer()));
 	TextBlock2D* textBlock_Left = static_cast<TextBlock2D*>(mDrawables2D.back());
-
-	textBlock_Left->SetMaxLineLength(thirdPart);
-	textBlock_Left->SetTextAlign(TextAlign::Left);
 	textBlock_Left->SetText(textEng_FeatureDesc);
-
 	textBlock_Left->SetPosition(glm::vec2(leftColumnStart, -280.0f));
 	textBlock_Left->SetTextColor(glm::vec4(1.0f, 0.0, 0.0f, 1.0f));
 
-	// Center column
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
-	TextBlock2D* textBlock_Center = static_cast<TextBlock2D*>(mDrawables2D.back());
-
-	textBlock_Center->SetMaxLineLength(thirdPart);
-	textBlock_Center->SetTextAlign(TextAlign::Center);
-	textBlock_Center->SetText(textEng_FeatureDesc);
-
-	textBlock_Center->SetPosition(glm::vec2(centerColumnStart, -280.0f));
-	textBlock_Center->SetTextColor(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
-
-	// Right column
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
-	TextBlock2D* textBlock_Right = static_cast<TextBlock2D*>(mDrawables2D.back());
-
-	textBlock_Right->SetMaxLineLength(thirdPart);
-	textBlock_Right->SetTextAlign(TextAlign::Right);
-	textBlock_Right->SetText(textEng_FeatureDesc);
-
-	textBlock_Right->SetPosition(glm::vec2(rightColumnStart, -280.0f));
-	textBlock_Right->SetTextColor(glm::vec4(0.0f, 0.0, 1.0f, 1.0f));
-
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
+	// Updatable text block - counter
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer()));
 	mTextBlockUpdating = static_cast<TextBlock2D*>(mDrawables2D.back());
 	mTextBlockUpdating->SetText(std::to_string(mCounter));
 
 	mTextBlockUpdating->SetPosition(glm::vec2(0.0f, 200.0f));
 	mTextBlockUpdating->SetTextColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
+	TextBlock2D::Properties chtb;
+	chtb.fontName = "NotoSansSC-Regular";
+	chtb.textAlign = TextAlign::Center;
+	chtb.fontSize = 18;
+	const std::string textChn_FeatureDesc =
+		"文本渲染是渲染引擎的一项功能，\n"
+		"它能够绘制包含文字、数字和符号\n"
+		"的字符串。这是显示文本块、控件、\n"
+		"按钮、注 释等内容所必需的功能。";
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), chtb));
+	TextBlock2D* textBlock_LeftBottom = static_cast<TextBlock2D*>(mDrawables2D.back());
+	textBlock_LeftBottom->SetText(textChn_FeatureDesc);
+	textBlock_LeftBottom->SetPosition(glm::vec2(leftColumnStart, 0.0f));
+	textBlock_LeftBottom->SetTextColor(glm::vec4(1.0f, 0.0, 0.0f, 1.0f));
+
+	// Center column
+	TextBlock2D::Properties centtb;
+	centtb.textAlign = TextAlign::Center;
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), centtb));
+	TextBlock2D* textBlock_Center = static_cast<TextBlock2D*>(mDrawables2D.back());
+	textBlock_Center->SetText(textEng_FeatureDesc);
+	textBlock_Center->SetPosition(glm::vec2(centerColumnStart, -280.0f));
+	textBlock_Center->SetTextColor(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
+
+	// Right column
+	TextBlock2D::Properties rtb;
+	rtb.textAlign = TextAlign::Right;
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), rtb));
+	TextBlock2D* textBlock_Right = static_cast<TextBlock2D*>(mDrawables2D.back());
+	textBlock_Right->SetText(textEng_FeatureDesc);
+	textBlock_Right->SetPosition(glm::vec2(rightColumnStart, -280.0f));
+	textBlock_Right->SetTextColor(glm::vec4(0.0f, 0.0, 1.0f, 1.0f));
+
+
 	// Multi material text block
-	std::string multiMaterialText = "This is multi-material text block. Он отображает разные системы письма, а значит uses mutiple batches with differrent materials and font atlases.";
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), fontName));
+	std::string multiMaterialText = 
+		"This is multi-material text block. \n"
+		"Он отображает разные системы письма, \n"
+		"а значит uses mutiple batches with \n"
+		"differrent materials and font atlases.";
+	TextBlock2D::Properties mmtb;
+	mmtb.textAlign = TextAlign::Center;
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), mmtb));
 	TextBlock2D* multimaterialTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
-
-	multimaterialTextBlock->SetMaxLineLength(thirdPart);
-	multimaterialTextBlock->SetTextAlign(TextAlign::Center);
 	multimaterialTextBlock->SetText(multiMaterialText);
-
 	multimaterialTextBlock->SetPosition(glm::vec2(centerColumnStart, 0.0f));
 	multimaterialTextBlock->SetTextColor(glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
-
 
 	const std::string hebrewFontName = "FrankRuhlLibre-Regular";
 	const std::string arabicFontName = "Amiri-Regular";
@@ -120,15 +133,18 @@ void StartLevel::Initialize()
 		"ܕܟܬܒܐ، ܡܕܒܪ̈ܢܐ، ܟܘܦ̈ܝܐ، ܡܦܪ̈ܫܢܘܬܐ  \n"
 		"ܘܐܚܪ̈ܢܐ. \n";
 
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), hebrewFontName));
+	TextBlock2D::Properties htdProp;
+	htdProp.fontSize = 16;
+	htdProp.fontName = hebrewFontName;
+	htdProp.textAlign = TextAlign::Right;
+	htdProp.textShapeEnabled = true;
+	htdProp.maxLineLength = thirdPart;
+
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), htdProp));
 	TextBlock2D* textBlock_Shaped_FeatureDesc = static_cast<TextBlock2D*>(mDrawables2D.back());
 
-	textBlock_Shaped_FeatureDesc->SetMaxLineLength(thirdPart);
-	textBlock_Shaped_FeatureDesc->SetTextAlign(TextAlign::Right);
-	textBlock_Shaped_FeatureDesc->SetTextShapeEnabled(true);
 	textBlock_Shaped_FeatureDesc->SetText(textHebrew_FeatureDesc);
-
-	textBlock_Shaped_FeatureDesc->SetPosition(glm::vec2(rightColumnStart, -30.0f));
+	textBlock_Shaped_FeatureDesc->SetPosition(glm::vec2(rightColumnStart, 0.0f));
 	textBlock_Shaped_FeatureDesc->SetTextColor(glm::vec4(1.0f, 1.0, 1.0f, 1.0f));
 }
 void StartLevel::Update(float deltaTime)

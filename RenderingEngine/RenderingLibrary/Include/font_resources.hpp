@@ -18,6 +18,7 @@
 #include FT_RENDER_H
 
 #include "render_resource_context.hpp"
+#include "rendering_engine_export.hpp"
 
 namespace rendering_engine
 {
@@ -48,13 +49,14 @@ struct FontMetrics
 };
 
 class ImageData;
+class TextRenderer;
 
-class FontResources
+class RE_API FontResources
 {
 
 public:
-	FontResources(RenderResourceContext rrc, std::string filepath, unsigned int const fontSize);
-    FontResources(RenderResourceContext rrc, std::string fontName, std::vector<uint8_t> const& fileBytes, unsigned int const fontSize);
+	FontResources(RenderResourceContext rrc, TextRenderer* textRenderer, std::string filepath, unsigned int const fontSize);
+    FontResources(RenderResourceContext rrc, TextRenderer* textRenderer, std::string fontName, std::vector<uint8_t> const& fileBytes, unsigned int const fontSize);
 	~FontResources();
 
     void LoadGlyphsFromCodePointRange(std::uint32_t begin, std::uint32_t end);
@@ -83,10 +85,11 @@ private:
 
 protected:
     RenderResourceContext mRenderResourceContext;
+    TextRenderer* mTextRenderer;
     std::string mFontName;
+    const unsigned int mFontSize;
 
 	FT_Error   mErrorResult = FT_Err_Ok;
-	FT_Library mLibrary = 0;
 	FT_Face    mFace = 0;
 
     FontMetrics mFontMetrics;
@@ -101,5 +104,6 @@ protected:
     std::unordered_map<std::string, std::string> mFontAtlases;
 
     bool bStoreFontAtlasesInFiles = false;
+    static std::uint32_t sMaxGlyphsPerFontAtlas;
 };
 } // namespace rendering_engine

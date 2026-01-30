@@ -5,6 +5,8 @@
 #pragma once
 
 #include "render_resource_context.hpp"
+#include "rendering_engine_export.hpp"
+#include "utility.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -12,11 +14,18 @@
 #include <string>
 #include <vector>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+#include FT_TYPES_H
+#include FT_OUTLINE_H
+#include FT_RENDER_H
+
 namespace rendering_engine
 {
 class FontResources;
 
-class TextRenderer
+class RE_API TextRenderer
 {
 public:
     TextRenderer(RenderResourceContext rrc);
@@ -26,30 +35,48 @@ public:
     void LoadFontsFromPackage();
     const RenderResourceContext& GetRenderResourceContext() const;
 
-    std::shared_ptr<FontResources> GetFontResources(std::string fontName);
+    std::shared_ptr<FontResources> GetFontResources(const std::string& fontName, int fontSize);
 
     void StoreFontAtlasesInFiles(bool in);
-    inline bool IsTextShapingEnabled()
+
+    const std::vector<std::string>& GetScriptsRequiredShaping() const;
+    std::pair<std::uint32_t, std::uint32_t> GetScriptRange(std::string script);
+    inline FT_Library& GetFontLibrary()
     {
-        return bTextShapingEnabled;
+        return mLibrary;
     }
 
-    std::vector<std::string> GetScriptsRequiredShaping();
-    std::pair<std::uint32_t, std::uint32_t> GetScriptRange(std::string script);
+protected:
+    void LoadFontsAvailableInFolder(std::string pathToFolder);
+    void LoadPreloadableFontAtlasesFromFolder(const std::unordered_map<std::string, std::string>& availableFontsInFolder);
 
+    void LoadFontsAvailableInPackage();
+    void LoadPreloadableFontAtlasesFromPackage(const std::unordered_map<std::string, std::string>& availableFontsInPackage);
 private:
+    struct PairHash
+    {
+        std::size_t operator()(const std::pair<std::string, int>& p) const {
+            return std::hash<std::string>{}(p.first) ^ (std::hash<int>{}(p.second) << 1);
+        }
+    };
+
+    FT_Library mLibrary = 0;
+    FT_Error   mErrorResult = FT_Err_Ok;
+
     RenderResourceContext mRenderResourceContext;
 
-    std::unordered_map<std::string, std::shared_ptr<FontResources>> mFontResources;
+    // Store name of fonts avalable from font's folder
+    std::unordered_map<std::string, std::string> mAvailableFontsInFolder;
+    std::unordered_map<std::string, std::string> mAvailableFontsInPackage;
+
+    std::unordered_map<std::pair<std::string, int>, std::shared_ptr<FontResources>, PairHash> mFontResources;
 
     bool bStoreFontAtlasesInFiles = false;
-
-    bool bTextShapingEnabled = false;
 
     // Script - <Begin, End>
     static std::unordered_map<std::string, std::pair<std::uint32_t, std::uint32_t>> sScriptRanges;
     static std::vector<std::string> sScriptsRequiresShaping;
-    static std::vector<std::uint32_t> sFontSizesPreload;
+    static std::vector<std::string> sFontAtlasPreloadableScripts;
 };
 
 } // namespace rendering_engine

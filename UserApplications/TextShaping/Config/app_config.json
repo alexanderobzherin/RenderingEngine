@@ -6,8 +6,9 @@
 
     "text": {
     "scripts": [
-      "latin"
     ],
-    "textShapingEnabled": true
+    "fontSizePreload": [
+      10, 14, 16
+    ]
     }
 }

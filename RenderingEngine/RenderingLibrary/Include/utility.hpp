@@ -34,8 +34,8 @@ struct AppConfig
 	/** @brief Desired window height in pixels (ignored in full-screen mode). */
 	float screenHeight = 600.0f;
 
-	std::vector<std::string> textScripts;
-	bool testShapingEnabled = false;
+	std::vector<std::string> textScripts{"Latin"};
+	std::vector<int> fontSizePreload{10};
 };
 
 /**

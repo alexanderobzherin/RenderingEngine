@@ -28,7 +28,7 @@ class TextRenderer;
 class FontResources;
 struct GlyphIndex;
 
-enum TextAlign
+enum class TextAlign
 {
 	Left = 0,
 	Center,
@@ -73,7 +73,21 @@ struct ShapedGlyph
 };
 
 public:
-	TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, std::string fontName);
+struct Properties
+{
+	std::string fontName;
+	unsigned int fontSize = 10;
+	TextAlign textAlign = TextAlign::Left;
+	float maxLineLength = 0.0f;
+	bool textShapeEnabled = false;
+
+	Properties()
+	: fontName(TextBlock2D::sDefaultFontName)
+    {}
+};
+
+public:
+	TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, Properties properties = Properties());
 
    /**
 	* @copydoc DrawableComponent::Initialize
@@ -88,22 +102,20 @@ public:
 	 */
 	void Draw(const Camera2D& camera) override;
 
-	void SetText(std::string text);
-	void SetMaxLineLength(float maxLineLength);
-	void SetTextColor(glm::vec4 color);
-	void SetTextAlign(TextAlign textAlign);
-	void SetTextShapeEnabled(bool);
+	virtual void SetText(std::string text);
 
-	void DrawFontAtlas();
+	void SetTextColor(glm::vec4 color);
 
 protected:
-	void SetFont(std::string fontName);
     std::vector<std::uint32_t> DecodeUtf8(const std::string& text);
 	std::string CodepointToUtf8(std::uint32_t codePoint);
 
 	std::vector<ShapedGlyph> ShapeText(const std::string& text);
 
-	void ConstructMesh(const std::vector<std::uint32_t>& codePoints);
+	// Deprecated
+	void ConstructMeshAutoLinebreak(const std::vector<std::uint32_t>& codePoints);
+
+	void ConstructMesh();
 	void ShapeTextAndConstructMesh();
 	GlyphQuad MakeGlyphQuad(GlyphIndex glyphIndext, float penX, float penY);
 	void PushQuad(std::string meshName,
@@ -123,18 +135,22 @@ private:
 	static std::uint64_t sNumOfTextBlocks;
 	std::string mTextBlockID;
 
+protected:
 	/*Stores material used in string and corresponding name of created mesh*/
 	std::unordered_map<std::string, std::string> mMaterialMesh;
 
-	std::shared_ptr<TextRenderer> mTextRenderer;
+	const std::shared_ptr<TextRenderer> mTextRenderer;
 	std::shared_ptr<FontResources> mFontResources;
 	glm::vec4 mColor;
-	std::string mFontName;
+	static std::string sDefaultFontName;
+	const std::string mFontName;
+	const unsigned int mFontSize;
 
 	std::string mText;
 	float mMaxLineLength = 0.0f;
-	TextAlign mTextAlign = TextAlign::Left;
+	const TextAlign mTextAlign;
+	glm::vec2 mDimensions;
 
-	bool bIsTextShapeEnabled;
+	const bool bIsTextShapeEnabled;
 };
 }

@@ -3,11 +3,10 @@
 #include "render_resource_context.hpp"
 
 #include "font_resources.hpp"
-#include "utility.hpp"
+
 
 namespace rendering_engine
 {
-std::vector<std::uint32_t> sFontSizesPreload{10, 14, 16};
 std::unordered_map<std::string, std::pair<std::uint32_t, std::uint32_t>> TextRenderer::sScriptRanges{
 	// European
 	{{"Latin"}, {0x0020, 0x007E}},
@@ -54,6 +53,23 @@ std::unordered_map<std::string, std::pair<std::uint32_t, std::uint32_t>> TextRen
 	// Tibetan
 	{{"Tibetan"}, {0x0F00, 0x0FFF}}		
 };
+std::vector<std::string> TextRenderer::sFontAtlasPreloadableScripts{
+	// European
+	{"Latin"},			
+	{"Cyrillic"},		
+	{"Greek"},			
+
+	// Asian
+	{"Han"},			
+	{"HanExtensionA"}, 
+
+	{"Hiragana"},		
+	{"Katakana"},		
+	{"KatakanaPhoneticExtensions"},
+
+	{"Hangul"}
+};
+
 std::vector<std::string> TextRenderer::sScriptsRequiresShaping{
 	{"Hebrew"}, 
 	{"Arabic"},
@@ -82,16 +98,112 @@ TextRenderer::TextRenderer(RenderResourceContext rrc)
 	:
 	mRenderResourceContext(rrc)
 {
+	mErrorResult = FT_Init_FreeType(&mLibrary);
+	if (mErrorResult)
+	{
+		throw std::runtime_error{ "Failed to initialize FreeType library!" };
+	}
 }
 
 TextRenderer::~TextRenderer()
 {
+	FT_Done_FreeType(mLibrary);
 }
 
 void TextRenderer::LoadFontsFromFolder(std::string pathToFolder)
 {
-	// Load configured languages.
+	LoadFontsAvailableInFolder(pathToFolder);
+	LoadPreloadableFontAtlasesFromFolder(mAvailableFontsInFolder);
+}
 
+void TextRenderer::LoadFontsFromPackage()
+{
+	LoadFontsAvailableInPackage();
+	LoadPreloadableFontAtlasesFromPackage(mAvailableFontsInPackage);
+}
+
+const RenderResourceContext& TextRenderer::GetRenderResourceContext() const
+{
+	return mRenderResourceContext;
+}
+
+std::shared_ptr<FontResources> TextRenderer::GetFontResources(const std::string& fontName, int fontSize)
+{
+	auto key = std::make_pair(fontName, fontSize);
+	if (auto search = mFontResources.find(key); search != mFontResources.end())
+	{
+		return search->second;
+	}
+	else
+	{
+		if (!mAvailableFontsInPackage.empty())
+		{
+			if (!mAvailableFontsInPackage.empty())
+			{
+				auto foundInPackage = mAvailableFontsInPackage.find(fontName);
+				if (foundInPackage != mAvailableFontsInPackage.end())
+				{
+					const std::string virtualFilePath = mAvailableFontsInPackage[fontName];
+					std::vector<uint8_t> binaryFileData = Utility::ReadPackedFile(virtualFilePath);
+
+					mFontResources[key] = std::make_shared<FontResources>(mRenderResourceContext, this, fontName, binaryFileData, fontSize);
+					mFontResources[key]->StoreFontAtlasesInFiles(bStoreFontAtlasesInFiles);
+
+					return mFontResources[key];
+				}
+				else
+				{
+					// Log Font {fontName} is not avalable in asset package
+				}
+			}
+		}
+		else
+		{
+			if (!mAvailableFontsInFolder.empty())
+			{
+				auto foundInFolder = mAvailableFontsInFolder.find(fontName);
+				if (foundInFolder != mAvailableFontsInFolder.end())
+				{
+					auto key = std::make_pair(fontName, fontSize);
+					mFontResources[key] = std::make_shared<FontResources>(mRenderResourceContext, this, mAvailableFontsInFolder[fontName], fontSize);
+
+					return mFontResources[key];
+				}
+				else
+				{
+					// Log Font {fontName} is not avalable in asset folder
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void TextRenderer::StoreFontAtlasesInFiles(bool in)
+{
+	bStoreFontAtlasesInFiles = in;
+}
+
+const std::vector<std::string>& TextRenderer::GetScriptsRequiredShaping() const
+{
+	return sScriptsRequiresShaping;
+}
+
+std::pair<std::uint32_t, std::uint32_t> TextRenderer::GetScriptRange(std::string script)
+{
+	std::pair<std::uint32_t, std::uint32_t> result{0, 0};
+
+	auto search = sScriptRanges.find(script);
+	{
+		if (search != sScriptRanges.end())
+			return sScriptRanges[script];
+	}
+	return result;
+}
+
+void TextRenderer::LoadFontsAvailableInFolder(std::string pathToFolder)
+{
 	// 1. Check if path is valid and exist
 	boost::filesystem::path pathToDirectory = boost::filesystem::path(pathToFolder);
 	const bool isValidFolderPath = boost::filesystem::exists(boost::filesystem::path(pathToFolder)) && boost::filesystem::is_directory(boost::filesystem::path(pathToFolder));
@@ -114,66 +226,92 @@ void TextRenderer::LoadFontsFromFolder(std::string pathToFolder)
 		if (ext != ".ttf" && ext != ".otf")
 			continue;
 
+		// Fonts name and file path stored for future runtime loading
 		std::string fontName = filePath.stem().string();
+		mAvailableFontsInFolder[fontName] = filePath.string();
+	}
+}
 
-		const unsigned int fontSize = 16;
-		mFontResources[fontName] = std::make_shared<FontResources>(mRenderResourceContext, filePath.string(), fontSize);
-		mFontResources[fontName]->StoreFontAtlasesInFiles(bStoreFontAtlasesInFiles);
+void TextRenderer::LoadPreloadableFontAtlasesFromFolder(const std::unordered_map<std::string, std::string>& availableFontsInFolder)
+{
+	AppConfig appConfig = Utility::ReadConfigFile();
 
-		AppConfig appConfig = Utility::ReadConfigFile();
-		bTextShapingEnabled = appConfig.testShapingEnabled;
-
-		for (const auto& script : appConfig.textScripts)
+	for (const auto& [fontName, filePath] : availableFontsInFolder)
+	{
+		for (auto requestedScript : appConfig.textScripts)
 		{
-			if (sScriptRanges.find(script) == sScriptRanges.end())
-				continue;
+			auto preloadableScriptIt = std::find(sFontAtlasPreloadableScripts.begin(), sFontAtlasPreloadableScripts.end(), requestedScript);
+			if (preloadableScriptIt != sFontAtlasPreloadableScripts.end())
+			{
+				for (auto fontSize : appConfig.fontSizePreload)
+				{
+					auto key = std::make_pair(fontName, fontSize);
+					if (mFontResources.find(key) == mFontResources.end())
+					{
+						mFontResources[key] = std::make_shared<FontResources>(mRenderResourceContext, this, filePath, fontSize);
+						mFontResources[key]->StoreFontAtlasesInFiles(bStoreFontAtlasesInFiles);
+					}
 
-			const std::uint32_t rangeBegin = sScriptRanges[script].first;
-			const std::uint32_t rangeEnd = sScriptRanges[script].second;
-			mFontResources[fontName]->LoadGlyphsFromCodePointRange(rangeBegin, rangeEnd);
+					const std::uint32_t rangeBegin = sScriptRanges[requestedScript].first;
+					const std::uint32_t rangeEnd = sScriptRanges[requestedScript].second;
+					mFontResources[key]->LoadGlyphsFromCodePointRange(rangeBegin, rangeEnd);
+				}
+			}
 		}
 	}
 }
 
-void TextRenderer::LoadFontsFromPackage()
+void TextRenderer::LoadFontsAvailableInPackage()
 {
-}
+	const auto& entries = Utility::GetPackEntries();
 
-const RenderResourceContext& TextRenderer::GetRenderResourceContext() const
-{
-	return mRenderResourceContext;
-}
-
-std::shared_ptr<FontResources> TextRenderer::GetFontResources(std::string fontName)
-{
-	if (auto search = mFontResources.find(fontName); search != mFontResources.end())
+	std::string folderEntry = { "Fonts/" };
+	for (auto& entry : entries)
 	{
-		return search->second;
+		const std::string& virtualPath = entry.first;
+		if (virtualPath.rfind(folderEntry, 0) == 0) // starts with Fonts/
+		{
+			auto fontFilePath = boost::filesystem::path(virtualPath.substr(folderEntry.size()));
+			const std::string ext = fontFilePath.extension().string();
+			if (ext != ".ttf" && ext != ".otf")
+				continue;
+
+			// Fonts name and virtual path stored for future runtime loading
+			std::string fontName = fontFilePath.stem().string();
+			mAvailableFontsInPackage[fontName] = fontFilePath.string();
+		}
 	}
-
-	return nullptr;
 }
 
-void TextRenderer::StoreFontAtlasesInFiles(bool in)
+void TextRenderer::LoadPreloadableFontAtlasesFromPackage(const std::unordered_map<std::string, std::string>& availableFontsInPackage)
 {
-	bStoreFontAtlasesInFiles = in;
-}
+	AppConfig appConfig = Utility::ReadConfigFile();
 
-std::vector<std::string> TextRenderer::GetScriptsRequiredShaping()
-{
-	return sScriptsRequiresShaping;
-}
-
-std::pair<std::uint32_t, std::uint32_t> TextRenderer::GetScriptRange(std::string script)
-{
-	std::pair<std::uint32_t, std::uint32_t> result{0, 0};
-
-	auto search = sScriptRanges.find(script);
+	for (const auto& [fontName, virtualFilePath] : availableFontsInPackage)
 	{
-		if (search != sScriptRanges.end())
-			return sScriptRanges[script];
+		for (auto requestedScript : appConfig.textScripts)
+		{
+			auto preloadableScriptIt = std::find(sFontAtlasPreloadableScripts.begin(), sFontAtlasPreloadableScripts.end(), requestedScript);
+			if (preloadableScriptIt != sFontAtlasPreloadableScripts.end())
+			{
+				for (auto fontSize : appConfig.fontSizePreload)
+				{
+					auto key = std::make_pair(fontName, fontSize);
+					if (mFontResources.find(key) == mFontResources.end())
+					{
+						std::vector<uint8_t> binaryFileData = Utility::ReadPackedFile(virtualFilePath);
+
+						mFontResources[key] = std::make_shared<FontResources>(mRenderResourceContext, this, fontName, binaryFileData, fontSize);
+						mFontResources[key]->StoreFontAtlasesInFiles(bStoreFontAtlasesInFiles);
+					}
+
+					const std::uint32_t rangeBegin = sScriptRanges[requestedScript].first;
+					const std::uint32_t rangeEnd = sScriptRanges[requestedScript].second;
+					mFontResources[key]->LoadGlyphsFromCodePointRange(rangeBegin, rangeEnd);
+				}
+			}
+		}
 	}
-	return result;
 }
 
 } //namespace rendering_engine

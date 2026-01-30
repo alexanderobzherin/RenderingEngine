@@ -6,9 +6,10 @@
 
     "text": {
     "scripts": [
-      "latin",
-      "cyrillic",
-      "arabic"
+      "Cyrillic"
+    ],
+    "fontSizePreload": [
+      10, 14, 16
     ]
   }
 }

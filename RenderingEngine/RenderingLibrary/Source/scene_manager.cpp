@@ -49,7 +49,6 @@ void SceneManager::Initialize()
 	mMaterialCache->CreateBuildInMaterials();
 
 	mTextRenderer = std::make_shared<TextRenderer>(GetRenderResourceContext());
-	mTextRenderer->StoreFontAtlasesInFiles(true);
 
 	if (Utility::IsPackageProvided())
 	{
