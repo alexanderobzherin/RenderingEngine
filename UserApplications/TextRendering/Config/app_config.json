@@ -1,8 +1,8 @@
 {
   "appName": "TextRendering",
   "isFullScreen": false,
-  "screenWidth": 1200,
-  "screenHeight": 600,
+  "screenWidth": 1280,
+  "screenHeight": 720,
 
     "text": {
     "scripts": [

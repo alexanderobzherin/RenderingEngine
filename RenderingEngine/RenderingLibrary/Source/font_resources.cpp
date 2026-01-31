@@ -215,7 +215,7 @@ void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t 
     materialSettings.materialName = materialName;
     materialSettings.materialDomain = MaterialDomain::Sprite2D;
     materialSettings.shadingModel = ShadingModel::Unlit;
-    materialSettings.blendMode = BlendMode::Opaque;
+    materialSettings.blendMode = BlendMode::Translucent;
     materialSettings.parameterLayout = &Font2DLayout;
 
     materialCache->AddMaterial(materialSettings);
@@ -331,7 +331,7 @@ void FontResources::CreateFontAtlasFromList(const std::vector<GlyphIndex>& glyph
     materialSettings.materialName = materialName;
     materialSettings.materialDomain = MaterialDomain::Sprite2D;
     materialSettings.shadingModel = ShadingModel::Unlit;
-    materialSettings.blendMode = BlendMode::Opaque;
+    materialSettings.blendMode = BlendMode::Translucent;
     materialSettings.parameterLayout = &Font2DLayout;
 
     materialCache->AddMaterial(materialSettings);

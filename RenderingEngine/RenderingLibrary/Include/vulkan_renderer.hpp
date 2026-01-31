@@ -13,6 +13,7 @@
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 namespace rendering_engine
 {
@@ -359,6 +360,8 @@ private:
     std::vector<IRendererObserver*> mObservers;
 
     std::vector<DeferredItem> mDestroyObjects;
+
+    glm::vec3 mBgColor = {1.0f, 1.0f, 1.0f};
 };
 
 } //rendering_engine

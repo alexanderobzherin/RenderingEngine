@@ -46,7 +46,9 @@ void StartLevel::Initialize()
 	const float centerColumnStart = leftColumnStart + thirdPart;
 	const float rightColumnStart = leftColumnStart + (thirdPart * 2.0f);
 
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer()));
+	TextBlock2D::Properties lefttopbp;
+	lefttopbp.fontSize = 16;
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), lefttopbp));
 	TextBlock2D* textBlock_Left = static_cast<TextBlock2D*>(mDrawables2D.back());
 	textBlock_Left->SetText(textEng_FeatureDesc);
 	textBlock_Left->SetPosition(glm::vec2(leftColumnStart, -280.0f));
@@ -78,6 +80,7 @@ void StartLevel::Initialize()
 	// Center column
 	TextBlock2D::Properties centtb;
 	centtb.textAlign = TextAlign::Center;
+	centtb.fontSize = 16;
 	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), centtb));
 	TextBlock2D* textBlock_Center = static_cast<TextBlock2D*>(mDrawables2D.back());
 	textBlock_Center->SetText(textEng_FeatureDesc);
@@ -87,6 +90,7 @@ void StartLevel::Initialize()
 	// Right column
 	TextBlock2D::Properties rtb;
 	rtb.textAlign = TextAlign::Right;
+	rtb.fontSize = 16;
 	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), rtb));
 	TextBlock2D* textBlock_Right = static_cast<TextBlock2D*>(mDrawables2D.back());
 	textBlock_Right->SetText(textEng_FeatureDesc);
@@ -102,6 +106,7 @@ void StartLevel::Initialize()
 		"differrent materials and font atlases.";
 	TextBlock2D::Properties mmtb;
 	mmtb.textAlign = TextAlign::Center;
+	mmtb.fontSize = 16;
 	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), mmtb));
 	TextBlock2D* multimaterialTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
 	multimaterialTextBlock->SetText(multiMaterialText);
@@ -134,7 +139,7 @@ void StartLevel::Initialize()
 		"ܘܐܚܪ̈ܢܐ. \n";
 
 	TextBlock2D::Properties htdProp;
-	htdProp.fontSize = 16;
+	htdProp.fontSize = 20;
 	htdProp.fontName = hebrewFontName;
 	htdProp.textAlign = TextAlign::Right;
 	htdProp.textShapeEnabled = true;
