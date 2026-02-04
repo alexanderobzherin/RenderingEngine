@@ -14,6 +14,7 @@
 namespace rendering_engine
 {
 std::uint32_t FontResources::sMaxGlyphsPerFontAtlas = 1024;
+unsigned int FontResources::sFontAtlasPaddingPx = 4;
 
 FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRenderer, std::string filepath, unsigned int const fontSize)
 	:
@@ -49,9 +50,10 @@ FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRender
     mErrorResult(FT_Err_Ok),
     mFace(0),
     mFontName(fontName),
-    mFontSize(fontSize)
+    mFontSize(fontSize),
+    mFontFileBytes(fileBytes)
 {
-    mErrorResult = FT_New_Memory_Face(mTextRenderer->GetFontLibrary(), &fileBytes[0], fileBytes.size(), 0, &mFace);
+    mErrorResult = FT_New_Memory_Face(mTextRenderer->GetFontLibrary(), mFontFileBytes.data(), static_cast<FT_Long>(mFontFileBytes.size()), 0, &mFace);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to create new face!" };
@@ -140,27 +142,48 @@ std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmapBy(GlyphIndex
         throw std::runtime_error{ "Failed to render glyph!" };
     }
 
+    const unsigned padding = sFontAtlasPaddingPx;
+
+    const auto srcW = mFace->glyph->bitmap.width;
+    const auto srcH = mFace->glyph->bitmap.rows;
+
+    const auto dstW = srcW + padding * 2;
+    const auto dstH = srcH + padding * 2;
+
+    const auto bufferSize = dstW * dstH * 4;
+    std::vector<uint8_t> buffer(bufferSize, 0);
+    for (int y = 0; y < srcH; ++y)
+    {
+        for (int x = 0; x < srcW; ++x)
+        {
+            uint8_t coverage =
+                mFace->glyph->bitmap.buffer[y * srcW + x];
+
+            int dstX = x + padding;
+            int dstY = y + padding;
+
+            const size_t idx = (static_cast<size_t>(dstY) * static_cast<size_t>(dstW)
+                    + static_cast<size_t>(dstX)) * 4u;
+
+            buffer[idx + 0] = coverage;
+            buffer[idx + 1] = coverage;
+            buffer[idx + 2] = coverage;
+            buffer[idx + 3] = coverage;
+        }
+    }
     GlyphMetrics glyphMetrics;
-    glyphMetrics.atlasX = 0;
-    glyphMetrics.atlasY = 0;
-    glyphMetrics.width = mFace->glyph->bitmap.width;
-    glyphMetrics.height = mFace->glyph->bitmap.rows;
+    glyphMetrics.width =  srcW;
+    glyphMetrics.height = srcH;
+
 
     glyphMetrics.bearingX = mFace->glyph->bitmap_left;
     glyphMetrics.bearingY = mFace->glyph->bitmap_top;
+
     glyphMetrics.advanceX = mFace->glyph->advance.x >> 6;
 
-    std::vector<std::uint8_t> buffer;
-    for (int i = 0; i < (mFace->glyph->bitmap.width * mFace->glyph->bitmap.rows); ++i)
-    {
-        std::uint8_t coverage = mFace->glyph->bitmap.buffer[i];
-        buffer.push_back(coverage);
-        buffer.push_back(coverage);
-        buffer.push_back(coverage);
-        buffer.push_back(coverage);
-    }
+    glyphMetrics.padding = padding;
 
-    return std::pair(glyphMetrics, ImageData(mFace->glyph->bitmap.width, mFace->glyph->bitmap.rows, buffer));
+    return std::pair(glyphMetrics, ImageData(dstW, dstH, buffer));
 }
 
 std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmapBy(std::uint32_t codePoint)
@@ -221,6 +244,12 @@ void FontResources::CreateFontAtlasFromRange(std::uint32_t begin, std::uint32_t 
     materialCache->AddMaterial(materialSettings);
     Material* material = materialCache->GetMaterial(materialName);
     material->SetVec4("FontColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    material->SetVec4("OutlineColor", glm::vec4(0, 0, 0, 1));
+    material->SetFloat("OutlineThicknessPx", 0.0); // OFF by default
+    const float invW = 1.0f / static_cast<float>(fontAtlas.GetWidth());
+    const float invH = 1.0f / static_cast<float>(fontAtlas.GetHeight());
+    material->SetFloat("InvAtlasSizeWidth", invW);
+    material->SetFloat("InvAtlasSizeHeight", invH);
 
     material->AddTexture(textureName);
 
@@ -337,6 +366,12 @@ void FontResources::CreateFontAtlasFromList(const std::vector<GlyphIndex>& glyph
     materialCache->AddMaterial(materialSettings);
     Material* material = materialCache->GetMaterial(materialName);
     material->SetVec4("FontColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    material->SetVec4("OutlineColor", glm::vec4(0, 0, 0, 1));
+    material->SetFloat("OutlineThicknessPx", 0.0f); // OFF by default
+    const float invW = 1.0f / static_cast<float>(fontAtlas.GetWidth());
+    const float invH = 1.0f / static_cast<float>(fontAtlas.GetHeight());
+    material->SetFloat("InvAtlasSizeWidth", invW);
+    material->SetFloat("InvAtlasSizeHeight", invH);
 
     material->AddTexture(textureName);
 

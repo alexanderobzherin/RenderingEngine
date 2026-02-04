@@ -37,7 +37,45 @@ enum class TextAlign
 
 class RE_API TextBlock2D : public Drawable2D 
 {
+public:
+struct Properties
+{
+	std::string fontName;
+	unsigned int fontSize = 10;
+	TextAlign textAlign = TextAlign::Left;
+	float maxLineLength = 0.0f;
+	bool textShapeEnabled = false;
+	float outlineThicknessPx = 0.0f;
 
+	Properties()
+	: fontName(TextBlock2D::sDefaultFontName)
+    {}
+};
+
+public:
+	TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, Properties properties = Properties());
+
+   /**
+	* @copydoc DrawableComponent::Initialize
+	*/
+	void Initialize() override;
+	/**
+	 * @copydoc DrawableComponent::Update
+	 */
+	void Update(float deltaTime) override;
+	/**
+	 * @copydoc Drawable2D::Draw
+	 */
+	void Draw(const Camera2D& camera) override;
+
+	virtual void SetText(std::string text);
+
+	void SetTextColor(glm::vec4 color);
+	void SetOutlineColor(glm::vec4 color);
+
+	glm::vec2 GetDimensions() const;
+
+protected:
 struct Mesh
 {
 	std::vector<glm::vec2> positions2D;
@@ -72,40 +110,6 @@ struct ShapedGlyph
 	float yOffset;
 };
 
-public:
-struct Properties
-{
-	std::string fontName;
-	unsigned int fontSize = 10;
-	TextAlign textAlign = TextAlign::Left;
-	float maxLineLength = 0.0f;
-	bool textShapeEnabled = false;
-
-	Properties()
-	: fontName(TextBlock2D::sDefaultFontName)
-    {}
-};
-
-public:
-	TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, Properties properties = Properties());
-
-   /**
-	* @copydoc DrawableComponent::Initialize
-	*/
-	void Initialize() override;
-	/**
-	 * @copydoc DrawableComponent::Update
-	 */
-	void Update(float deltaTime) override;
-	/**
-	 * @copydoc Drawable2D::Draw
-	 */
-	void Draw(const Camera2D& camera) override;
-
-	virtual void SetText(std::string text);
-
-	void SetTextColor(glm::vec4 color);
-
 protected:
     std::vector<std::uint32_t> DecodeUtf8(const std::string& text);
 	std::string CodepointToUtf8(std::uint32_t codePoint);
@@ -123,6 +127,7 @@ protected:
 		GlyphQuad glyphQuad,
 		float horizontalShift = 0.0f);
 	void UploadMeshes(const std::unordered_map<std::string, TextBlock2D::Mesh>& meshes);
+	void SetOutlineThickness(float thicknessPx);
 
 	template <typename T>
 	std::unordered_map<std::string, TextBlock2D::Mesh> PrepareMeshSlots(const std::vector<T>& glyphs);
@@ -152,5 +157,7 @@ protected:
 	glm::vec2 mDimensions;
 
 	const bool bIsTextShapeEnabled;
+
+	const float mOutlineThicknessPx;
 };
 }

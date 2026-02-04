@@ -46,6 +46,7 @@ TextBlock2D::TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, Properties 
     mFontSize(properties.fontSize),
     mTextAlign(properties.textAlign),
     mMaxLineLength(properties.maxLineLength),
+    mOutlineThicknessPx(properties.outlineThicknessPx > 2 ? 2 : properties.outlineThicknessPx),
     mColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
     mDimensions(glm::vec2(0.0f, 0.0f))
 {
@@ -57,6 +58,9 @@ TextBlock2D::TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, Properties 
 
     ++sNumOfTextBlocks;
     mTextBlockID = "TextBlock_" + std::to_string(sNumOfTextBlocks);
+
+
+
 }
 
 void TextBlock2D::Initialize()
@@ -91,6 +95,7 @@ void TextBlock2D::SetText(std::string text)
     }
     mText = text;
 
+
     if (bIsTextShapeEnabled)
     {
         ShapeTextAndConstructMesh();
@@ -99,6 +104,7 @@ void TextBlock2D::SetText(std::string text)
     {
         ConstructMesh();
     }
+    SetOutlineThickness(mOutlineThicknessPx);
 }
 
 void TextBlock2D::SetTextColor(glm::vec4 color)
@@ -106,6 +112,27 @@ void TextBlock2D::SetTextColor(glm::vec4 color)
     for (auto& renderBatch : mRenderBatches)
     {
         renderBatch.materialParameters.SetMaterialVec4("FontColor", color);
+    }
+}
+
+void TextBlock2D::SetOutlineColor(glm::vec4 color)
+{
+    for (auto& renderBatch : mRenderBatches)
+    {
+        renderBatch.materialParameters.SetMaterialVec4("OutlineColor", color);
+    }
+}
+
+glm::vec2 TextBlock2D::GetDimensions() const
+{
+    return mDimensions;
+}
+
+void TextBlock2D::SetOutlineThickness(float thicknessPx)
+{
+    for (auto& renderBatch : mRenderBatches)
+    {
+        renderBatch.materialParameters.SetMaterialFloat("OutlineThicknessPx", thicknessPx);
     }
 }
 
@@ -474,26 +501,26 @@ TextBlock2D::GlyphQuad TextBlock2D::MakeGlyphQuad(GlyphIndex glyphIndex, float p
     const auto& fontAtlas = textureCache->GetTextureResources(fontAtlasTextureName);
 
     result.fontAtlasMaterialName = fontAtlasMaterialName;
-
+    
     // Positions
     const float x0 = penX + glyphMetrics.bearingX;
     const float y0 = penY - glyphMetrics.bearingY; // y0 - top
     const float y1 = y0 + glyphMetrics.height; // y1 - bottom
     const float x1 = x0 + glyphMetrics.width;
 
-    result.x0 = x0;
-    result.y0 = y0;
-    result.x1 = x1;
-    result.y1 = y1;
+    result.x0 = x0 - mOutlineThicknessPx * 2;
+    result.y0 = y0 - mOutlineThicknessPx * 2;
+    result.x1 = x1 + mOutlineThicknessPx * 2;
+    result.y1 = y1 + mOutlineThicknessPx * 2;
 
     // UVs
-    const auto atlasWidth = fontAtlas->GetCpuImageData().GetWidth();
-    const auto atlasHeight = fontAtlas->GetCpuImageData().GetHeight();
+    const auto atlasWidth = static_cast<float>(fontAtlas->GetCpuImageData().GetWidth());
+    const auto atlasHeight = static_cast<float>(fontAtlas->GetCpuImageData().GetHeight());
 
-    const float u0 = static_cast<float>(glyphMetrics.atlasX) / static_cast<float>(atlasWidth);
-    const float v0 = static_cast<float>(glyphMetrics.atlasY) / static_cast<float>(atlasHeight);
-    const float u1 = static_cast<float>(glyphMetrics.atlasX + glyphMetrics.width) / static_cast<float>(atlasWidth);
-    const float v1 = static_cast<float>(glyphMetrics.atlasY + glyphMetrics.height) / static_cast<float>(atlasHeight);
+    const float u0 = static_cast<float>(glyphMetrics.atlasX - mOutlineThicknessPx * 2) / atlasWidth;
+    const float v0 = static_cast<float>(glyphMetrics.atlasY - mOutlineThicknessPx * 2) / atlasHeight;
+    const float u1 = static_cast<float>(glyphMetrics.atlasX + glyphMetrics.width + mOutlineThicknessPx * 2) / atlasWidth;
+    const float v1 = static_cast<float>(glyphMetrics.atlasY + glyphMetrics.height + mOutlineThicknessPx * 2) / atlasHeight;
 
     result.u0 = u0;
     result.v0 = v0;

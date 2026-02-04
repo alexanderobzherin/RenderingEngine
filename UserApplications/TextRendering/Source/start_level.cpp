@@ -62,6 +62,18 @@ void StartLevel::Initialize()
 	mTextBlockUpdating->SetPosition(glm::vec2(0.0f, 200.0f));
 	mTextBlockUpdating->SetTextColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
+	// Outline
+	TextBlock2D::Properties olts54;
+	olts54.fontSize = 54;
+	olts54.outlineThicknessPx = 2.0f;
+	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), olts54));
+	TextBlock2D* outlineTextSize32 = static_cast<TextBlock2D*>(mDrawables2D.back());
+	outlineTextSize32->SetText("Outline Text Size 54");
+	
+	outlineTextSize32->SetPosition(glm::vec2(0.0f - (outlineTextSize32->GetDimensions().x / 2.0f), 250.0f));
+	outlineTextSize32->SetTextColor(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+	outlineTextSize32->SetOutlineColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
 	TextBlock2D::Properties chtb;
 	chtb.fontName = "NotoSansSC-Regular";
 	chtb.textAlign = TextAlign::Center;

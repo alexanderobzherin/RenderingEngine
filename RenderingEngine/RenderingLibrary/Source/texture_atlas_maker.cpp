@@ -90,8 +90,8 @@ ImageData TextureAtlasMaker::CreateTextureAtlas(std::unordered_map<std::uint32_t
 			{
 				ImageData::DrawImageOnImageAtPos(x * cellWidth, y * cellHeight, textureAtlasPalette, imageIterator->second.second);
 
-				imageIterator->second.first.atlasX = static_cast<std::uint32_t>(x * cellWidth);
-				imageIterator->second.first.atlasY = static_cast<std::uint32_t>(y * cellHeight);
+				imageIterator->second.first.atlasX = static_cast<std::uint32_t>(x * cellWidth) + imageIterator->second.first.padding;
+				imageIterator->second.first.atlasY = static_cast<std::uint32_t>(y * cellHeight) + imageIterator->second.first.padding;
 				
 				imageIterator++;
 			}

@@ -152,7 +152,11 @@ struct PackedMaterialData
 
 static const std::vector<MaterialParameterLayoutEntry> Font2DLayout =
 {
-    { "FontColor",   0, 16, MaterialParameterLayoutEntry::Type::Vec4 }
+    { "FontColor",   0, 16, MaterialParameterLayoutEntry::Type::Vec4 },
+	{ "OutlineColor",       16, 16, MaterialParameterLayoutEntry::Type::Vec4 },
+	{ "OutlineThicknessPx", 32, 4,  MaterialParameterLayoutEntry::Type::Float },
+	{ "InvAtlasSizeWidth",       36, 4,  MaterialParameterLayoutEntry::Type::Float },
+	{ "InvAtlasSizeHeight",       40, 4,  MaterialParameterLayoutEntry::Type::Float }
 };
 
 } // namespace rendering_engine

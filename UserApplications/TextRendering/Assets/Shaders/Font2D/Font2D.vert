@@ -14,6 +14,10 @@ layout(std140, binding = 0) uniform TransformationsUBO
 layout(std140, binding = 1) uniform PackedParametersUBO
 {
     vec4 fontColor;
+    vec4 OutlineColor;
+    float OutlineThicknessPx;
+    float InvAtlasSizeWidth; 
+    float InvAtlasSizeHeight;  
 } packedParamsUbo;
 
 // -------------

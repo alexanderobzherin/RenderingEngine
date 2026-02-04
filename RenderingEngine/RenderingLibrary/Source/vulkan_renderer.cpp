@@ -1366,7 +1366,7 @@ VkDescriptorSetLayout VulkanRenderer::CreateDescriptorSetLayout(Material* materi
         customMaterialVariables.binding = bindingNumber;
         customMaterialVariables.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         customMaterialVariables.descriptorCount = 1;
-        customMaterialVariables.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        customMaterialVariables.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
         customMaterialVariables.pImmutableSamplers = nullptr; // Optional
 
         bindings.push_back(customMaterialVariables);

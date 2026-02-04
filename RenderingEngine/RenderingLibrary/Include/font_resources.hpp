@@ -30,15 +30,16 @@ struct GlyphIndex
 struct GlyphMetrics
 {
     // Atlas placement
-    uint32_t atlasX;
-    uint32_t atlasY;
-    uint32_t width;
-    uint32_t height;
+    uint32_t atlasX = 0;
+    uint32_t atlasY = 0;
+    uint32_t width = 0;
+    uint32_t height = 0;
 
     // Layout
-    int32_t bearingX;
-    int32_t bearingY;
-    int32_t advanceX;
+    int32_t bearingX = 0;
+    int32_t bearingY = 0;
+    int32_t advanceX = 0;
+    int32_t padding = 0;
 };
 
 struct FontMetrics
@@ -103,7 +104,11 @@ protected:
     // Next container store names of created material name and corresponding font atlas textures name 
     std::unordered_map<std::string, std::string> mFontAtlases;
 
+    std::vector<uint8_t> mFontFileBytes;
+
     bool bStoreFontAtlasesInFiles = false;
     static std::uint32_t sMaxGlyphsPerFontAtlas;
+    static unsigned int sFontAtlasPaddingPx;
+
 };
 } // namespace rendering_engine
