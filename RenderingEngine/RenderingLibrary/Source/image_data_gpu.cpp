@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Alexander Obzherin — Licensed under the zlib License. See LICENSE.md.
+// Copyright (c) 2026 Alexander Obzherin ï¿½ Licensed under the zlib License. See LICENSE.md.
 
 #include "image_data_gpu.hpp"
 #include "image_data.hpp"

@@ -1,6 +1,6 @@
 Zlib License
 
-Copyright (c) 2025 Alexander Obzherin
+Copyright (c) 2026 Alexander Obzherin
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
