@@ -1,10 +1,11 @@
 #include "drawable_3d.hpp"
 #include "i_render_resources.hpp"
+#include "scene.hpp"
 
 namespace rendering_engine
 {
-Drawable3D::Drawable3D(RenderResourceContext renderContext):
-	DrawableComponent(renderContext)
+Drawable3D::Drawable3D(RenderResourceContext renderContext, Scene& scene):
+	DrawableComponent(renderContext, scene)
 {}
 
 void Drawable3D::Initialize()
@@ -55,6 +56,11 @@ SceneComponent& Drawable3D::GetTransform()
 const SceneComponent& Drawable3D::GetTransform() const
 {
 	return mSceneComponent;
+}
+
+void Drawable3D::Destroy()
+{
+	mScene.DestroyDrawable3D(this);
 }
 
 } // namespace rendering_engine

@@ -6,15 +6,17 @@
 #include "texture_cache.hpp"
 #include "material_cache.hpp"
 #include "material.hpp"
+#include "scene.hpp"
 
 #include <cstring>
 
 namespace rendering_engine
 {
 
-DrawableComponent::DrawableComponent(RenderResourceContext renderContext)
+DrawableComponent::DrawableComponent(RenderResourceContext renderContext, Scene& scene)
 	:
-	mRenderContext(renderContext)
+	mRenderContext(renderContext),
+	mScene(scene)
 {
 }
 
@@ -41,6 +43,10 @@ void DrawableComponent::Shutdown()
 		}
 	}
 	mRenderBatches.clear();
+}
+
+void DrawableComponent::Destroy()
+{
 }
 
 void DrawableComponent::AddRenderBatch(std::string meshName, std::string materialName)

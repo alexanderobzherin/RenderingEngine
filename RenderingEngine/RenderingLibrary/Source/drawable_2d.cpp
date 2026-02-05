@@ -1,11 +1,12 @@
 #include "drawable_2d.hpp"
 #include "i_render_resources.hpp"
+#include "scene.hpp"
 
 namespace rendering_engine
 {
-Drawable2D::Drawable2D(RenderResourceContext renderContext)
+Drawable2D::Drawable2D(RenderResourceContext renderContext, Scene& scene)
 	:
-	DrawableComponent(renderContext)
+	DrawableComponent(renderContext, scene)
 {}
 
 void Drawable2D::Initialize()
@@ -58,5 +59,9 @@ const SceneComponent2D& Drawable2D::GetTransform() const
 	return mSceneComponent;
 }
 
+void Drawable2D::Destroy()
+{
+	mScene.DestroyDrawable2D(this);
+}
 
 } // namespace rendering_engine

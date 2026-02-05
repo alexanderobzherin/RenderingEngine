@@ -2,13 +2,14 @@
 #include "camera_2d.hpp"
 #include "i_render_resources.hpp"
 #include "scene_component_2d.hpp"
+#include "scene.hpp"
 
 namespace rendering_engine
 {
 
-Quad2D::Quad2D(RenderResourceContext renderContext)
+Quad2D::Quad2D(RenderResourceContext renderContext, Scene& scene)
 	:
-	Drawable2D(renderContext)
+	Drawable2D(renderContext, scene)
 {}
 
 void Quad2D::Initialize()

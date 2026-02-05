@@ -14,8 +14,6 @@ using namespace rendering_engine;
 namespace rendering_engine
 {
 class SceneManager;
-class StaticMesh;
-class Quad2D;
 }
 
 namespace application

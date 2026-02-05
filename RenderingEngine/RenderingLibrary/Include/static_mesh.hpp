@@ -14,6 +14,7 @@
 
 namespace rendering_engine
 {
+class Scene;
 struct StaticMeshParams
 {
 	std::string meshName;
@@ -39,7 +40,7 @@ public:
 	 * @brief Constructs a StaticMesh component associated with a given render context.
 	 * @param renderContext Rendering resource context for material and mesh initialization.
 	 */
-	StaticMesh(RenderResourceContext renderContext, StaticMeshParams params);
+	StaticMesh(RenderResourceContext renderContext, Scene& scene, StaticMeshParams params);
 
 	/**
 	 * @copydoc DrawableComponent::Initialize

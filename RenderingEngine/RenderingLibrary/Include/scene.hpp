@@ -10,6 +10,7 @@
 #include <string>
 
 #include "rendering_engine_export.hpp"
+#include "drawable_component.hpp"
 
 namespace rendering_engine
 {
@@ -34,6 +35,8 @@ class Drawable2D;
  */
 class RE_API Scene
 {
+	friend class Drawable3D;
+	friend class Drawable2D;
 public:
 	/**
 	 * @brief Constructs a Scene instance associated with a SceneManager.
@@ -85,7 +88,21 @@ public:
 	 */
 	void LoadScene(std::string newSceneName);
 
+	std::shared_ptr<Camera>  GetActiveCamera3D();
+	std::shared_ptr<Camera2D> GetActiveCamera2D();
+
+	template <typename T, typename Args>
+	T* Spawn(Args args);
+
 protected:
+	friend class Drawable;
+	void DestroyDrawable3D(Drawable3D* drawable3D);
+	void DestroyDrawable2D(Drawable2D* drawable2D);
+
+private:
+	void FlushDestroyed();
+
+private:
 	SceneManager& mSceneManager;
 
 	std::shared_ptr<Camera>  mActiveCamera3D;
@@ -93,6 +110,10 @@ protected:
 
 	std::vector<Drawable3D*> mDrawables3D;
 	std::vector<Drawable2D*> mDrawables2D;
-};
+
+	std::vector<Drawable3D*> mPendingDestroy3D;
+	std::vector<Drawable2D*> mPendingDestroy2D;
+};	
+
 
 } // namespace rendering_engine

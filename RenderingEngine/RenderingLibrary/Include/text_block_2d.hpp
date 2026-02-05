@@ -24,6 +24,7 @@ y = penY - bearingY
 width, height - quad size
 penX += advanceX
 */
+class Scene;
 class TextRenderer;
 class FontResources;
 struct GlyphIndex;
@@ -81,7 +82,7 @@ public:
 	 * @param textRenderer Owning text renderer.
 	 * @param properties Text block configuration.
 	 */
-	TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, Properties properties = Properties());
+	TextBlock2D(Scene& scene, std::shared_ptr<TextRenderer> textRenderer, Properties properties = Properties());
 
    /**
 	* @copydoc DrawableComponent::Initialize

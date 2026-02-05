@@ -1,0 +1,15 @@
+{
+  "appName": "DrawTextBlocks",
+  "isFullScreen": false,
+  "screenWidth": 1280,
+  "screenHeight": 720,
+
+    "text": {
+    "scripts": [
+      "Latin"
+    ],
+    "fontSizePreload": [
+      10
+    ]
+  }
+}

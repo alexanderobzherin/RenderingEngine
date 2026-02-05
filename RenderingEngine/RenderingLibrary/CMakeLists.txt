@@ -57,6 +57,7 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/model_material.hpp
 	
 	# Drawable entities
+	${PROJECT_SOURCE_DIR}/Include/spawn_drawables.hpp
 	${PROJECT_SOURCE_DIR}/Include/drawable_component.hpp
 	${PROJECT_SOURCE_DIR}/Include/drawable_2d.hpp
 	${PROJECT_SOURCE_DIR}/Include/drawable_3d.hpp

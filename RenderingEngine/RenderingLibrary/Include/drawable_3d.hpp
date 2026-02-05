@@ -30,7 +30,7 @@ public:
 	 * @brief Constructs the Drawable3D with a render context.
 	 * @param renderContext Resource context.
 	 */
-	Drawable3D(RenderResourceContext renderContext);
+	Drawable3D(RenderResourceContext renderContext, Scene& scene);
 
 	/**
 	 * @copydoc DrawableComponent::Initialize
@@ -86,6 +86,8 @@ public:
 	SceneComponent& GetTransform();
 	const SceneComponent& GetTransform() const;
 	///@}
+
+	void Destroy() override;
 
 	Drawable3D(const Drawable3D& rhs) = delete;
 	Drawable3D& operator=(const Drawable3D& rhs) = delete;
