@@ -8,6 +8,8 @@
 #include "text_renderer.hpp"
 #include "i_application.hpp"
 
+#include "spawn_drawables.hpp"
+
 using namespace rendering_engine;
 
 namespace application
@@ -21,12 +23,6 @@ StartLevel::StartLevel(SceneManager& sceneManager)
 void StartLevel::Initialize()
 {
 	Scene::Initialize();
-
-	mActiveCamera3D = std::make_shared<Camera>(*mSceneManager.GetApplication());
-	mActiveCamera3D->Initialize();
-
-	mActiveCamera2D = std::make_shared<Camera2D>(*mSceneManager.GetApplication());
-	mActiveCamera2D->Initialize();
 
 	const std::string textEng_TextRendering = "Text Rendering";
 	const std::string textEng_FeatureDesc =
@@ -48,15 +44,14 @@ void StartLevel::Initialize()
 
 	TextBlock2D::Properties lefttopbp;
 	lefttopbp.fontSize = 16;
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), lefttopbp));
-	TextBlock2D* textBlock_Left = static_cast<TextBlock2D*>(mDrawables2D.back());
+	
+	TextBlock2D* textBlock_Left = Spawn<TextBlock2D>(lefttopbp);
 	textBlock_Left->SetText(textEng_FeatureDesc);
 	textBlock_Left->SetPosition(glm::vec2(leftColumnStart, -280.0f));
 	textBlock_Left->SetTextColor(glm::vec4(1.0f, 0.0, 0.0f, 1.0f));
 
 	// Updatable text block - counter
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer()));
-	mTextBlockUpdating = static_cast<TextBlock2D*>(mDrawables2D.back());
+	mTextBlockUpdating = Spawn<TextBlock2D>(lefttopbp);
 	mTextBlockUpdating->SetText(std::to_string(mCounter));
 
 	mTextBlockUpdating->SetPosition(glm::vec2(0.0f, 200.0f));
@@ -66,8 +61,7 @@ void StartLevel::Initialize()
 	TextBlock2D::Properties olts54;
 	olts54.fontSize = 54;
 	olts54.outlineThicknessPx = 2.0f;
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), olts54));
-	TextBlock2D* outlineTextSize32 = static_cast<TextBlock2D*>(mDrawables2D.back());
+	TextBlock2D* outlineTextSize32 = Spawn<TextBlock2D>(olts54);
 	outlineTextSize32->SetText("Outline Text Size 54");
 	
 	outlineTextSize32->SetPosition(glm::vec2(0.0f - (outlineTextSize32->GetDimensions().x / 2.0f), 250.0f));
@@ -83,8 +77,7 @@ void StartLevel::Initialize()
 		"它能够绘制包含文字、数字和符号\n"
 		"的字符串。这是显示文本块、控件、\n"
 		"按钮、注 释等内容所必需的功能。";
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), chtb));
-	TextBlock2D* textBlock_LeftBottom = static_cast<TextBlock2D*>(mDrawables2D.back());
+	TextBlock2D* textBlock_LeftBottom = Spawn<TextBlock2D>(chtb);
 	textBlock_LeftBottom->SetText(textChn_FeatureDesc);
 	textBlock_LeftBottom->SetPosition(glm::vec2(leftColumnStart, 0.0f));
 	textBlock_LeftBottom->SetTextColor(glm::vec4(1.0f, 0.0, 0.0f, 1.0f));
@@ -93,8 +86,7 @@ void StartLevel::Initialize()
 	TextBlock2D::Properties centtb;
 	centtb.textAlign = TextAlign::Center;
 	centtb.fontSize = 16;
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), centtb));
-	TextBlock2D* textBlock_Center = static_cast<TextBlock2D*>(mDrawables2D.back());
+	TextBlock2D* textBlock_Center = Spawn<TextBlock2D>(centtb);
 	textBlock_Center->SetText(textEng_FeatureDesc);
 	textBlock_Center->SetPosition(glm::vec2(centerColumnStart, -280.0f));
 	textBlock_Center->SetTextColor(glm::vec4(0.0f, 1.0, 0.0f, 1.0f));
@@ -103,8 +95,7 @@ void StartLevel::Initialize()
 	TextBlock2D::Properties rtb;
 	rtb.textAlign = TextAlign::Right;
 	rtb.fontSize = 16;
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), rtb));
-	TextBlock2D* textBlock_Right = static_cast<TextBlock2D*>(mDrawables2D.back());
+	TextBlock2D* textBlock_Right = Spawn<TextBlock2D>(rtb);
 	textBlock_Right->SetText(textEng_FeatureDesc);
 	textBlock_Right->SetPosition(glm::vec2(rightColumnStart, -280.0f));
 	textBlock_Right->SetTextColor(glm::vec4(0.0f, 0.0, 1.0f, 1.0f));
@@ -119,8 +110,7 @@ void StartLevel::Initialize()
 	TextBlock2D::Properties mmtb;
 	mmtb.textAlign = TextAlign::Center;
 	mmtb.fontSize = 16;
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), mmtb));
-	TextBlock2D* multimaterialTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
+	TextBlock2D* multimaterialTextBlock = Spawn<TextBlock2D>(mmtb);
 	multimaterialTextBlock->SetText(multiMaterialText);
 	multimaterialTextBlock->SetPosition(glm::vec2(centerColumnStart, 0.0f));
 	multimaterialTextBlock->SetTextColor(glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
@@ -157,8 +147,7 @@ void StartLevel::Initialize()
 	htdProp.textShapeEnabled = true;
 	htdProp.maxLineLength = thirdPart;
 
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), htdProp));
-	TextBlock2D* textBlock_Shaped_FeatureDesc = static_cast<TextBlock2D*>(mDrawables2D.back());
+	TextBlock2D* textBlock_Shaped_FeatureDesc = Spawn<TextBlock2D>(htdProp);
 
 	textBlock_Shaped_FeatureDesc->SetText(textHebrew_FeatureDesc);
 	textBlock_Shaped_FeatureDesc->SetPosition(glm::vec2(rightColumnStart, 0.0f));

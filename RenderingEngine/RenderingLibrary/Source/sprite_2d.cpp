@@ -8,12 +8,13 @@
 #include "material_cache.hpp"
 #include "material.hpp"
 #include "material_types.hpp"
+#include "scene.hpp"
 
 namespace rendering_engine
 {
-Sprite2D::Sprite2D(RenderResourceContext renderContext, std::string textureName)
+Sprite2D::Sprite2D(RenderResourceContext renderContext, Scene& scene, std::string textureName)
 	:
-	Drawable2D(renderContext),
+	Drawable2D(renderContext, scene),
 	mTextureName(textureName)
 {}
 
@@ -42,7 +43,8 @@ void Sprite2D::Initialize()
 	AddRenderBatch(meshName, materialName);
 
 	Drawable2D::Initialize();
-	SetScale(glm::vec2(width, height));
+	mTextureRespectiveScale = glm::vec2(width, height);
+	Drawable2D::SetScale(mTextureRespectiveScale);
 }
 
 void Sprite2D::Update(float deltaTime)
@@ -61,6 +63,11 @@ void Sprite2D::Draw(const Camera2D& camera)
 	{
 		renderBatch.renderResources->SubmitResources(transformations, renderBatch.materialParameters);
 	}
+}
+
+void Sprite2D::SetScale(float scale)
+{
+	Drawable2D::SetScale(glm::vec2(mTextureRespectiveScale.x * scale, mTextureRespectiveScale.y * scale));
 }
 
 } // namespace rendering_engine

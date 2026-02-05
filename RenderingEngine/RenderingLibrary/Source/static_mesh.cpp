@@ -3,15 +3,16 @@
 #include "camera.hpp"
 #include "i_render_resources.hpp"
 #include "scene_component.hpp"
+#include "scene.hpp"
 
 #include <unordered_map>
 
 namespace rendering_engine
 {
 
-StaticMesh::StaticMesh(RenderResourceContext renderContext, StaticMeshParams params)
+StaticMesh::StaticMesh(RenderResourceContext renderContext, Scene& scene, StaticMeshParams params)
 	:
-	Drawable3D(renderContext),
+	Drawable3D(renderContext, scene),
 	mParams(params)
 {
 }

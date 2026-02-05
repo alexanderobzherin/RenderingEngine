@@ -6,6 +6,7 @@
 #include "image_data_gpu.hpp"
 #include "image_data.hpp"
 #include "model_cache.hpp"
+#include "scene.hpp"
 
 #include "drawable_component.hpp"
 
@@ -37,9 +38,9 @@ std::unordered_map<std::string, TextBlock2D::Mesh> TextBlock2D::PrepareMeshSlots
 template<>
 std::unordered_map<std::string, TextBlock2D::Mesh> TextBlock2D::PrepareMeshSlots(const std::vector<ShapedGlyph>& glyphs);
 
-TextBlock2D::TextBlock2D(std::shared_ptr<TextRenderer> textRenderer, Properties properties)
+TextBlock2D::TextBlock2D(Scene& scene, std::shared_ptr<TextRenderer> textRenderer, Properties properties)
     :
-    Drawable2D(textRenderer->GetRenderResourceContext()),
+    Drawable2D(textRenderer->GetRenderResourceContext(), scene),
     mTextRenderer(textRenderer),
     bIsTextShapeEnabled(properties.textShapeEnabled),
     mFontName(properties.fontName),

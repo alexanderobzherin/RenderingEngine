@@ -30,7 +30,7 @@ public:
 	 * @brief Constructs the Drawable2D with a resource context.
 	 * @param renderContext Rendering resource context (renderer, caches).
 	 */
-	Drawable2D(RenderResourceContext renderContext);
+	Drawable2D(RenderResourceContext renderContext, Scene& scene);
 
 	/**
 	 * @brief Initializes render resources.
@@ -87,6 +87,8 @@ public:
 	SceneComponent2D& GetTransform();
 	const SceneComponent2D& GetTransform() const;
 	///@}
+
+	void Destroy() override;
 
 protected:
 	SceneComponent2D mSceneComponent;

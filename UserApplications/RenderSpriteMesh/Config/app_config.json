@@ -1,0 +1,15 @@
+{
+  "appName": "RenderSpriteMesh",
+  "isFullScreen": false,
+  "screenWidth": 800,
+  "screenHeight": 600,
+
+    "text": {
+    "scripts": [
+      "Latin"
+    ],
+    "fontSizePreload": [
+      10
+    ]
+  }
+}

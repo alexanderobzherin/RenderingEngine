@@ -10,6 +10,7 @@
 
 namespace rendering_engine
 {
+class Scene;
 /**
  * @class Quad2D
  * @brief 2D drawable component for rendering rectangular primitives.
@@ -28,7 +29,7 @@ public:
 	 * @brief Constructs the Quad2D with a render context.
 	 * @param renderContext Resource context.
 	 */
-	Quad2D(RenderResourceContext renderContext);
+	Quad2D(RenderResourceContext renderContext, Scene& scene);
 
 	/**
 	 * @copydoc DrawableComponent::Initialize

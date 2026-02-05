@@ -10,6 +10,7 @@
 
 namespace rendering_engine
 {
+class Scene;
 /**
 	* @class Sprite2D
 	* @brief 2D drawable component for rendering textured quad.
@@ -25,7 +26,7 @@ public:
 	* @param renderContext Resource context.
 	* 
 	*/
-	Sprite2D(RenderResourceContext renderContext, std::string textureName);
+	Sprite2D(RenderResourceContext renderContext, Scene& scene, std::string textureName);
 
    /**
     * @copydoc DrawableComponent::Initialize
@@ -42,11 +43,14 @@ public:
 	*/
 	void Draw(const Camera2D& camera) override;
 
+	void SetScale(float scale);
+
 	Sprite2D(const Sprite2D& rhs) = delete;
 	Sprite2D& operator=(const Sprite2D& rhs) = delete;
 
 protected:
 	std::string mTextureName;
+	glm::vec2 mTextureRespectiveScale;
 };
 
 } // namespace rendering_engine

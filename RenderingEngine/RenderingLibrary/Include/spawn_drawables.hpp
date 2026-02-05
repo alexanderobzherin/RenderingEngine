@@ -1,0 +1,52 @@
+// This file is part of the Rendering Engine project.
+// Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+// Copyright (c) 2026 Alexander Obzherin
+// Distributed under the terms of the zlib License. See LICENSE.md for details.
+
+#pragma once
+
+#include "scene.hpp"
+
+#include "static_mesh.hpp"
+#include "sprite_2d.hpp"
+#include "text_block_2d.hpp"
+
+namespace rendering_engine
+{
+
+template <>
+StaticMesh* Scene::Spawn<StaticMesh>(StaticMeshParams param);
+
+template <>
+Sprite2D* Scene::Spawn<Sprite2D>(std::string textureName);
+
+template <>
+TextBlock2D* Scene::Spawn<TextBlock2D>(TextBlock2D::Properties prop);
+
+template <>
+StaticMesh* Scene::Spawn<StaticMesh>(StaticMeshParams param)
+{
+	mDrawables3D.push_back(new StaticMesh(mSceneManager.GetRenderResourceContext(), *this, param));
+	StaticMesh* staticMesh = static_cast<StaticMesh*>(mDrawables3D.back());
+	staticMesh->Initialize();
+	return staticMesh;
+}
+
+template <>
+Sprite2D* Scene::Spawn<Sprite2D>(std::string textureName)
+{
+	mDrawables2D.push_back(new Sprite2D(mSceneManager.GetRenderResourceContext(), *this, textureName));
+	Sprite2D* sprite2D = static_cast<Sprite2D*>(mDrawables2D.back());
+	sprite2D->Initialize();
+	return sprite2D;
+}
+template <>
+TextBlock2D* Scene::Spawn<TextBlock2D>(TextBlock2D::Properties prop)
+{
+	mDrawables2D.push_back(new TextBlock2D(*this, mSceneManager.GetTextRenderer(), prop));
+	TextBlock2D* textBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
+	return textBlock;
+}
+
+
+} // namespace rendering_engine

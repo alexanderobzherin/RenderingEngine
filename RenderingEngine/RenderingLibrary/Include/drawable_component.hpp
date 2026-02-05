@@ -21,6 +21,7 @@ class ModelCache;
 class TextureCache;
 class MaterialCache;
 class MeshDataGpu;
+class Scene;
 
 struct RenderBatch
 {
@@ -50,7 +51,7 @@ public:
      * @brief Constructs the DrawableComponent with a resource context.
      * @param renderContext Rendering resource context (renderer, caches).
      */
-    DrawableComponent(RenderResourceContext renderContext);
+    DrawableComponent(RenderResourceContext renderContext, Scene& scene);
 
     /// Virtual destructor.
     virtual ~DrawableComponent() = default;
@@ -69,6 +70,8 @@ public:
 
     virtual void Shutdown();
 
+    virtual void Destroy();
+
     DrawableComponent(const DrawableComponent&) = delete;
     DrawableComponent& operator=(const DrawableComponent&) = delete;
 
@@ -77,7 +80,7 @@ protected:
 
 protected:
     RenderResourceContext mRenderContext;
-        
+    Scene& mScene;
     std::vector<RenderBatch> mRenderBatches;
 };
 

@@ -2,6 +2,7 @@
 #include "camera.hpp"
 #include "camera_2d.hpp"
 #include "scene_manager.hpp"
+#include "spawn_drawables.hpp"
 #include "static_mesh.hpp"
 #include "quad_2d.hpp"
 
@@ -18,12 +19,6 @@ StartLevel::StartLevel(SceneManager& sceneManager)
 void StartLevel::Initialize()
 {
 	Scene::Initialize();
-
-	mActiveCamera3D = std::make_shared<Camera>(*mSceneManager.GetApplication());
-	mActiveCamera3D->Initialize();
-
-	mActiveCamera2D = std::make_shared<Camera2D>(*mSceneManager.GetApplication());
-	mActiveCamera2D->Initialize();
 }
 void StartLevel::Update(float deltaTime)
 {

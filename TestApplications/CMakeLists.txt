@@ -3,4 +3,3 @@
 # Copyright (c) 2026 Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
 
-add_subdirectory(RenderSpriteMesh)

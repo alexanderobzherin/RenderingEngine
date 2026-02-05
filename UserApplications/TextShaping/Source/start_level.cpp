@@ -2,6 +2,7 @@
 #include "camera.hpp"
 #include "camera_2d.hpp"
 #include "scene_manager.hpp"
+#include "spawn_drawables.hpp"
 #include "static_mesh.hpp"
 #include "text_block_2d.hpp"
 #include "i_application.hpp"
@@ -19,12 +20,6 @@ StartLevel::StartLevel(SceneManager& sceneManager)
 void StartLevel::Initialize()
 {
 	Scene::Initialize();
-
-	mActiveCamera3D = std::make_shared<Camera>(*mSceneManager.GetApplication());
-	mActiveCamera3D->Initialize();
-
-	mActiveCamera2D = std::make_shared<Camera2D>(*mSceneManager.GetApplication());
-	mActiveCamera2D->Initialize();
 
 	auto screenSettings = GetSceneManager().GetApplication()->GetScreenSettings();
 	
@@ -220,9 +215,9 @@ void StartLevel::AddTextBlock(const std::string& fontName, const std::string& te
 	TextBlock2D::Properties tbprop;
 	tbprop.fontName = fontName;
 	tbprop.textShapeEnabled = textShapeEnabled;
+	tbprop.fontSize = 16;
 
-	mDrawables2D.push_back(new TextBlock2D(mSceneManager.GetTextRenderer(), tbprop));
-	TextBlock2D* notShapedTextBlock = static_cast<TextBlock2D*>(mDrawables2D.back());
+	TextBlock2D* notShapedTextBlock = Spawn<TextBlock2D>(tbprop);
 
 	notShapedTextBlock->SetText(text);
 
