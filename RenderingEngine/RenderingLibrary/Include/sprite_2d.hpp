@@ -43,7 +43,15 @@ public:
 	*/
 	void Draw(const Camera2D& camera) override;
 
-	void SetScale(float scale);
+	/**
+	 * @brief Sets a uniform scale relative to the sprite's texture size.
+	 *
+	 * The scale factor is applied to the original texture dimensions,
+	 * allowing convenient uniform resizing of the sprite.
+	 *
+	 * @param scale Uniform scale factor (1.0 = original texture size).
+	 */
+	void SetSpriteScale(float scale);
 
 	Sprite2D(const Sprite2D& rhs) = delete;
 	Sprite2D& operator=(const Sprite2D& rhs) = delete;

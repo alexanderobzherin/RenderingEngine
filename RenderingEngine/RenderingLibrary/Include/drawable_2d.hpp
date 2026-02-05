@@ -88,6 +88,9 @@ public:
 	const SceneComponent2D& GetTransform() const;
 	///@}
 
+	/**
+	 * @copydoc DrawableComponent::Destroy
+	 */
 	void Destroy() override;
 
 protected:

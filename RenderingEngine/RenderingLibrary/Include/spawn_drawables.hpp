@@ -3,6 +3,17 @@
 // Copyright (c) 2026 Alexander Obzherin
 // Distributed under the terms of the zlib License. See LICENSE.md for details.
 
+/**
+ * @file spawn_drawables.hpp
+ * @brief Scene::Spawn<T> specializations for built-in drawable types.
+ *
+ * This file provides explicit template specializations of Scene::Spawn<T>()
+ * for engine-supported drawable classes (e.g. StaticMesh, Sprite2D, TextBlock2D).
+ *
+ * Including this file enables spawning of the corresponding drawable types.
+ * Scene itself remains generic and unaware of concrete drawable implementations.
+ */
+
 #pragma once
 
 #include "scene.hpp"

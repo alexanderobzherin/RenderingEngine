@@ -38,7 +38,7 @@ void StartLevel::Initialize()
 	const std::string textureName = "PNG_transparency_demonstration_1";
 	mSprite2D = Spawn<Sprite2D>(textureName);
 	mSprite2D->SetPosition(glm::vec2(-300.0f, -200.0f));
-	mSprite2D->SetScale(0.2f);
+	mSprite2D->SetSpriteScale(0.2f);
 }
 void StartLevel::Update(float deltaTime)
 {

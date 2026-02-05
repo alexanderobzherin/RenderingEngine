@@ -88,15 +88,42 @@ public:
 	 */
 	void LoadScene(std::string newSceneName);
 
+	/**
+	 * @brief Returns the active 3D camera of the scene.
+	 * @return Active 3D camera.
+	 */
 	std::shared_ptr<Camera>  GetActiveCamera3D();
+
+	/**
+	 * @brief Returns the active 2D camera of the scene.
+	 * @return Active 2D camera.
+	 */
 	std::shared_ptr<Camera2D> GetActiveCamera2D();
 
-	template <typename T, typename Args>
-	T* Spawn(Args args);
+	/**
+	 * @brief Spawns and registers a drawable of type T.
+	 *
+	 * All drawables must be created via this function to ensure
+	 * correct Scene-level ownership and lifecycle management.
+	 * Creation logic is provided by explicit template specializations.
+	 *
+	 * @tparam T    Drawable type.
+	 * @tparam V Construction argument type.
+	 * @param arg  Construction argument.
+	 * @return Pointer to the created drawable.
+	 */
+	template <typename T, typename V>
+	T* Spawn(V arg);
 
 protected:
 	friend class Drawable;
+	/**
+	 * @brief Schedules a 3D drawable for deferred destruction.
+	 */
 	void DestroyDrawable3D(Drawable3D* drawable3D);
+	/**
+	 * @brief Schedules a 2D drawable for deferred destruction.
+	 */
 	void DestroyDrawable2D(Drawable2D* drawable2D);
 
 private:

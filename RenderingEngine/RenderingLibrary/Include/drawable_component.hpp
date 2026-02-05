@@ -68,8 +68,24 @@ public:
      */
     virtual void Update(float deltaTime) = 0;
 
+    /**
+     * @brief Releases all render resources owned by this drawable.
+     *
+     * Called internally by the Scene during destruction or scene shutdown.
+     * This function must free GPU and CPU-side render resources but must not
+     * remove the drawable from Scene containers.
+     */
     virtual void Shutdown();
 
+    /**
+     * @brief Requests destruction of this drawable.
+     *
+     * Schedules the drawable for deferred removal via the owning Scene.
+     * The drawable is not destroyed immediately; actual cleanup is performed
+     * at a safe point during the Scene update cycle.
+     *
+     * @note This function must be used instead of deleting the object directly.
+     */
     virtual void Destroy();
 
     DrawableComponent(const DrawableComponent&) = delete;

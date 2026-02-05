@@ -65,7 +65,7 @@ void Sprite2D::Draw(const Camera2D& camera)
 	}
 }
 
-void Sprite2D::SetScale(float scale)
+void Sprite2D::SetSpriteScale(float scale)
 {
 	Drawable2D::SetScale(glm::vec2(mTextureRespectiveScale.x * scale, mTextureRespectiveScale.y * scale));
 }

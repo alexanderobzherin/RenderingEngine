@@ -87,6 +87,9 @@ public:
 	const SceneComponent& GetTransform() const;
 	///@}
 
+	/**
+	 * @copydoc DrawableComponent::Destroy
+	 */
 	void Destroy() override;
 
 	Drawable3D(const Drawable3D& rhs) = delete;

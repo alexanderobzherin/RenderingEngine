@@ -58,7 +58,7 @@ void StartLevel::Initialize()
 	auto SpawnSprite = [&]() {
 		const std::string textureName = "PNG_transparency_demonstration_1";
 		Sprite2D* sprite = Spawn<Sprite2D>(textureName);
-		sprite->SetScale(0.2f);
+		sprite->SetSpriteScale(0.2f);
 		const int x= GenerateNumber(-6, 6); // * 50.0f
 		const int y = GenerateNumber(-5, 5); // * 40.0f
 		sprite->SetPosition(glm::vec2(50.0f * x, 40.0f * y));
