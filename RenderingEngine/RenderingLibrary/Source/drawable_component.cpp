@@ -16,7 +16,8 @@ namespace rendering_engine
 DrawableComponent::DrawableComponent(RenderResourceContext renderContext, Scene& scene)
 	:
 	mRenderContext(renderContext),
-	mScene(scene)
+	mScene(scene),
+	bUpdateOnTick(true)
 {
 }
 
@@ -47,6 +48,11 @@ void DrawableComponent::Shutdown()
 
 void DrawableComponent::Destroy()
 {
+}
+
+void DrawableComponent::UpdateOnTick(bool in)
+{
+	bUpdateOnTick = in;
 }
 
 void DrawableComponent::AddRenderBatch(std::string meshName, std::string materialName)

@@ -88,6 +88,8 @@ public:
      */
     virtual void Destroy();
 
+    void UpdateOnTick(bool in);
+
     DrawableComponent(const DrawableComponent&) = delete;
     DrawableComponent& operator=(const DrawableComponent&) = delete;
 
@@ -98,6 +100,8 @@ protected:
     RenderResourceContext mRenderContext;
     Scene& mScene;
     std::vector<RenderBatch> mRenderBatches;
+
+    bool bUpdateOnTick;
 };
 
 }

@@ -15,7 +15,10 @@ void Drawable3D::Initialize()
 
 void Drawable3D::Update(float deltaTime)
 {
-	mSceneComponent.UpdateWorldMatrix();
+	if (bUpdateOnTick)
+	{
+		mSceneComponent.UpdateWorldMatrix();
+	}
 }
 
 void Drawable3D::SetPosition(const glm::vec3& position)

@@ -87,6 +87,7 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/app_clock.hpp
 	
 	${PROJECT_SOURCE_DIR}/Include/actor.hpp
+	${PROJECT_SOURCE_DIR}/Include/create_subobject.hpp
 )
 
 set(RenderingLibrary_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/Include/")

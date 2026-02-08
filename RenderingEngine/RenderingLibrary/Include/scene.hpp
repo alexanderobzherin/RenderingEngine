@@ -19,6 +19,8 @@ class Camera;
 class Camera2D;
 class Drawable3D;
 class Drawable2D;
+class Actor;
+class Actor2D;
 
 /**
  * @class Scene
@@ -37,6 +39,8 @@ class RE_API Scene
 {
 	friend class Drawable3D;
 	friend class Drawable2D;
+	friend class Actor;
+	friend class Actor2D;
 public:
 	/**
 	 * @brief Constructs a Scene instance associated with a SceneManager.
@@ -115,8 +119,10 @@ public:
 	template <typename T, typename V>
 	T* Spawn(V arg);
 
+	template <typename T>
+	T* SpawnActor();
+
 protected:
-	friend class Drawable;
 	/**
 	 * @brief Schedules a 3D drawable for deferred destruction.
 	 */
@@ -125,6 +131,10 @@ protected:
 	 * @brief Schedules a 2D drawable for deferred destruction.
 	 */
 	void DestroyDrawable2D(Drawable2D* drawable2D);
+	/**
+	 * @brief Schedules a 2D actor for deferred destruction.
+	 */
+	void DestroyActor(Actor* actor);
 
 private:
 	void FlushDestroyed();
@@ -140,7 +150,24 @@ private:
 
 	std::vector<Drawable3D*> mPendingDestroy3D;
 	std::vector<Drawable2D*> mPendingDestroy2D;
+
+	std::vector<Actor*> mActors;
+	std::vector<Actor*> mPendingDestroyActors;
+
+	std::vector<Actor2D*> mActors2D;
 };	
 
+template <typename T>
+inline T* Scene::SpawnActor()
+{
+	static_assert(std::is_base_of_v<Actor, T>,
+		"SpawnActor<T>: T must derive from Actor");
+
+	mActors.push_back(new T(*this));
+	T* ptr = static_cast<T*>(mActors.back());
+
+	ptr->Initialize();
+	return ptr;
+}
 
 } // namespace rendering_engine

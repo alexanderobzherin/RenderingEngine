@@ -24,18 +24,19 @@
 
 namespace rendering_engine
 {
+	
+template <>
+StaticMesh* Scene::Spawn<StaticMesh, StaticMeshParams>(StaticMeshParams param);
 
 template <>
-StaticMesh* Scene::Spawn<StaticMesh>(StaticMeshParams param);
+Sprite2D* Scene::Spawn<Sprite2D, std::string>(std::string textureName);
 
 template <>
-Sprite2D* Scene::Spawn<Sprite2D>(std::string textureName);
+TextBlock2D* Scene::Spawn<TextBlock2D, TextBlock2D::Properties>(TextBlock2D::Properties prop);
+	
 
 template <>
-TextBlock2D* Scene::Spawn<TextBlock2D>(TextBlock2D::Properties prop);
-
-template <>
-StaticMesh* Scene::Spawn<StaticMesh>(StaticMeshParams param)
+StaticMesh* Scene::Spawn<StaticMesh, StaticMeshParams>(StaticMeshParams param)
 {
 	mDrawables3D.push_back(new StaticMesh(mSceneManager.GetRenderResourceContext(), *this, param));
 	StaticMesh* staticMesh = static_cast<StaticMesh*>(mDrawables3D.back());
@@ -44,7 +45,7 @@ StaticMesh* Scene::Spawn<StaticMesh>(StaticMeshParams param)
 }
 
 template <>
-Sprite2D* Scene::Spawn<Sprite2D>(std::string textureName)
+Sprite2D* Scene::Spawn<Sprite2D, std::string>(std::string textureName)
 {
 	mDrawables2D.push_back(new Sprite2D(mSceneManager.GetRenderResourceContext(), *this, textureName));
 	Sprite2D* sprite2D = static_cast<Sprite2D*>(mDrawables2D.back());
@@ -52,7 +53,7 @@ Sprite2D* Scene::Spawn<Sprite2D>(std::string textureName)
 	return sprite2D;
 }
 template <>
-TextBlock2D* Scene::Spawn<TextBlock2D>(TextBlock2D::Properties prop)
+TextBlock2D* Scene::Spawn<TextBlock2D, TextBlock2D::Properties>(TextBlock2D::Properties prop)
 {
 	mDrawables2D.push_back(new TextBlock2D(*this, mSceneManager.GetTextRenderer(), prop));
 	TextBlock2D* textBlock = static_cast<TextBlock2D*>(mDrawables2D.back());

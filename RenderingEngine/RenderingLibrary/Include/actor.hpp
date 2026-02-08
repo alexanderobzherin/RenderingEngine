@@ -5,46 +5,95 @@
 
 #pragma once
 
+#include "rendering_engine_export.hpp"
 #include "drawable_component.hpp"
+#include "scene_component.hpp"
 
 namespace rendering_engine
 {
-class Scene;
-class Camera;
 
-class Actor
+class SceneComponent;
+class DrawableComponent;
+class Drawable3D;
+
+class RE_API Actor
 {
+    friend class Scene;
 public:
-    /**
-     * @brief Constructs the Actor with a resource context.
-     * @param renderContext Rendering resource context (renderer, caches).
-     */
     Actor(Scene& scene);
 
-    /// Virtual destructor.
-    virtual ~Actor() = default;
+    virtual ~Actor();
 
-    /**
-     * @brief Initializes render resource pointers (material, mesh, etc.).
-     */
     virtual void Initialize();
 
+	/**
+	 * @brief Sets the actor's position in world space.
+	 * @param position New position vector (x, y, z).
+	 */
+	void SetPosition(const glm::vec3& position);
+
+	/**
+	 * @brief Sets the actor's rotation in degrees.
+	 * @param rotation New rotation vector (pitch, yaw, roll), in degrees.
+	 */
+	void SetRotation(const glm::vec3& rotation);
+
+	/**
+	 * @brief Sets the actor's scale along each axis.
+	 * @param scale New scale vector (x, y, z).
+	 */
+	void SetScale(const glm::vec3& scale);
+
+	/**
+	 * @brief Gets the actor's position.
+	 */
+	const glm::vec3& GetPosition() const;
+
+	/**
+	 * @brief Gets the actor's rotation (pitch, yaw, roll in degrees).
+	 */
+	const glm::vec3& GetRotation() const;
+
+	/**
+	 * @brief Gets the actor's scale.
+	 */
+	const glm::vec3& GetScale() const;
+
+	/**
+	 * @brief Access to the underlying SceneComponent (transform).
+	 */
+	SceneComponent& GetTransform();
+	const SceneComponent& GetTransform() const;
+	///@}
+
+
     /**
-     * @brief Updates logic (animation, movement, etc.) for this drawable.
+     * @brief Updates logic (animation, movement, etc.) for this actor.
      * @param deltaTime Time step (seconds).
      */
     virtual void Update(float deltaTime);
 
-    virtual void Draw(const Camera& camera);
-
     RenderResourceContext GetRenderContext() const;
+
+    void Destroy();
 
     Actor(const Actor&) = delete;
     Actor& operator=(const Actor&) = delete;
 
 protected:
-    RenderResourceContext mRenderContext;
+    virtual void Shutdown();
+
+    template <typename T, typename V>
+    T* CreateSubobject(V arg);
+
+protected:
+    SceneComponent mRootComponent;
+	bool bUpdateOnTick;
+
+private:
     Scene& mScene;
+    RenderResourceContext mRenderContext;
+    std::vector<Drawable3D*> mWards;
 
 };
 

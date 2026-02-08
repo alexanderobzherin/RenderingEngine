@@ -1,0 +1,15 @@
+{
+  "appName": "ActorDrawableAttach",
+  "isFullScreen": false,
+  "screenWidth": 1920,
+  "screenHeight": 1024,
+
+    "text": {
+    "scripts": [
+      "Latin"
+    ],
+    "fontSizePreload": [
+      10
+    ]
+  }
+}

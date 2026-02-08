@@ -5,6 +5,7 @@
 #include "drawable_2d.hpp"
 #include "drawable_3d.hpp"
 #include "drawable_component.hpp"
+#include "actor.hpp"
 
 namespace rendering_engine
 {
@@ -26,13 +27,24 @@ void Scene::Initialize()
 
 void Scene::Update(float deltaTime)
 {
+	// Update cameras
 	if (mActiveCamera2D)
 	{
 		mActiveCamera2D->Update(deltaTime);
 	}
 	if (mActiveCamera3D)
 	{
+		// TO DO - uncomment
 		//mActiveCamera3D->Update(deltaTime);
+	}
+
+	for (auto& actor : mActors)
+	{
+		actor->Update(deltaTime);
+	}
+	for (auto& actor2D : mActors2D)
+	{
+		//actor2D->Update(deltaTime);
 	}
 
 	for (auto& drawable2D : mDrawables2D)
@@ -41,8 +53,9 @@ void Scene::Update(float deltaTime)
 	}
 	for (auto& drawable3D : mDrawables3D)
 	{
-		//drawable3D->Update(deltaTime);
+		drawable3D->Update(deltaTime);
 	}
+
 	FlushDestroyed();
 }
 
@@ -108,6 +121,11 @@ void Scene::DestroyDrawable2D(Drawable2D* drawable2D)
 	mPendingDestroy2D.push_back(drawable2D);
 }
 
+void Scene::DestroyActor(Actor* actor)
+{
+	mPendingDestroyActors.push_back(actor);
+}
+
 void Scene::FlushDestroyed()
 {
 	for (auto* d : mPendingDestroy3D)
@@ -116,6 +134,7 @@ void Scene::FlushDestroyed()
 		if (it != mDrawables3D.end())
 		{
 			(*it)->Shutdown();
+			delete* it;
 			mDrawables3D.erase(it);
 		}
 	}
@@ -127,10 +146,23 @@ void Scene::FlushDestroyed()
 		if (it != mDrawables2D.end())
 		{
 			(*it)->Shutdown();
+			delete* it;
 			mDrawables2D.erase(it);
 		}
 	}
 	mPendingDestroy2D.clear();
+
+	for (auto* actor : mPendingDestroyActors)
+	{
+		auto it = std::find(mActors.begin(), mActors.end(), actor);
+		if (it != mActors.end())
+		{
+			(*it)->Shutdown();
+			delete* it;
+			mActors.erase(it);
+		}
+	}
+	mPendingDestroyActors.clear();
 }
 
 } // namespace rendering_engine

@@ -17,6 +17,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <memory>
 #include "vector_definitions.hpp"
+#include "rendering_engine_export.hpp"
 
 namespace rendering_engine
 {
@@ -38,7 +39,7 @@ namespace rendering_engine
  *   - **Z+** : Up
  * - Copy and assignment are disabled for this class.
  */
-class SceneComponent
+class RE_API SceneComponent
 {
 public:
 	/**
@@ -55,13 +56,15 @@ public:
 	 * @brief Updates the world transformation matrix from the current position, rotation, and scale.
 	 * @details Normally called automatically after setters; call manually if you modify transform members directly.
 	 */
+	void UpdateLocalMatrix();
+
 	void UpdateWorldMatrix();
 
 	/**
 	 * @brief Returns the world transformation matrix (model matrix).
 	 * @return The current world/model matrix (glm::mat4).
 	 */
-	const glm::mat4& GetWorldMatrix() const;
+	const glm::mat4& GetWorldMatrix();
 
 	/**
 	 * @brief Sets the position of the component in world space.
@@ -140,6 +143,39 @@ public:
 	 */
 	glm::vec3 GetUp() const;
 
+	/**
+	 * @brief Returns the world-space position of this component.
+	 * @return World-space position extracted from the world matrix.
+	 */
+	glm::vec3 GetWorldPosition() const;
+
+	/**
+	 * @brief Returns the world-space rotation of this component.
+	 * @return World-space rotation as a quaternion.
+	 *
+	 * @note Result is reliable for uniform scale.
+	 */
+	glm::quat GetWorldRotation() const;
+
+	/**
+	 * @brief Returns the world-space scale of this component.
+	 * @return World-space scale extracted from the world matrix.
+	 */
+	glm::vec3 GetWorldScale() const;
+
+	/**
+	 * @brief Attaches this scene component to a parent scene component.
+	 *
+	 * After attachment, this component's transform becomes relative to the parent.
+	 * The world transformation is computed by combining the parent's world transform
+	 * with this component's local transform.
+	 *
+	 * Passing nullptr detaches the component and makes it a root-level component.
+	 *
+	 * @param parent Pointer to the parent SceneComponent, or nullptr to detach.
+	 */
+	void AttachTo(SceneComponent* parent);
+
 	SceneComponent(const SceneComponent& rhs) = delete;
 	SceneComponent& operator=(const SceneComponent& rhs) = delete;
 
@@ -149,7 +185,11 @@ protected:
 	glm::vec3 mEulerRotation;
 	glm::vec3 mScale;
 
+	glm::mat4 mLocalMatrix;
 	glm::mat4 mWorldMatrix;
+
+	SceneComponent* mParent;
+	bool bIsDirty;
 };
 
 } //rendering_engine
