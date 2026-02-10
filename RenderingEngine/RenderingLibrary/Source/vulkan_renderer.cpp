@@ -167,7 +167,7 @@ bool VulkanRenderer::BeginFrame()
     mImagesInFlight[mImageIndex] = mInFlightFences[mCurrentFrame];
 
     vkResetFences(mLogicalDevice, 1, &mInFlightFences[mCurrentFrame]);
-
+    ++mFrameSerial;  
     ProcessDeferredDestruction();
 
     vkResetCommandBuffer(mCommandBuffers[mCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
@@ -274,6 +274,11 @@ void VulkanRenderer::WaitIdle()
 
 void VulkanRenderer::ShutdownRenderer()
 {
+    vkDeviceWaitIdle(mLogicalDevice);
+
+    mFrameSerial = std::numeric_limits<uint64_t>::max();
+    ProcessDeferredDestruction();
+
     CleanupSwapChain();
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -579,7 +584,8 @@ void VulkanRenderer::AddDeferredDestroy(DeferredItem deferredItem)
         case DeferredType::DescriptorPool: if (deferredItem.descriptorPool == VK_NULL_HANDLE) return; break;
     default: break;
     }
-    mDestroyObjects.push_back(deferredItem);
+    deferredItem.retireFrame = mFrameSerial + MAX_FRAMES_IN_FLIGHT;
+    mDeferredQueue.push_back(deferredItem);
 }
 
 void VulkanRenderer::CreateInstance()
@@ -1838,30 +1844,27 @@ void VulkanRenderer::EndSingleTimeCommand(VkCommandBuffer commandBuffer)
 
 void VulkanRenderer::ProcessDeferredDestruction()
 {
-    for (const auto& object : mDestroyObjects)
+    std::vector<DeferredItem> ripe;
+
+    while (!mDeferredQueue.empty() &&
+           mDeferredQueue.front().retireFrame <= mFrameSerial)
     {
-        switch (object.type)
-        {
-            case DeferredType::Buffer:
-            {
-                vkDestroyBuffer(mLogicalDevice, object.buffer, nullptr);
-                break;
-            } 
-            case DeferredType::Memory:
-            {
-                vkFreeMemory(mLogicalDevice, object.memory, nullptr);
-                break;
-            }
-            case DeferredType::DescriptorPool:
-            {
-                vkDestroyDescriptorPool(mLogicalDevice, object.descriptorPool, nullptr);
-                break;
-            }
-            default:
-                break;
-        }
+        ripe.push_back(mDeferredQueue.front());
+        mDeferredQueue.pop_front();
     }
-    mDestroyObjects.clear();
+
+    // Correct destruction order
+    for (auto& o : ripe)
+        if (o.type == DeferredType::DescriptorPool)
+            vkDestroyDescriptorPool(mLogicalDevice, o.descriptorPool, nullptr);
+
+    for (auto& o : ripe)
+        if (o.type == DeferredType::Buffer)
+            vkDestroyBuffer(mLogicalDevice, o.buffer, nullptr);
+
+    for (auto& o : ripe)
+        if (o.type == DeferredType::Memory)
+            vkFreeMemory(mLogicalDevice, o.memory, nullptr);
 }
 
 template<typename T>

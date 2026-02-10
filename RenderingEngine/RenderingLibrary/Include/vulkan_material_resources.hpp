@@ -74,7 +74,7 @@ public:
 
 private:
 	VulkanRenderer* mRenderer;
-	VkDescriptorSetLayout mDescriptorSetLayout;
+	VkDescriptorSetLayout mDescriptorSetLayout = VK_NULL_HANDLE;
 	std::pair<VkPipelineLayout, VkPipeline> mPipelinePair;
 };
 

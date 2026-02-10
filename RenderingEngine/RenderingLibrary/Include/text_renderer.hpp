@@ -101,6 +101,8 @@ public:
         return mLibrary;
     }
 
+    void Shutdown();
+
 protected:
     /**
      * @brief Discovers fonts available in a filesystem folder.

@@ -13,6 +13,8 @@ VulkanMaterialResources::VulkanMaterialResources(VulkanRenderer* renderer)
 
 void VulkanMaterialResources::Initialize(Material * material)
 {
+	Shutdown(); 
+
 	mDescriptorSetLayout = mRenderer->CreateDescriptorSetLayout(material);
 	
 	std::string matName;
@@ -52,11 +54,31 @@ void VulkanMaterialResources::Initialize(Material * material)
 
 void VulkanMaterialResources::Shutdown()
 {
-	auto vulkanLogicalDevice = mRenderer->GetLogicalDevice();
-	vkDestroyDescriptorSetLayout(vulkanLogicalDevice, mDescriptorSetLayout, nullptr);
+    if (!mRenderer)
+        return;
 
-	vkDestroyPipeline(vulkanLogicalDevice, mPipelinePair.second, nullptr);
-	vkDestroyPipelineLayout(vulkanLogicalDevice, mPipelinePair.first, nullptr);
+    VkDevice device = mRenderer->GetLogicalDevice(); // or GetDevice()
+
+    // Pipeline first
+    if (mPipelinePair.second != VK_NULL_HANDLE)
+    {
+        vkDestroyPipeline(device, mPipelinePair.second, nullptr);
+        mPipelinePair.second = VK_NULL_HANDLE;
+    }
+
+    // Then pipeline layout
+    if (mPipelinePair.first != VK_NULL_HANDLE)
+    {
+        vkDestroyPipelineLayout(device, mPipelinePair.first, nullptr);
+        mPipelinePair.first = VK_NULL_HANDLE;
+    }
+
+    // Then descriptor set layout
+    if (mDescriptorSetLayout != VK_NULL_HANDLE)
+    {
+        vkDestroyDescriptorSetLayout(device, mDescriptorSetLayout, nullptr);
+        mDescriptorSetLayout = VK_NULL_HANDLE;
+    }
 }
 
 VkDescriptorSetLayout VulkanMaterialResources::GetDescriptorSetLayout() const

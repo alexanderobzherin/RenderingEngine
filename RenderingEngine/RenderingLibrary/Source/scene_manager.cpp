@@ -114,6 +114,7 @@ void SceneManager::Shutdown()
 	mMaterialCache->ReleaseAll();
 	mModelCache->ReleaseAll();
 	mTextureCache->ReleaseAll();
+	mTextRenderer->Shutdown();
 }
 
 IApplication* SceneManager::GetApplication()

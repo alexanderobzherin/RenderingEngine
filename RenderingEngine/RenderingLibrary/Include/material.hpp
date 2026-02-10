@@ -38,6 +38,7 @@ public:
     explicit Material(IRenderer* renderer, 
                       MaterialSettings matSettings);
 
+    ~Material();
     /**
      * @brief Returns the material's static settings (domain, blend mode, shading model, etc.).
      */

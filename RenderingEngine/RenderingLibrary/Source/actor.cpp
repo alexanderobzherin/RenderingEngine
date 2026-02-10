@@ -76,16 +76,28 @@ RenderResourceContext Actor::GetRenderContext() const
 
 void Actor::Destroy()
 {
-	for (auto& ward : mWards)
-	{
-		ward->Destroy();
-	}
+    if (bPendingDestroy)
+        return;
+
+    bPendingDestroy = true;
+
+    for (auto* ward : mWards)
+        if (ward) ward->Destroy();
+
 	mScene.DestroyActor(this);
 }
-
+	
 void Actor::Shutdown()
 {
+    // Detach wards from this actor to avoid dangling parent pointers
+    for (auto* ward : mWards)
+    {
+        if (ward)
+            ward->GetTransform().AttachTo(nullptr);
+    }
+    mWards.clear();
 
+    mRootComponent.AttachTo(nullptr);
 }
 
 

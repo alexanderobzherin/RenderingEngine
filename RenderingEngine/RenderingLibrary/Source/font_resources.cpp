@@ -72,7 +72,11 @@ FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRender
 
 FontResources::~FontResources()
 {
-	FT_Done_Face(mFace);
+    if (mFace)
+    {
+        FT_Done_Face(mFace);
+        mFace = nullptr;
+    }
 }
 
 void FontResources::LoadGlyphsFromCodePointRange(std::uint32_t begin, std::uint32_t end)

@@ -14,6 +14,11 @@ Material::Material(IRenderer* renderer, MaterialSettings matSettings)
     mGpuHandle(nullptr),
     mParameterLayout(matSettings.parameterLayout)
 {}
+Material::~Material()
+{
+    if (mGpuHandle)
+        ReleaseRenderResources();
+}
 const MaterialSettings Material::GetMaterialSettings() const
 {
     return mMaterialSettings;
@@ -25,9 +30,11 @@ void Material::InitializeRenderResources()
 }
 void Material::ReleaseRenderResources()
 {
+    if (!mGpuHandle)
+        return;
+
     mGpuHandle->Shutdown();
-    mGpuHandle.release();
-    mGpuHandle = nullptr;
+    mGpuHandle.reset();
 }
 PackedMaterialData Material::PackMaterialParameters()
 {

@@ -10,6 +10,7 @@
 #include <optional>
 #include <vector>
 #include <unordered_map>
+#include <deque>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -69,6 +70,7 @@ union {
     VkPipeline pipeline;
     VkPipelineLayout pipelineLayout;
 };
+std::uint64_t retireFrame = 0;
 DeferredItem() { buffer = VK_NULL_HANDLE; }
 };
 
@@ -359,7 +361,8 @@ private:
     std::vector<VkFence> mImagesInFlight;
     std::vector<IRendererObserver*> mObservers;
 
-    std::vector<DeferredItem> mDestroyObjects;
+    std::uint64_t mFrameSerial = 0;
+    std::deque<DeferredItem> mDeferredQueue;
 
     glm::vec3 mBgColor = {1.0f, 1.0f, 1.0f};
 };

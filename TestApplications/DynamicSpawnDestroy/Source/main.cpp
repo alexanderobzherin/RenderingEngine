@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
     {
         app->Initialize();
         app->Run();
-        app->Shutdown();
     }
     catch( std::exception const& exc )
     {
