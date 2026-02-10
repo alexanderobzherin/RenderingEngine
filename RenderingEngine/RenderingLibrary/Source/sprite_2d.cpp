@@ -20,31 +20,38 @@ Sprite2D::Sprite2D(RenderResourceContext renderContext, Scene& scene, std::strin
 
 void Sprite2D::Initialize()
 {
-	auto texture = mRenderContext.textureCache->GetTextureResources(mTextureName);
-	const float width = static_cast<float>(texture->GetCpuImageData().GetWidth());
-	const float height = static_cast<float>(texture->GetCpuImageData().GetHeight());
+    auto texture = mRenderContext.textureCache->GetTextureResources(mTextureName);
+    const float width  = static_cast<float>(texture->GetCpuImageData().GetWidth());
+    const float height = static_cast<float>(texture->GetCpuImageData().GetHeight());
 
-	const std::string materialName = std::string{ "Sprite2D_" } + mTextureName + "Mat";
+    const std::string materialName = "Sprite2D_" + mTextureName + "Mat";
+    auto materialCache = mRenderContext.materialCache;
 
-	MaterialSettings materialSettings;
-	materialSettings.parentMaterialName = std::string{ "Quad2D" };
-	materialSettings.materialName = materialName;
-	materialSettings.materialDomain = MaterialDomain::Sprite2D;
-	materialSettings.shadingModel = ShadingModel::Unlit;
-	materialSettings.blendMode = BlendMode::Opaque;
+    Material* material = materialCache->GetMaterial(materialName);
 
-	auto materialCache = mRenderContext.materialCache;
-	materialCache->AddMaterial(materialSettings);
-	Material* material = materialCache->GetMaterial(materialName);
-	material->AddTexture(mTextureName);
-	material->InitializeRenderResources();
+    // CREATE MATERIAL ONLY ONCE
+    if (!material)
+    {
+        MaterialSettings materialSettings;
+        materialSettings.parentMaterialName = "Quad2D";
+        materialSettings.materialName = materialName;
+        materialSettings.materialDomain = MaterialDomain::Sprite2D;
+        materialSettings.shadingModel = ShadingModel::Unlit;
+        materialSettings.blendMode = BlendMode::Opaque;
 
-	const std::string meshName("Quad2D");
-	AddRenderBatch(meshName, materialName);
+        materialCache->AddMaterial(materialSettings);
 
-	Drawable2D::Initialize();
-	mTextureRespectiveScale = glm::vec2(width, height);
-	Drawable2D::SetScale(mTextureRespectiveScale);
+        material = materialCache->GetMaterial(materialName);
+        material->AddTexture(mTextureName);
+        material->InitializeRenderResources();
+    }
+
+    AddRenderBatch("Quad2D", materialName);
+
+    Drawable2D::Initialize();
+
+    mTextureRespectiveScale = glm::vec2(width, height);
+    Drawable2D::SetScale(mTextureRespectiveScale);
 }
 
 void Sprite2D::Update(float deltaTime)

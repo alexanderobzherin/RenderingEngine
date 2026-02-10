@@ -76,6 +76,7 @@ public:
     RenderResourceContext GetRenderContext() const;
 
     void Destroy();
+	bool IsPendingDestroy() const { return bPendingDestroy; }
 
     Actor(const Actor&) = delete;
     Actor& operator=(const Actor&) = delete;
@@ -89,6 +90,8 @@ protected:
 protected:
     SceneComponent mRootComponent;
 	bool bUpdateOnTick;
+
+	bool bPendingDestroy = false;
 
 private:
     Scene& mScene;

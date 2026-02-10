@@ -2,7 +2,7 @@
 #include "i_renderer.hpp"
 #include "material.hpp"
 #include "i_material_render_resources.hpp"
-
+#include <iostream>
 namespace rendering_engine
 {
 
@@ -70,12 +70,18 @@ void MaterialCache::CreateBuildInMaterials()
 
 void MaterialCache::AddMaterial(MaterialSettings matSettings)
 {
-	if (matSettings.materialName.empty())
-	{
-		// Log incorrect material name
-		return;
-	}
-	mMaterials[matSettings.materialName] = std::make_shared<Material>(mRenderer, matSettings);
+    if (matSettings.materialName.empty())
+        return;
+
+    auto it = mMaterials.find(matSettings.materialName);
+    if (it != mMaterials.end() && it->second)
+    {
+        std::cout << "Replacing material: " << matSettings.materialName << "\n";
+        it->second->ReleaseRenderResources();
+    }
+
+    mMaterials[matSettings.materialName] =
+        std::make_shared<Material>(mRenderer, matSettings);
 }
 
 Material* MaterialCache::GetMaterial(std::string materialName)

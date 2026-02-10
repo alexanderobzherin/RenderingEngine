@@ -111,6 +111,8 @@ void CoreApplication::Run()
         Update(mAppTime->ElapsedAppTimeMilliseconds());
         Draw();
     }
+
+    Shutdown();
 }
 
 void CoreApplication::Update(float deltaTime)

@@ -40,7 +40,8 @@ void Scene::Update(float deltaTime)
 
 	for (auto& actor : mActors)
 	{
-		actor->Update(deltaTime);
+		if (!actor->IsPendingDestroy())
+			actor->Update(deltaTime);
 	}
 	for (auto& actor2D : mActors2D)
 	{
@@ -79,16 +80,23 @@ void Scene::Draw()
 
 void Scene::Shutdown()
 {
-	for (auto& drawable2D : mDrawables2D)
-	{
-		drawable2D->Shutdown();
-	}
-	for (auto& drawable3D : mDrawables3D)
-	{
-		drawable3D->Shutdown();
-	}
-	mDrawables2D.clear();
-	mDrawables3D.clear();
+    // Finish any queued destroys first (so we don't double-delete later)
+    FlushDestroyed();
+
+    // Destroy drawables FIRST (they may reference actor transforms as parents)
+    for (auto* d : mDrawables2D) { if (d) { d->Shutdown(); delete d; } }
+    mDrawables2D.clear();
+
+    for (auto* d : mDrawables3D) { if (d) { d->Shutdown(); delete d; } }
+    mDrawables3D.clear();
+
+    // Now destroy actors
+    for (auto* a : mActors) { if (a) { a->Shutdown(); delete a; } }
+    mActors.clear();
+
+    mPendingDestroy2D.clear();
+    mPendingDestroy3D.clear();
+    mPendingDestroyActors.clear();
 }
 
 SceneManager& Scene::GetSceneManager()

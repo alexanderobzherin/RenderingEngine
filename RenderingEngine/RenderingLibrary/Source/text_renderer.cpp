@@ -107,7 +107,20 @@ TextRenderer::TextRenderer(RenderResourceContext rrc)
 
 TextRenderer::~TextRenderer()
 {
-	FT_Done_FreeType(mLibrary);
+}
+
+void TextRenderer::Shutdown()
+{
+    if (!mLibrary)
+        return;
+
+    for (auto& fontResource : mFontResources)
+        fontResource.second.reset();
+
+    mFontResources.clear();
+
+    FT_Done_FreeType(mLibrary);
+    mLibrary = nullptr;
 }
 
 void TextRenderer::LoadFontsFromFolder(std::string pathToFolder)

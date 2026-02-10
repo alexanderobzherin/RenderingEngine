@@ -71,7 +71,6 @@ void StartLevel::Initialize()
 		tbProp.fontSize = 18;
 		TextBlock2D* textBlock2D = Spawn<TextBlock2D>(tbProp);
 		textBlock2D->SetText("Random Text Block");
-
 		const int R255 = GenerateNumber(0, 255);
 		const int G255 = GenerateNumber(0, 255);
 		const int B255 = GenerateNumber(0, 255);
@@ -87,6 +86,7 @@ void StartLevel::Initialize()
 		return textBlock2D;
 	};
 	mDrawableSpawners.push_back(SpawnTextBlock2D);
+
 
 
 	for (int i = 0; i < mInnitNumberOfObjects; i++)
