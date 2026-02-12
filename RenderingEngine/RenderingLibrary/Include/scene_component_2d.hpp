@@ -14,25 +14,51 @@ namespace rendering_engine
 {
 /**
  * @class SceneComponent2D
- * @brief Represents a 2D transformable scene component with position, rotation, and scale.
+ * @brief Represents a hierarchical 2D transform component.
  *
- * SceneComponent2D holds position (in 2D), rotation (in degrees, counterclockwise), and scale.
- * It provides methods to set and get each component and maintains the current model matrix.
- * 
+ * SceneComponent2D stores local 2D transformation state:
+ *  - Position (x, y)
+ *  - Rotation (degrees, counterclockwise around Z-axis)
+ *  - Scale (x, y)
+ *
+ * It supports parent-child relationships, allowing hierarchical
+ * transform propagation. When attached to a parent component,
+ * its world transform is computed as:
+ *
+ *     World = ParentWorld * Local
+ *
  * The engine uses a left-handed coordinate system:
- * - X+ : Right
- * - Y+ : Up
+ *  - X+ : Right
+ *  - Y+ : Up
  *
- * The model matrix is updated automatically after any property change, and can be used to transform object-local
- * coordinates into world (scene) coordinates.
+ * Transform order is:
  *
- * Transform order is: scale, then rotate, then translate (S→R→T), matching typical 2D graphics pipelines.
+ *     M = T * R * S
+ *
+ * which results in object-space vertices being scaled, then rotated,
+ * then translated when applied.
+ *
+ * The component uses a dirty-flag mechanism. World matrices are
+ * recomputed lazily when requested.
+ *
+ * @note
+ *  - This component operates strictly in the 2D domain.
+ *  - Rotation is always around the Z-axis.
+ *  - Ownership and lifetime are managed externally (e.g., by Actor2D).
+ *
+ * @see Actor2D
  */
 class RE_API SceneComponent2D
 {
 public:
     /**
-     * @brief Constructs a SceneComponent2D at the origin, with zero rotation and unit scale.
+     * @brief Constructs a SceneComponent2D with identity transform.
+     *
+     * Initial state:
+     *  - Position = (0, 0)
+     *  - Rotation = 0 degrees
+     *  - Scale    = (1, 1)
+     *  - No parent attached
      */
     SceneComponent2D();
 
@@ -42,8 +68,12 @@ public:
     virtual ~SceneComponent2D() = default;
 
     /**
-     * @brief Sets the position in 2D space.
-     * @param position New position as glm::vec2.
+     * @brief Sets the local position of this component.
+     *
+     * Marks the component as dirty so that world transformation
+     * will be recalculated when needed.
+     *
+     * @param position Local position in 2D space.
      */
     void SetPosition(const glm::vec2& position);
 
@@ -76,20 +106,60 @@ public:
      * @return The scale as glm::vec2.
      */
     const glm::vec2& GetScale() const { return mScale; }
-
+    /**
+     * @brief Returns the world-space position of this component.
+     *
+     * Extracted from the world transformation matrix.
+     *
+     * @return World position as glm::vec2.
+     */
     glm::vec2 GetWorldPosition() const;
+    /**
+     * @brief Returns the accumulated world-space rotation.
+     *
+     * If attached to a parent, this includes parent rotation.
+     *
+     * @return World rotation angle in degrees.
+     */
     float GetWorldRotation() const;
+    /**
+     * @brief Returns the accumulated world-space scale.
+     *
+     * If attached to a parent, this includes parent scaling.
+     *
+     * @return World scale as glm::vec2.
+     */
     glm::vec2 GetWorldScale() const;
-
+    /**
+     * @brief Returns the world transformation matrix.
+     *
+     * If the component is marked dirty, the world matrix
+     * will be recomputed before returning.
+     *
+     * @return 4x4 world transformation matrix.
+     */
     const glm::mat4& GetWorldMatrix();
 
     /**
-     * @brief Updates the model matrix from the current position, rotation, and scale.
-     * @details 
-     * @see SetPosition(), SetRotation(), SetScale()
+     * @brief Recomputes the local transformation matrix.
+     *
+     * The local matrix is constructed as:
+     *
+     *     Local = T * R * S
+     *
+     * This method does not compute the world matrix.
+     * Called internally by UpdateWorldMatrix().
      */
     void UpdateLocalMatrix();
-
+    /**
+     * @brief Recomputes the world transformation matrix.
+     *
+     * Combines parent world matrix (if any) with the local matrix:
+     *
+     *     World = ParentWorld * Local
+     *
+     * Clears the dirty flag after update.
+     */
     void UpdateWorldMatrix();
 
     /**

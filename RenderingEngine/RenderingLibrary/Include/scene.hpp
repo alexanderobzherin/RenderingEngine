@@ -34,6 +34,10 @@ class Actor2D;
  *
  * @note Scenes are created and managed by SceneManager.
  * @see SceneManager, Drawable3D, Drawable2D, Camera, Camera2D
+ * 
+ * The Scene implements a deferred destruction mechanism to guarantee
+ * safe removal of actors and drawables during update and render passes.
+ * All objects spawned via the Scene are owned and lifetime-managed by it.
  */
 class RE_API Scene
 {
@@ -119,29 +123,111 @@ public:
 	template <typename T, typename V>
 	T* Spawn(V arg);
 
+	/**
+	 * @brief Spawns and registers a 3D actor of type T.
+	 *
+	 * The actor is:
+	 *  - Allocated and owned by the Scene.
+	 *  - Stored internally in the 3D actor list.
+	 *  - Automatically initialized via Initialize().
+	 *
+	 * The Scene manages the full lifecycle of the actor, including
+	 * deferred destruction and Shutdown() invocation.
+	 *
+	 * @tparam T Type deriving from Actor.
+	 * @return Pointer to the created actor instance.
+	 *
+	 * @note The returned pointer is owned by the Scene.
+	 *       Do not manually delete the actor.
+	 *
+	 * @see DestroyActor(), SpawnActor2D()
+	 */
 	template <typename T>
 	T* SpawnActor();
 
+	/**
+	 * @brief Spawns and registers a 2D actor of type T.
+	 *
+	 * The actor is:
+	 *  - Allocated and owned by the Scene.
+	 *  - Stored internally in the 2D actor list.
+	 *  - Automatically initialized via Initialize().
+	 *
+	 * This function mirrors SpawnActor() but operates in the 2D domain.
+	 * 2D actors use SceneComponent2D for hierarchical transformations.
+	 *
+	 * @tparam T Type deriving from Actor2D.
+	 * @return Pointer to the created 2D actor instance.
+	 *
+	 * @note The returned pointer is owned by the Scene.
+	 *       Do not manually delete the actor.
+	 *
+	 * @see SpawnActor(), DestroyActor(Actor2D*)
+	 */
 	template <typename T>
 	T* SpawnActor2D();
 
 protected:
 	/**
 	 * @brief Schedules a 3D drawable for deferred destruction.
+	 *
+	 * The drawable will be shut down and removed safely during
+	 * the next Scene flush cycle.
+	 *
+	 * @param drawable3D Pointer to the drawable to destroy.
 	 */
 	void DestroyDrawable3D(Drawable3D* drawable3D);
 	/**
 	 * @brief Schedules a 2D drawable for deferred destruction.
+	 *
+	 * The drawable will be shut down and removed safely during
+	 * the next Scene flush cycle.
+	 *
+	 * @param drawable2D Pointer to the drawable to destroy.
 	 */
 	void DestroyDrawable2D(Drawable2D* drawable2D);
 	/**
-	 * @brief Schedules a 2D actor for deferred destruction.
+	 * @brief Schedules a 3D actor for deferred destruction.
+	 *
+	 * The actor is not destroyed immediately. Instead, it is placed into
+	 * a pending destruction queue and safely removed during the next
+	 * Scene update cycle.
+	 *
+	 * This ensures that destruction does not invalidate iterators or
+	 * interfere with the current update/draw pass.
+	 *
+	 * @param actor Pointer to the actor to destroy.
+	 *
+	 * @note Do not delete actors manually. Always use Actor::Destroy().
 	 */
 	void DestroyActor(Actor* actor);
-
+	/**
+	 * @brief Schedules a 2D actor for deferred destruction.
+	 *
+	 * Mirrors DestroyActor(Actor*) but operates on the 2D actor list.
+	 * The actor will be safely shut down and deleted during
+	 * the next flush phase.
+	 *
+	 * @param actor2D Pointer to the 2D actor to destroy.
+	 *
+	 * @note Do not delete actors manually. Always use Actor2D::Destroy().
+	 */
 	void DestroyActor(Actor2D * actor2D);
 
 private:
+	/**
+	 * @brief Processes all pending destruction queues.
+	 *
+	 * This method:
+	 *  - Shuts down and deletes pending 3D drawables
+	 *  - Shuts down and deletes pending 2D drawables
+	 *  - Shuts down and deletes pending 3D actors
+	 *  - Shuts down and deletes pending 2D actors
+	 *
+	 * Called internally during Scene::Update() and Scene::Shutdown().
+	 *
+	 * @note Ensures safe destruction without invalidating update/draw loops.
+	 */
 	void FlushDestroyed();
 
 private:
