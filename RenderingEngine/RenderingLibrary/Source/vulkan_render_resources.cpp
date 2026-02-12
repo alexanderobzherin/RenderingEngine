@@ -52,20 +52,29 @@ void VulkanRenderResources::SubmitResources(Transformations3D& transformations, 
 
 void VulkanRenderResources::Shutdown()
 {
-    DeferredItem descriptorPool;
-    descriptorPool.type = DeferredType::DescriptorPool;
-    descriptorPool.descriptorPool = mDescriptorPool;
-    mRenderer->AddDeferredDestroy(descriptorPool);
-    mDescriptorPool = VK_NULL_HANDLE;
-
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    if (mDescriptorPool != VK_NULL_HANDLE)
     {
-        if (!mTransformationBuffers.empty())
-        {   
+        DeferredItem descriptorPool;
+        descriptorPool.type = DeferredType::DescriptorPool;
+        descriptorPool.descriptorPool = mDescriptorPool;
+        mRenderer->AddDeferredDestroy(descriptorPool);
+        mDescriptorPool = VK_NULL_HANDLE;
+
+    }
+
+    for (size_t i = 0; i < mTransformationBuffers.size(); i++)
+    {
+        if (mTransformationBuffers[i] != VK_NULL_HANDLE)
+        {
             DeferredItem tBuffer;
             tBuffer.type = DeferredType::Buffer;
             tBuffer.buffer = mTransformationBuffers[i];
             mRenderer->AddDeferredDestroy(tBuffer);
+        }
+
+        if (i < mTransformationBuffersMemory.size() &&
+            mTransformationBuffersMemory[i] != VK_NULL_HANDLE)
+        {
 
             DeferredItem tMem;
             tMem.type = DeferredType::Memory;
@@ -75,14 +84,21 @@ void VulkanRenderResources::Shutdown()
             mTransformationBuffers[i] = VK_NULL_HANDLE;
             mTransformationBuffersMemory[i] = VK_NULL_HANDLE;
         }
+    }
 
-        if (!mMaterialParametersBuffers.empty())
+    for(size_t i = 0; i < mMaterialParametersBuffers.size(); ++i)
+    {
+        if (mMaterialParametersBuffers[i] != VK_NULL_HANDLE)
         {
             DeferredItem matBuffer;
             matBuffer.type = DeferredType::Buffer;
             matBuffer.buffer = mMaterialParametersBuffers[i];
             mRenderer->AddDeferredDestroy(matBuffer);
+        }
 
+        if(i < mMaterialParametersMemory.size() &&
+            mMaterialParametersMemory[i] != VK_NULL_HANDLE)
+        {
             DeferredItem matMem;
             matMem.type = DeferredType::Memory;
             matMem.memory = mMaterialParametersMemory[i];

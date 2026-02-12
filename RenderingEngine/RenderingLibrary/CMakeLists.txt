@@ -63,6 +63,7 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/drawable_3d.hpp
 	${PROJECT_SOURCE_DIR}/Include/quad_2d.hpp
 	${PROJECT_SOURCE_DIR}/Include/sprite_2d.hpp
+	${PROJECT_SOURCE_DIR}/Include/rectangle_2d.hpp
 	${PROJECT_SOURCE_DIR}/Include/static_mesh.hpp
 	
 	# Text rendering system
@@ -87,7 +88,9 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/app_clock.hpp
 	
 	${PROJECT_SOURCE_DIR}/Include/actor.hpp
-	${PROJECT_SOURCE_DIR}/Include/create_subobject.hpp
+	${PROJECT_SOURCE_DIR}/Include/actor_2d.hpp
+	${PROJECT_SOURCE_DIR}/Include/create_actor_subobject.hpp
+	${PROJECT_SOURCE_DIR}/Include/create_actor_2d_subobject.hpp
 )
 
 set(RenderingLibrary_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/Include/")
@@ -132,6 +135,7 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/drawable_3d.cpp
 	${PROJECT_SOURCE_DIR}/Source/quad_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/sprite_2d.cpp
+	${PROJECT_SOURCE_DIR}/Source/rectangle_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/static_mesh.cpp
 
 	# Text rendering system
@@ -155,6 +159,7 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/app_clock.cpp
 	
 	${PROJECT_SOURCE_DIR}/Source/actor.cpp
+	${PROJECT_SOURCE_DIR}/Source/actor_2d.cpp
 )
 
 

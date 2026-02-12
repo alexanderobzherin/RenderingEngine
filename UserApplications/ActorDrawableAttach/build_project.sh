@@ -68,7 +68,8 @@ CompileShaders()
   $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Quad2D/Quad2D.frag -o $PATH_SHADERS_BIN/Quad2D/Quad2D_frag.spv
   $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Font2D/Font2D.vert -o $PATH_SHADERS_BIN/Font2D/Font2D_vert.spv
   $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Font2D/Font2D.frag -o $PATH_SHADERS_BIN/Font2D/Font2D_frag.spv
-
+  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Rectangle2D/Rectangle2D.vert -o $PATH_SHADERS_BIN/Rectangle2D/Rectangle2D_vert.spv
+  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Rectangle2D/Rectangle2D.frag -o $PATH_SHADERS_BIN/Rectangle2D/Rectangle2D_frag.spv
   # Compile custom user shader from json files via calling MaterialCompiler
   # TO DO
 }

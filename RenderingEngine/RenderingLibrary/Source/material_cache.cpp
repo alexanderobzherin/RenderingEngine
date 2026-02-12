@@ -66,6 +66,19 @@ void MaterialCache::CreateBuildInMaterials()
 	}
 
 	testSprite2dMat->InitializeRenderResources();
+
+	MaterialSettings rectangle2D;
+	rectangle2D.materialName = std::string{ "Rectangle2D" };
+	rectangle2D.materialDomain = MaterialDomain::Sprite2D;
+	rectangle2D.shadingModel = ShadingModel::Unlit;
+	rectangle2D.blendMode = BlendMode::Translucent;
+	rectangle2D.parameterLayout = &Rectangle2DLayout;
+
+	AddMaterial(rectangle2D);
+	Material* rectangle2DMat = GetMaterial(rectangle2D.materialName);
+	rectangle2DMat->SetVec4("Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	rectangle2DMat->InitializeRenderResources();
+
 }
 
 void MaterialCache::AddMaterial(MaterialSettings matSettings)

@@ -152,6 +152,11 @@ set(font2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Font2D/Font2D_vert.spv")
 set(font2D_frag_source "${PATH_TO_SOURCE_SHADER}/Font2D/Font2D.frag")
 set(font2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Font2D/Font2D_frag.spv")
 
+set(rectangle2D_vert_source "${PATH_TO_SOURCE_SHADER}/Rectangle2D/Rectangle2D.vert")
+set(rectangle2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Rectangle2D/Rectangle2D_vert.spv")
+set(rectangle2D_frag_source "${PATH_TO_SOURCE_SHADER}/Rectangle2D/Rectangle2D.frag")
+set(rectangle2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Rectangle2D/Rectangle2D_frag.spv")
+
 if(WIN32)
 add_custom_command(
 	TARGET DrawTextBlocks  
@@ -192,6 +197,9 @@ add_custom_command(
 
 	COMMAND cmd /c ${SHADER_COMPILER} ${font2D_vert_source} -o ${font2D_vert_spv}
 	COMMAND cmd /c ${SHADER_COMPILER} ${font2D_frag_source} -o ${font2D_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${rectangle2D_vert_source} -o ${rectangle2D_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${rectangle2D_frag_source} -o ${rectangle2D_frag_spv}
 
 	# Compile custom user shader from json files via calling MaterialCompiler
 	# TO DO

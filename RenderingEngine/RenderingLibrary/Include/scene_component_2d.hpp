@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "rendering_engine_export.hpp"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -26,7 +28,7 @@ namespace rendering_engine
  *
  * Transform order is: scale, then rotate, then translate (S→R→T), matching typical 2D graphics pipelines.
  */
-class SceneComponent2D
+class RE_API SceneComponent2D
 {
 public:
     /**
@@ -75,27 +77,47 @@ public:
      */
     const glm::vec2& GetScale() const { return mScale; }
 
-    /**
-     * @brief Gets the model matrix for this component.
-     * @return The model matrix as glm::mat4.
-     *
-     * @note Use this to transform object-local coordinates into world (scene) coordinates.
-     */
-    const glm::mat4& GetModelMatrix() const { return mModelMatrix; }
+    glm::vec2 GetWorldPosition() const;
+    float GetWorldRotation() const;
+    glm::vec2 GetWorldScale() const;
+
+    const glm::mat4& GetWorldMatrix();
 
     /**
      * @brief Updates the model matrix from the current position, rotation, and scale.
-     * @details Called automatically after property changes, but can be called manually if needed.
+     * @details 
      * @see SetPosition(), SetRotation(), SetScale()
      */
-    void UpdateModelMatrix();
+    void UpdateLocalMatrix();
+
+    void UpdateWorldMatrix();
+
+    /**
+     * @brief Attaches this scene component to a parent scene component.
+     *
+     * After attachment, this component's transform becomes relative to the parent.
+     * The world transformation is computed by combining the parent's world transform
+     * with this component's local transform.
+     *
+     * Passing nullptr detaches the component and makes it a root-level component.
+     *
+     * @param parent Pointer to the parent SceneComponent2D, or nullptr to detach.
+     */
+    void AttachTo(SceneComponent2D* parent);
+
+    SceneComponent2D(const SceneComponent2D& rhs) = delete;
+    SceneComponent2D& operator=(const SceneComponent2D& rhs) = delete;
 
 protected:
     glm::vec2 mPosition;
     float mRotation;
     glm::vec2 mScale;
 
-    glm::mat4 mModelMatrix;
+    glm::mat4 mLocalMatrix;
+    glm::mat4 mWorldMatrix;
+
+    SceneComponent2D* mParent;
+    bool bIsDirty;
 };
 
 } // namespace rendering_engine

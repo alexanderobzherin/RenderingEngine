@@ -62,7 +62,7 @@ void Sprite2D::Update(float deltaTime)
 void Sprite2D::Draw(const Camera2D& camera)
 {
 	Transformations2D transformations;
-	transformations.model = GetTransform().GetModelMatrix();
+	transformations.model = GetTransform().GetWorldMatrix();
 	transformations.view = camera.GetWorldView();
 	transformations.proj = camera.GetProjectionMatrix();
 

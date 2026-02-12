@@ -1,12 +1,11 @@
-#include "actor.hpp"
+#include "actor_2d.hpp"
 #include "scene.hpp"
 #include "scene_manager.hpp"
-#include "drawable_3d.hpp"
+#include "drawable_2d.hpp"
 
 namespace rendering_engine
 {
-
-Actor::Actor(Scene& scene)
+Actor2D::Actor2D(Scene& scene)
 	:
 	mScene(scene),
 	bUpdateOnTick(true)
@@ -14,56 +13,55 @@ Actor::Actor(Scene& scene)
 	mRenderContext = mScene.GetSceneManager().GetRenderResourceContext();
 }
 
-Actor::~Actor()
+Actor2D::~Actor2D()
 {
 }
 
-void Actor::Initialize()
+void Actor2D::Initialize()
 {
 }
 
-void Actor::SetPosition(const glm::vec3& position)
+void Actor2D::SetPosition(const glm::vec2& position)
 {
 	mRootComponent.SetPosition(position);
 }
 
-void Actor::SetRotation(const glm::vec3& rotation)
+void Actor2D::SetRotation(float angleDegrees)
 {
-	mRootComponent.SetRotation(rotation);
-
+	mRootComponent.SetRotation(angleDegrees);
 }
 
-void Actor::SetScale(const glm::vec3& scale)
+void Actor2D::SetScale(const glm::vec2& scale)
 {
 	mRootComponent.SetScale(scale);
 }
 
-const glm::vec3& Actor::GetPosition() const
+const glm::vec2& Actor2D::GetPosition() const
 {
 	return mRootComponent.GetPosition();
 }
 
-const glm::vec3& Actor::GetRotation() const
+float Actor2D::GetRotation() const
 {
 	return mRootComponent.GetRotation();
 }
 
-const glm::vec3& Actor::GetScale() const
+const glm::vec2& Actor2D::GetScale() const
 {
 	return mRootComponent.GetScale();
 }
 
-SceneComponent& Actor::GetTransform()
+SceneComponent2D& Actor2D::GetTransform()
 {
 	return mRootComponent;
 }
 
-const SceneComponent& Actor::GetTransform() const
+const SceneComponent2D& Actor2D::GetTransform() const
 {
 	return mRootComponent;
 }
 
-void Actor::Update(float deltaTime)
+void Actor2D::Update(float deltaTime)
 {
 	if (!bUpdateOnTick)
 		return;
@@ -71,12 +69,12 @@ void Actor::Update(float deltaTime)
 	mRootComponent.UpdateWorldMatrix();
 }
 
-RenderResourceContext Actor::GetRenderContext() const
+RenderResourceContext Actor2D::GetRenderContext() const
 {
 	return mRenderContext;
 }
 
-void Actor::Destroy()
+void Actor2D::Destroy()
 {
     if (bPendingDestroy)
         return;
@@ -99,13 +97,14 @@ void Actor::Destroy()
 
     mScene.DestroyActor(this);
 }
-	
-void Actor::Shutdown()
-{
-    mWards.clear();
 
-    mRootComponent.AttachTo(nullptr);
+void Actor2D::Shutdown()
+{
+	mWards.clear();
+
+	mRootComponent.AttachTo(nullptr);
 }
+
 
 
 

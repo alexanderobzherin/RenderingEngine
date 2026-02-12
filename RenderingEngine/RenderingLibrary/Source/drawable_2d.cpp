@@ -16,7 +16,10 @@ void Drawable2D::Initialize()
 
 void Drawable2D::Update(float deltaTime)
 {
-	mSceneComponent.UpdateModelMatrix();
+	if (bUpdateOnTick)
+	{
+		mSceneComponent.UpdateWorldMatrix();
+	}
 }
 
 void Drawable2D::SetPosition(const glm::vec2& position)

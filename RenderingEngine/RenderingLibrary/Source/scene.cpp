@@ -6,6 +6,7 @@
 #include "drawable_3d.hpp"
 #include "drawable_component.hpp"
 #include "actor.hpp"
+#include "actor_2d.hpp"
 
 namespace rendering_engine
 {
@@ -45,7 +46,8 @@ void Scene::Update(float deltaTime)
 	}
 	for (auto& actor2D : mActors2D)
 	{
-		//actor2D->Update(deltaTime);
+		if (!actor2D->IsPendingDestroy())
+			actor2D->Update(deltaTime);
 	}
 
 	for (auto& drawable2D : mDrawables2D)
@@ -62,18 +64,19 @@ void Scene::Update(float deltaTime)
 
 void Scene::Draw()
 {
-	if (mActiveCamera2D)
-	{
-		for (auto& drawable2D : mDrawables2D)
-		{
-			drawable2D->Draw(*mActiveCamera2D);
-		}
-	}
 	if (mActiveCamera3D)
 	{
 		for (auto& drawable3D : mDrawables3D)
 		{
 			drawable3D->Draw(*mActiveCamera3D);
+		}
+	}
+
+	if (mActiveCamera2D)
+	{
+		for (auto& drawable2D : mDrawables2D)
+		{
+			drawable2D->Draw(*mActiveCamera2D);
 		}
 	}
 }
@@ -94,9 +97,13 @@ void Scene::Shutdown()
     for (auto* a : mActors) { if (a) { a->Shutdown(); delete a; } }
     mActors.clear();
 
+	for (auto* a : mActors2D) { if (a) { a->Shutdown(); delete a; } }
+	mActors2D.clear();
+
     mPendingDestroy2D.clear();
     mPendingDestroy3D.clear();
     mPendingDestroyActors.clear();
+	mPendingDestroyActors2D.clear();
 }
 
 SceneManager& Scene::GetSceneManager()
@@ -132,6 +139,11 @@ void Scene::DestroyDrawable2D(Drawable2D* drawable2D)
 void Scene::DestroyActor(Actor* actor)
 {
 	mPendingDestroyActors.push_back(actor);
+}
+
+void Scene::DestroyActor(Actor2D* actor2D)
+{
+	mPendingDestroyActors2D.push_back(actor2D);
 }
 
 void Scene::FlushDestroyed()

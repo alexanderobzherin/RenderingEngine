@@ -1,6 +1,6 @@
 #include "cube_cluster_actor.hpp"
 
-#include "create_subobject.hpp"
+#include "create_actor_subobject.hpp"
 #include "scene_component.hpp"
 #include "static_mesh.hpp"
 

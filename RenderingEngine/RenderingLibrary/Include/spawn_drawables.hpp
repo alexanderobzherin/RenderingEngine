@@ -21,6 +21,7 @@
 #include "static_mesh.hpp"
 #include "sprite_2d.hpp"
 #include "text_block_2d.hpp"
+#include "rectangle_2d.hpp"
 
 namespace rendering_engine
 {
@@ -60,5 +61,13 @@ TextBlock2D* Scene::Spawn<TextBlock2D, TextBlock2D::Properties>(TextBlock2D::Pro
 	return textBlock;
 }
 
+template <>
+Rectangle2D* Scene::Spawn<Rectangle2D, Rectangle2D::Properties>(Rectangle2D::Properties prop)
+{
+	mDrawables2D.push_back(new Rectangle2D(mSceneManager.GetRenderResourceContext(), *this, prop));
+	Rectangle2D* rectangle2D = static_cast<Rectangle2D*>(mDrawables2D.back());
+	rectangle2D->Initialize();
+	return rectangle2D;
+}
 
 } // namespace rendering_engine
