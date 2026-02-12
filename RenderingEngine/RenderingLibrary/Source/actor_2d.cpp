@@ -76,25 +76,30 @@ RenderResourceContext Actor2D::GetRenderContext() const
 
 void Actor2D::Destroy()
 {
-	if (bPendingDestroy)
-		return;
+    if (bPendingDestroy)
+        return;
 
-	bPendingDestroy = true;
+    bPendingDestroy = true;
 
-	for (auto* ward : mWards)
-		if (ward) ward->Destroy();
+    // Detach wards while they are still valid objects
+    for (auto* ward : mWards)
+    {
+        if (ward)
+            ward->GetTransform().AttachTo(nullptr);
+    }
 
-	mScene.DestroyActor(this);
+    // Now schedule ward destruction
+    for (auto* ward : mWards)
+    {
+        if (ward)
+            ward->Destroy();
+    }
+
+    mScene.DestroyActor(this);
 }
 
 void Actor2D::Shutdown()
 {
-	// Detach wards from this actor to avoid dangling parent pointers
-	for (auto* ward : mWards)
-	{
-		if (ward)
-			ward->GetTransform().AttachTo(nullptr);
-	}
 	mWards.clear();
 
 	mRootComponent.AttachTo(nullptr);
