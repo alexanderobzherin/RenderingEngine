@@ -12,8 +12,6 @@
 
 namespace rendering_engine
 {
-template <>
-StaticMesh* Actor::CreateSubobject<StaticMesh>(StaticMeshParams params);
 
 template <>
 StaticMesh* Actor::CreateSubobject<StaticMesh>(StaticMeshParams params)
@@ -24,4 +22,6 @@ StaticMesh* Actor::CreateSubobject<StaticMesh>(StaticMeshParams params)
 
 	return staticMesh;
 }
+
+
 } // namespace rendering_engine

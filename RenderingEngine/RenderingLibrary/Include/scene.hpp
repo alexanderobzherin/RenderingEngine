@@ -122,6 +122,9 @@ public:
 	template <typename T>
 	T* SpawnActor();
 
+	template <typename T>
+	T* SpawnActor2D();
+
 protected:
 	/**
 	 * @brief Schedules a 3D drawable for deferred destruction.
@@ -135,6 +138,8 @@ protected:
 	 * @brief Schedules a 2D actor for deferred destruction.
 	 */
 	void DestroyActor(Actor* actor);
+
+	void DestroyActor(Actor2D * actor2D);
 
 private:
 	void FlushDestroyed();
@@ -155,6 +160,7 @@ private:
 	std::vector<Actor*> mPendingDestroyActors;
 
 	std::vector<Actor2D*> mActors2D;
+	std::vector<Actor2D*> mPendingDestroyActors2D;
 };	
 
 template <typename T>
@@ -165,6 +171,19 @@ inline T* Scene::SpawnActor()
 
 	mActors.push_back(new T(*this));
 	T* ptr = static_cast<T*>(mActors.back());
+
+	ptr->Initialize();
+	return ptr;
+}
+
+template <typename T>
+inline T* Scene::SpawnActor2D()
+{
+	static_assert(std::is_base_of_v<Actor2D, T>,
+		"SpawnActor<T>: T must derive from Actor2D");
+
+	mActors2D.push_back(new T(*this));
+	T* ptr = static_cast<T*>(mActors2D.back());
 
 	ptr->Initialize();
 	return ptr;

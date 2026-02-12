@@ -27,7 +27,7 @@ void StartLevel::Initialize()
 	// Generate random positions in visible viewport
 	// 	  For 3D objects:
 	//          0.0   [-5; 5] [-3; 3]
-	//	 For 3D objects:
+	//	 For 2D objects:
 	//        [-300; 300] [-200; 200]
 
 	auto SpawnCube = [&]() {

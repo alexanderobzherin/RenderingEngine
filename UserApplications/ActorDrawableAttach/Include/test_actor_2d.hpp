@@ -5,35 +5,37 @@
 
 #pragma once
 
-#include "scene.hpp"
-
-#include <memory>
+#include "actor_2d.hpp"
 
 using namespace rendering_engine;
 
 namespace rendering_engine
 {
-class SceneManager;
+class Rectangle2D;
+class TextBlock2D;
 }
 
 namespace application
 {
-class CubeClusterActor;
-class TestActor2D;
 
-class StartLevel : public Scene
+class TestActor2D : public Actor2D
 {
 public:
-	StartLevel(SceneManager& sceneManager);
+	TestActor2D(Scene& scene);
 
 	void Initialize() override;
+
 	void Update(float deltaTime) override;
 
 private:
-	const int mFrequency = 600;
-	int mTicking = 0;
-	CubeClusterActor* mCubeClusterActor;
-	TestActor2D* mTestActor2D;
+	float mAngularVelocity = 0.3f;
+
+	Rectangle2D* mRectangle2D;
+	TextBlock2D* mLeftTextBlock2D;
+	TextBlock2D* mRightTextBlock2D;
+	
+	const float mSpeed = 1.0f;
+	glm::vec2 mMovementDirection = glm::vec2(1.0f, 0.0f);
 };
 
-} //application
+} // namespace rendering_engine

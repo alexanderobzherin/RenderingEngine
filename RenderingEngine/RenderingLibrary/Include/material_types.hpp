@@ -159,4 +159,9 @@ static const std::vector<MaterialParameterLayoutEntry> Font2DLayout =
 	{ "InvAtlasSizeHeight",       40, 4,  MaterialParameterLayoutEntry::Type::Float }
 };
 
+static const std::vector<MaterialParameterLayoutEntry> Rectangle2DLayout =
+{
+	{ "Color",   0, 16, MaterialParameterLayoutEntry::Type::Vec4 }
+};
+
 } // namespace rendering_engine

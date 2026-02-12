@@ -24,7 +24,7 @@ A generated project contains:
 - Minimal C++ files (main + start scene)
 - Auto-copied assets (Shaders, Models, Textures, Fonts)
 - A per-project build script for Unix (build_project.sh)
-- Auto-registration in TestApplications/CMakeLists.txt
+- Auto-registration in UserApplications/CMakeLists.txt
 
 This system works on Windows and FreeBSD/Linux, but the build workflows differ slightly.
 

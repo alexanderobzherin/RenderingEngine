@@ -12,7 +12,6 @@
 namespace rendering_engine
 {
 
-class SceneComponent;
 class DrawableComponent;
 class Drawable3D;
 

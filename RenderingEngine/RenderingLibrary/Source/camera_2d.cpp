@@ -86,7 +86,7 @@ float Camera2D::GetZoom() const
 
 const glm::mat4& Camera2D::GetWorldView() const
 {
-	return mSceneComponent->GetModelMatrix();
+	return mSceneComponent->GetWorldMatrix();
 }
 
 glm::mat4 Camera2D::ComputeOrthographicMatrix(float left, float right, float top, float bottom, float nearPlane, float farPlane) const
