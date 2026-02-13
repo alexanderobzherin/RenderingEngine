@@ -8,19 +8,13 @@ cmake_minimum_required(VERSION 3.16)
 project(ActorDrawableAttach LANGUAGES CXX)
 
 #set header files
-set(HEADER_FILES
-	${PROJECT_SOURCE_DIR}/Include/level_register.hpp
-	${PROJECT_SOURCE_DIR}/Include/start_level.hpp
-	${PROJECT_SOURCE_DIR}/Include/cube_cluster_actor.hpp
-	${PROJECT_SOURCE_DIR}/Include/test_actor_2d.hpp
+file(GLOB_RECURSE HEADER_FILES
+    "${PROJECT_SOURCE_DIR}/Include/*.hpp"
 )
 
 #set source files
-set(SRC_FILES
-    ${PROJECT_SOURCE_DIR}/Source/main.cpp
-	${PROJECT_SOURCE_DIR}/Source/start_level.cpp
-	${PROJECT_SOURCE_DIR}/Source/cube_cluster_actor.cpp
-	${PROJECT_SOURCE_DIR}/Source/test_actor_2d.cpp
+file(GLOB_RECURSE SRC_FILES
+    "${PROJECT_SOURCE_DIR}/Source/*.cpp"
 )
 
 include_directories(${PROJECT_SOURCE_DIR}/Include/)

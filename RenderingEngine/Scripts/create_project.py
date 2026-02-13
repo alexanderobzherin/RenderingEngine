@@ -39,7 +39,8 @@ def copy_template(src_dir, dst_dir, project_name):
         for file in files:
             src_file = os.path.join(root, file)
             dst_file = os.path.join(target_root, file)
-            if ".in" in file:
+            # Do not process .in files inside Scripts/Templates
+            if file.endswith(".in") and not rel_path.startswith(os.path.join("Scripts", "Templates")):
                 dst_file = os.path.join(target_root, file.replace(".in", ""))
 
                 with open(src_file, "r") as f:

@@ -8,15 +8,13 @@ cmake_minimum_required(VERSION 3.16)
 project(DrawTextBlocks LANGUAGES CXX)
 
 #set header files
-set(HEADER_FILES
-	${PROJECT_SOURCE_DIR}/Include/level_register.hpp
-	${PROJECT_SOURCE_DIR}/Include/start_level.hpp
+file(GLOB_RECURSE HEADER_FILES
+    "${PROJECT_SOURCE_DIR}/Include/*.hpp"
 )
 
 #set source files
-set(SRC_FILES
-    ${PROJECT_SOURCE_DIR}/Source/main.cpp
-	${PROJECT_SOURCE_DIR}/Source/start_level.cpp
+file(GLOB_RECURSE SRC_FILES
+    "${PROJECT_SOURCE_DIR}/Source/*.cpp"
 )
 
 include_directories(${PROJECT_SOURCE_DIR}/Include/)
