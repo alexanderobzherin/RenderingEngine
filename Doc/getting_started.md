@@ -32,10 +32,15 @@ Configure your application settings, such as screen size and other runtime param
 See: [Application Config Guide](app_config_guide.md)
 
 ### 3. Application Development
+
 Implement your application logic by:
-- deriving from renderable base classes (for example, Drawable2D and Drawable3D) to create visual elements
-- defining application flow and behaviour by deriving from Scene, where you implement: object lifecycles, level logic, transitions between scenes, etc.
-See: **Classes** for full API documentation.
+- Creating ```Actor``` and ```Actor2D``` based classes
+- Attaching drawable subobjects (such as ```StaticMesh```, ```Rectangle2D```, ```TextBlock2D```)
+- Defining application flow and behaviour by deriving from ```Scene```
+
+See: [Application Development Guide](application_development_guide.md)
+
+See also: **Classes** for full API documentation.
 
 ### 4. Project Packaging
 Package your application for distribution, for example:
