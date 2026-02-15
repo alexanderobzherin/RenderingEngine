@@ -284,7 +284,7 @@ void TextRenderer::LoadFontsAvailableInPackage()
 		const std::string& virtualPath = entry.first;
 		if (virtualPath.rfind(folderEntry, 0) == 0) // starts with Fonts/
 		{
-			auto fontFilePath = boost::filesystem::path(virtualPath.substr(folderEntry.size()));
+			auto fontFilePath = boost::filesystem::path(virtualPath);
 			const std::string ext = fontFilePath.extension().string();
 			if (ext != ".ttf" && ext != ".otf")
 				continue;
@@ -312,6 +312,7 @@ void TextRenderer::LoadPreloadableFontAtlasesFromPackage(const std::unordered_ma
 					auto key = std::make_pair(fontName, fontSize);
 					if (mFontResources.find(key) == mFontResources.end())
 					{
+						std::cout << "Virtual file path: " << virtualFilePath << std::endl;
 						std::vector<uint8_t> binaryFileData = Utility::ReadPackedFile(virtualFilePath);
 
 						mFontResources[key] = std::make_shared<FontResources>(mRenderResourceContext, this, fontName, binaryFileData, fontSize);

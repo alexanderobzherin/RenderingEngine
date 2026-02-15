@@ -91,6 +91,8 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/actor_2d.hpp
 	${PROJECT_SOURCE_DIR}/Include/create_actor_subobject.hpp
 	${PROJECT_SOURCE_DIR}/Include/create_actor_2d_subobject.hpp
+
+	${PROJECT_SOURCE_DIR}/Include/logger.hpp
 )
 
 set(RenderingLibrary_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/Include/")
@@ -160,6 +162,8 @@ set(SRC_FILES
 	
 	${PROJECT_SOURCE_DIR}/Source/actor.cpp
 	${PROJECT_SOURCE_DIR}/Source/actor_2d.cpp
+
+	${PROJECT_SOURCE_DIR}/Source/logger.cpp
 )
 
 

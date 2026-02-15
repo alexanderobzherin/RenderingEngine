@@ -5,6 +5,7 @@
 #include "app_time.hpp"
 #include "scene_manager.hpp"
 #include "utility.hpp"
+#include "logger.hpp"
 
 #include <exception>
 
@@ -77,6 +78,13 @@ CoreApplication::~CoreApplication(){};
 
 void CoreApplication::Initialize()
 {
+    Logger::Get().Initialize(mAppName);
+
+    LOG_DEBUG("This is debug level message");
+    LOG_INFO("This is info level message");
+    LOG_WARNING("This is warning level message");
+    LOG_ERROR("This is error level message");
+
     if (!mWindowSystem)
     {
         mWindowSystem = std::make_shared<StandaloneDesktopWindow>(*this);
@@ -140,6 +148,8 @@ void CoreApplication::Shutdown()
     mSceneManager->Shutdown();
     mRenderer->ShutdownRenderer();
     mWindowSystem->Shutdown();
+
+    Logger::Get().Shutdown();
 }
 
 ScreenSettings CoreApplication::GetScreenSettings() const

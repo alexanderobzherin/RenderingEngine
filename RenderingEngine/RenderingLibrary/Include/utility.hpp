@@ -36,6 +36,8 @@ struct AppConfig
 
 	std::vector<std::string> textScripts{"Latin"};
 	std::vector<int> fontSizePreload{10};
+
+	std::string logLevel{"Info"};
 };
 
 /**
@@ -136,6 +138,9 @@ public:
 	/// @brief Returns absolute path to Config/app_config.json.
 	static boost::filesystem::path GetConfigFilePath();
 
+	/// @brief Returns absolute path to Logs folder.
+	static boost::filesystem::path GetLogsFolderPath();
+
 	/**
      * @brief Checks whether packed assets (Pack.bin / Pack.json) exist.
      */
@@ -174,6 +179,7 @@ public:
 		static boost::filesystem::path const sFontsRelativePathFolder;
 		static boost::filesystem::path const sShadersRelativePathFolder;
 		static boost::filesystem::path const sAppConfigFilePath;
+		static boost::filesystem::path const sLogFolderPath;
 		
 };
 

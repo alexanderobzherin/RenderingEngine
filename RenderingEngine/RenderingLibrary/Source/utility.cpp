@@ -12,6 +12,7 @@ path const Utility::sModelsRelativePathFolder = sContentRelativePathFolder / "Mo
 path const Utility::sFontsRelativePathFolder = sContentRelativePathFolder / "Fonts";
 path const Utility::sShadersRelativePathFolder = sContentRelativePathFolder / "Shaders";
 path const Utility:: sAppConfigFilePath = path{} / "Config" / "app_config.json";
+path const Utility::sLogFolderPath = path{} / "Logs";
 
 path Utility::sShadersBinaryPath;
 path Utility::sApplicationPath;
@@ -87,6 +88,9 @@ AppConfig Utility::ReadConfigFile()
 				}
 			}
 		}
+
+		if (appConfigData.contains("logLevel"))
+			cfg.logLevel = appConfigData["logLevel"].get<std::string>();
 	}
 	catch (const std::exception& e)
 	{
@@ -250,6 +254,11 @@ boost::filesystem::path Utility::GetShadersFolderPath()
 boost::filesystem::path Utility::GetConfigFilePath()
 {
 	return ResolveProjectRoot() / sAppConfigFilePath;
+}
+
+boost::filesystem::path Utility::GetLogsFolderPath()
+{
+	return ResolveProjectRoot() / sLogFolderPath;
 }
 
 bool Utility::IsPackageProvided()
