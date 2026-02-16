@@ -101,9 +101,9 @@ public:
      *
      * If the texture is not found in RAM cache, the function does nothing.
      *
-     * @param filename Base filename (no path, no extension) used as the cache key.
+     * @param textureName Base texture name (no path, no extension) used as the cache key.
      */
-    void UploadTextureToGPU(std::string filename);
+    void UploadTextureToGPU(std::string textureName);
 
     /**
      * @brief Releases a texture from GPU memory.
@@ -112,7 +112,7 @@ public:
      *
      * @param filename Cache key of the texture to release (base filename).
      */
-    void ReleaseTextureFromGPU(std::string filename);
+    void ReleaseTextureFromGPU(std::string textureName);
 
     /**
      * @brief Releases all cached textures from GPU memory.

@@ -13,24 +13,24 @@ mLastTime()
 	Reset();
 }
 
-const std::chrono::high_resolution_clock::time_point& AppClock::StartTime() const
+const std::chrono::steady_clock::time_point& AppClock::StartTime() const
 {
 	return mStartTime;
 }
 
-const std::chrono::high_resolution_clock::time_point& AppClock::CurrentTime() const
+const std::chrono::steady_clock::time_point& AppClock::CurrentTime() const
 {
 	return mCurrentTime;
 }
 
-const std::chrono::high_resolution_clock::time_point& AppClock::LastTime() const
+const std::chrono::steady_clock::time_point& AppClock::LastTime() const
 {
 	return mLastTime;
 }
 
 void AppClock::Reset()
 {
-	mStartTime = std::chrono::high_resolution_clock::now();
+	mStartTime = std::chrono::steady_clock::now();
 	mCurrentTime = mStartTime;
 	mLastTime = mCurrentTime;
 }
@@ -38,7 +38,7 @@ void AppClock::Reset()
 void AppClock::UpdateAppTime(AppTime& appTime)
 {
 	mLastTime = mCurrentTime;
-	mCurrentTime = std::chrono::high_resolution_clock::now();
+	mCurrentTime = std::chrono::steady_clock::now();
 	
 	appTime.SetCurrentTime( mCurrentTime );
 	appTime.SetTotalAppTime( std::chrono::duration_cast<std::chrono::milliseconds>(mCurrentTime - mStartTime) );

@@ -7,6 +7,9 @@
 #include "material_cache.hpp"
 #include "text_renderer.hpp"
 #include "utility.hpp"
+#include "logger.hpp"
+
+#include <chrono>
 
 namespace rendering_engine
 {
@@ -25,6 +28,8 @@ SceneManager::~SceneManager()
 
 void SceneManager::Initialize()
 {
+	const auto start = std::chrono::steady_clock::now();
+
 	// Apply pending registrations once (first initialization only)
 	static bool sRegistrationsApplied = false;
 	if (!sRegistrationsApplied)
@@ -52,12 +57,14 @@ void SceneManager::Initialize()
 
 	if (Utility::IsPackageProvided())
 	{
+		LOG_INFO("Loading assets from package.");
 		mTextureCache->LoadTexturesFromPackage();
 		mModelCache->LoadModelsFromPackage();
 		mTextRenderer->LoadFontsFromPackage();
 	}
 	else
 	{
+		LOG_INFO("Loading assets from folders.");
 		const auto textureFolder = Utility::GetTextureFolderPath();
 		mTextureCache->LoadTexturesFromFolder(textureFolder.string());
 		const auto modelsFolder = Utility::GetModelsFolderPath();
@@ -75,20 +82,40 @@ void SceneManager::Initialize()
 			LoadScene(startScene);
 		}
 	}
+	const auto end = std::chrono::steady_clock::now();
+	const float initMs =
+		std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("SceneManager initialized in " +
+		std::to_string(initMs) + " ms.");
 }
 
 void SceneManager::Update(float deltaTime)
 {
 	if (mNextScene)
 	{
+		using clock = std::chrono::steady_clock;
+		auto start = clock::now();
+
+		std::string oldSceneName = mCurrentScene ? typeid(*mCurrentScene).name() : "None";
+		std::string newSceneName = typeid(*mNextScene).name();
+
 		if (mCurrentScene)
 		{
 			mCurrentScene->Shutdown();
 		}
 
 		mCurrentScene = std::move(mNextScene);
+
+		LOG_INFO("Switching scene: " + oldSceneName + " -> " + newSceneName);
+
 		mCurrentScene->Initialize();
 		mNextScene = nullptr;
+
+		auto end = clock::now();
+		auto durationMs = std::chrono::duration<float, std::milli>(end - start).count();
+
+		LOG_INFO("Scene '" + newSceneName + "' loaded in " + std::to_string(durationMs) + " ms");
 	}
 
 	if (mCurrentScene)

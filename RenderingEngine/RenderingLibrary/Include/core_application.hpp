@@ -8,6 +8,7 @@
 #include "i_application.hpp"
 #include "i_window_system.hpp"
 #include "i_renderer.hpp"
+#include "utility.hpp"
 
 #include <memory>
 #include <vector>
@@ -95,6 +96,9 @@ protected:
 	unsigned int mWidth;
 	unsigned int mHeight;
 	std::string mAppName;
+	AppConfig mAppConfig;
+
+	FrameMetrics mFrameMetrics;
 	
 	std::shared_ptr<AppTime> mAppTime;
 	std::shared_ptr<IWindowSystem> mWindowSystem;

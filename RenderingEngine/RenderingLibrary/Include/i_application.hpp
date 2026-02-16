@@ -31,6 +31,15 @@ struct ScreenSettings
     unsigned int height;
 };
 
+struct FrameMetrics
+{
+    float frameDurationMs = 0.0f;
+    float updateTimeMs = 0.0f;
+    float drawTimeMs = 0.0f;
+    float fpsRaw = 0.0f;
+    float fpsSmoothed = 0.0f;
+};
+
 /**
  * @class IApplication
  * @brief Defines a generic application interface for rendering-based programs.

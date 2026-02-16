@@ -3,6 +3,9 @@
 #include "boost/filesystem.hpp"
 #include "mesh_data_gpu.hpp"
 #include "utility.hpp"
+#include "logger.hpp"
+
+#include <chrono>
 
 namespace rendering_engine
 {
@@ -13,16 +16,20 @@ ModelCache::ModelCache(IRenderer* renderer)
 	mTotalSizeRAM(0),
 	mTotalSizeGPU(0)
 {
+	LOG_DEBUG("ModelCache created.");
 	mRenderer->RegisterObserver(this);
 }
 
 ModelCache::~ModelCache()
 {
+	LOG_DEBUG("ModelCache destroyed.");
 	mRenderer->UnregisterObserver(this);
 }
 
 void ModelCache::LoadModelsFromFolder(std::string pathToFolder)
 {
+	LOG_INFO("Loading models from folder: " + pathToFolder);
+	auto start = std::chrono::steady_clock::now();
 	// 1. Check if path is valid and exist
 	boost::filesystem::path pathToDirectory = boost::filesystem::path(pathToFolder);
 	const bool isValidFolderPath = boost::filesystem::exists(boost::filesystem::path(pathToFolder)) && boost::filesystem::is_directory(boost::filesystem::path(pathToFolder));
@@ -36,10 +43,20 @@ void ModelCache::LoadModelsFromFolder(std::string pathToFolder)
 	{
 		(void)UploadModelToRAM(x.path().string());
 	}
+
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("Loaded " + std::to_string(mModels.size()) +
+		" models from folder in " +
+		std::to_string(ms) + " ms. RAM usage: " +
+		std::to_string(mTotalSizeRAM) + " bytes.");
 }
 
 void ModelCache::LoadModelsFromPackage()
 {
+	LOG_INFO("Loading models from package.");
+	auto start = std::chrono::steady_clock::now();
 	const auto& entries = Utility::GetPackEntries();
 
 	std::string folderEntry = { "Models/" };
@@ -53,8 +70,7 @@ void ModelCache::LoadModelsFromPackage()
 			std::vector<uint8_t> binaryFileData = Utility::ReadPackedFile(virtualPath);
 			if (binaryFileData.empty())
 			{
-				std::cerr << "[TextureCache] Could not read packed texture: "
-					<< virtualPath << std::endl;
+				LOG_ERROR("Failed to read packed model: " + virtualPath);
 				continue;
 			}
 
@@ -62,6 +78,13 @@ void ModelCache::LoadModelsFromPackage()
 			(void)UploadModelToRAM(modelName, binaryFileData);
 		}
 	}
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("Loaded " + std::to_string(mModels.size()) +
+		" models from package in " +
+		std::to_string(ms) + " ms. RAM usage: " +
+		std::to_string(mTotalSizeRAM) + " bytes.");
 }
 
 void ModelCache::CreateQuad2D()
@@ -77,6 +100,8 @@ void ModelCache::CreateQuad2D()
 
 void ModelCache::LoadCustomMesh(std::string meshName, std::vector<glm::vec2> positions2D, std::vector<glm::vec2> texCoords, std::vector<glm::vec4> colors, std::vector<std::uint32_t> indices)
 {
+	LOG_DEBUG("Loading custom mesh: " + meshName);
+	auto start = std::chrono::steady_clock::now();
 	auto search = mModels.find(meshName);
 	if (search != mModels.end())
 	{
@@ -92,6 +117,14 @@ void ModelCache::LoadCustomMesh(std::string meshName, std::vector<glm::vec2> pos
 	mTotalSizeRAM += sizeVertices;
 	const size_t sizeIndices = mModels.at(meshName)->GetCpuIndexBufferSize();
 	mTotalSizeRAM += sizeIndices;
+
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_DEBUG("Custom mesh loaded: " + meshName +
+		" (RAM: " +
+		std::to_string(sizeVertices + sizeIndices) +
+		" bytes, " + std::to_string(ms) + " ms)");
 }
 
 std::string ModelCache::UploadModelToRAM(std::string path)
@@ -115,13 +148,21 @@ std::string ModelCache::UploadModelToRAM(std::string path)
 	{
 		return std::string{};
 	}
+	LOG_DEBUG("Uploading model to RAM: " + filename);
+	auto start = std::chrono::steady_clock::now();
 	mModels[filename] = std::make_shared<MeshDataGpu>(filePath.string(), mRenderer);
 
 	const size_t sizeVertices = mModels.at(filename)->GetCpuVertexBufferSize();
 	mTotalSizeRAM += sizeVertices;
 	const size_t sizeIndices = mModels.at(filename)->GetCpuIndexBufferSize();
 	mTotalSizeRAM += sizeIndices;
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
 
+	LOG_DEBUG("Model loaded to RAM: " + filename +
+		" (Vertices+Indices: " +
+		std::to_string(sizeVertices + sizeIndices) +
+		" bytes, " + std::to_string(ms) + " ms)");
 	return filename;
 }
 
@@ -134,14 +175,21 @@ std::string ModelCache::UploadModelToRAM(std::string fileName, std::vector<uint8
 	{
 		return std::string{};
 	}
-
+	LOG_DEBUG("Uploading model to RAM: " + fileName);
+	auto start = std::chrono::steady_clock::now();
 	mModels[modelName] = std::make_shared<MeshDataGpu>(fileBytes, mRenderer);
 
 	const size_t sizeVertices = mModels.at(modelName)->GetCpuVertexBufferSize();
 	mTotalSizeRAM += sizeVertices;
 	const size_t sizeIndices = mModels.at(modelName)->GetCpuIndexBufferSize();
 	mTotalSizeRAM += sizeIndices;
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
 
+	LOG_INFO("Model loaded to RAM: " + fileName +
+		" (Vertices+Indices: " +
+		std::to_string(sizeVertices + sizeIndices) +
+		" bytes, " + std::to_string(ms) + " ms)");
 	return modelName;
 }
 
@@ -156,12 +204,20 @@ void ModelCache::UploadModelToGPU(std::string filename)
 	{
 		return;
 	}
-
+	LOG_DEBUG("Uploading model to GPU: " + filename);
+	auto start = std::chrono::steady_clock::now();
 	mModels[filename]->UploadToGPU();
 	size_t sizeVertices = mModels[filename]->GetGpuVertexBufferSize();
 	mTotalSizeGPU += sizeVertices;
 	size_t sizeIndices = mModels[filename]->GetGpuIndexBufferSize();
 	mTotalSizeGPU += sizeIndices;
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_DEBUG("Model uploaded to GPU: " + filename +
+		" (GPU: " +
+		std::to_string(sizeVertices + sizeIndices) +
+		" bytes, " + std::to_string(ms) + " ms)");
 }
 
 void ModelCache::ReleaseModelFromGPU(std::string filename)
@@ -170,7 +226,7 @@ void ModelCache::ReleaseModelFromGPU(std::string filename)
 	{
 		return;
 	}
-
+	LOG_DEBUG("Releasing model from GPU: " + filename);
 	auto& model = mModels[filename];
 	size_t sizeVertices = model->GetGpuVertexBufferSize();
 	size_t sizeIndices = model->GetGpuIndexBufferSize();
@@ -191,6 +247,10 @@ void ModelCache::ReleaseAllFromGPU()
 
 void ModelCache::ReleaseAll()
 {
+	LOG_INFO("Releasing all models. RAM usage: " +
+		std::to_string(mTotalSizeRAM) +
+		", GPU usage: " +
+		std::to_string(mTotalSizeGPU));
 	mModels.clear();
 	mTotalSizeRAM = 0;
 	mTotalSizeGPU = 0;
