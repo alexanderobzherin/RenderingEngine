@@ -8,6 +8,7 @@
 #include "logger.hpp"
 
 #include <exception>
+#include <thread>
 
 namespace rendering_engine
 {
