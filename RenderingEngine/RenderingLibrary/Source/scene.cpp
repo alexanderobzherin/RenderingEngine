@@ -7,6 +7,7 @@
 #include "drawable_component.hpp"
 #include "actor.hpp"
 #include "actor_2d.hpp"
+#include "logger.hpp"
 
 namespace rendering_engine
 {
@@ -183,6 +184,18 @@ void Scene::FlushDestroyed()
 		}
 	}
 	mPendingDestroyActors.clear();
+
+	for (auto* actor2D : mPendingDestroyActors2D)
+	{
+		auto it = std::find(mActors2D.begin(), mActors2D.end(), actor2D);
+		if (it != mActors2D.end())
+		{
+			(*it)->Shutdown();
+			delete* it;
+			mActors2D.erase(it);
+		}
+	}
+	mPendingDestroyActors2D.clear();
 }
 
 } // namespace rendering_engine

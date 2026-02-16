@@ -1,9 +1,7 @@
 #include "text_renderer.hpp"
-
 #include "render_resource_context.hpp"
-
 #include "font_resources.hpp"
-
+#include "logger.hpp"
 
 namespace rendering_engine
 {
@@ -98,11 +96,20 @@ TextRenderer::TextRenderer(RenderResourceContext rrc)
 	:
 	mRenderResourceContext(rrc)
 {
+	LOG_INFO("Initializing TextRenderer...");
+	auto start = std::chrono::steady_clock::now();
+
 	mErrorResult = FT_Init_FreeType(&mLibrary);
 	if (mErrorResult)
 	{
+		LOG_ERROR("Failed to initialize FreeType library!");
 		throw std::runtime_error{ "Failed to initialize FreeType library!" };
 	}
+
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("FreeType initialized in " + std::to_string(ms) + " ms.");
 }
 
 TextRenderer::~TextRenderer()
@@ -111,6 +118,7 @@ TextRenderer::~TextRenderer()
 
 void TextRenderer::Shutdown()
 {
+	LOG_INFO("Shutting down TextRenderer...");
     if (!mLibrary)
         return;
 
@@ -121,12 +129,20 @@ void TextRenderer::Shutdown()
 
     FT_Done_FreeType(mLibrary);
     mLibrary = nullptr;
+	LOG_INFO("TextRenderer shutdown complete.");
 }
 
 void TextRenderer::LoadFontsFromFolder(std::string pathToFolder)
 {
+	LOG_INFO("Loading fonts from folder: " + pathToFolder);
+	auto start = std::chrono::steady_clock::now();
 	LoadFontsAvailableInFolder(pathToFolder);
 	LoadPreloadableFontAtlasesFromFolder(mAvailableFontsInFolder);
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("Font discovery and preload complete in " +
+		std::to_string(ms) + " ms.");
 }
 
 void TextRenderer::LoadFontsFromPackage()
@@ -217,6 +233,7 @@ std::pair<std::uint32_t, std::uint32_t> TextRenderer::GetScriptRange(std::string
 
 void TextRenderer::LoadFontsAvailableInFolder(std::string pathToFolder)
 {
+	LOG_INFO("Scanning font folder: " + pathToFolder);
 	// 1. Check if path is valid and exist
 	boost::filesystem::path pathToDirectory = boost::filesystem::path(pathToFolder);
 	const bool isValidFolderPath = boost::filesystem::exists(boost::filesystem::path(pathToFolder)) && boost::filesystem::is_directory(boost::filesystem::path(pathToFolder));
@@ -243,10 +260,15 @@ void TextRenderer::LoadFontsAvailableInFolder(std::string pathToFolder)
 		std::string fontName = filePath.stem().string();
 		mAvailableFontsInFolder[fontName] = filePath.string();
 	}
+	LOG_INFO("Discovered " +
+		std::to_string(mAvailableFontsInFolder.size()) +
+		" fonts in folder.");
 }
 
 void TextRenderer::LoadPreloadableFontAtlasesFromFolder(const std::unordered_map<std::string, std::string>& availableFontsInFolder)
 {
+	LOG_INFO("Preloading font atlases from folder...");
+	auto start = std::chrono::steady_clock::now();
 	AppConfig appConfig = Utility::ReadConfigFile();
 
 	for (const auto& [fontName, filePath] : availableFontsInFolder)
@@ -261,10 +283,14 @@ void TextRenderer::LoadPreloadableFontAtlasesFromFolder(const std::unordered_map
 					auto key = std::make_pair(fontName, fontSize);
 					if (mFontResources.find(key) == mFontResources.end())
 					{
+						LOG_DEBUG("Creating font resource: " + fontName +
+							" size " + std::to_string(fontSize));
 						mFontResources[key] = std::make_shared<FontResources>(mRenderResourceContext, this, filePath, fontSize);
 						mFontResources[key]->StoreFontAtlasesInFiles(bStoreFontAtlasesInFiles);
 					}
-
+					LOG_DEBUG("Preloading script '" + requestedScript +
+						"' for font " + fontName +
+						" size " + std::to_string(fontSize));
 					const std::uint32_t rangeBegin = sScriptRanges[requestedScript].first;
 					const std::uint32_t rangeEnd = sScriptRanges[requestedScript].second;
 					mFontResources[key]->LoadGlyphsFromCodePointRange(rangeBegin, rangeEnd);
@@ -272,10 +298,17 @@ void TextRenderer::LoadPreloadableFontAtlasesFromFolder(const std::unordered_map
 			}
 		}
 	}
+
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("Font atlas preloading (folder) completed in " +
+		std::to_string(ms) + " ms.");
 }
 
 void TextRenderer::LoadFontsAvailableInPackage()
 {
+	LOG_INFO("Scanning fonts in package...");
 	const auto& entries = Utility::GetPackEntries();
 
 	std::string folderEntry = { "Fonts/" };
@@ -294,10 +327,15 @@ void TextRenderer::LoadFontsAvailableInPackage()
 			mAvailableFontsInPackage[fontName] = fontFilePath.string();
 		}
 	}
+	LOG_INFO("Discovered " +
+		std::to_string(mAvailableFontsInPackage.size()) +
+		" fonts in package.");
 }
 
 void TextRenderer::LoadPreloadableFontAtlasesFromPackage(const std::unordered_map<std::string, std::string>& availableFontsInPackage)
 {
+	LOG_INFO("Preloading font atlases from package...");
+	auto start = std::chrono::steady_clock::now();
 	AppConfig appConfig = Utility::ReadConfigFile();
 
 	for (const auto& [fontName, virtualFilePath] : availableFontsInPackage)
@@ -312,13 +350,15 @@ void TextRenderer::LoadPreloadableFontAtlasesFromPackage(const std::unordered_ma
 					auto key = std::make_pair(fontName, fontSize);
 					if (mFontResources.find(key) == mFontResources.end())
 					{
-						std::cout << "Virtual file path: " << virtualFilePath << std::endl;
 						std::vector<uint8_t> binaryFileData = Utility::ReadPackedFile(virtualFilePath);
-
+						LOG_DEBUG("Creating font resource: " + fontName +
+							" size " + std::to_string(fontSize));
 						mFontResources[key] = std::make_shared<FontResources>(mRenderResourceContext, this, fontName, binaryFileData, fontSize);
 						mFontResources[key]->StoreFontAtlasesInFiles(bStoreFontAtlasesInFiles);
 					}
-
+					LOG_DEBUG("Preloading script '" + requestedScript +
+						"' for font " + fontName +
+						" size " + std::to_string(fontSize));
 					const std::uint32_t rangeBegin = sScriptRanges[requestedScript].first;
 					const std::uint32_t rangeEnd = sScriptRanges[requestedScript].second;
 					mFontResources[key]->LoadGlyphsFromCodePointRange(rangeBegin, rangeEnd);
@@ -326,6 +366,12 @@ void TextRenderer::LoadPreloadableFontAtlasesFromPackage(const std::unordered_ma
 			}
 		}
 	}
+
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("Font atlas preloading (package) completed in " +
+		std::to_string(ms) + " ms.");
 }
 
 } //namespace rendering_engine

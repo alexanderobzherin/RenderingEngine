@@ -2,7 +2,9 @@
 #include "i_renderer.hpp"
 #include "material.hpp"
 #include "i_material_render_resources.hpp"
-#include <iostream>
+#include "logger.hpp"
+#include <chrono>
+
 namespace rendering_engine
 {
 
@@ -10,16 +12,20 @@ MaterialCache::MaterialCache(IRenderer* renderer)
 	:
 	mRenderer(renderer)
 {
+	LOG_DEBUG("MaterialCache created.");
 	mRenderer->RegisterObserver(this);
 }
 
 MaterialCache::~MaterialCache()
 {
+	LOG_DEBUG("MaterialCache destroyed.");
 	mRenderer->UnregisterObserver(this);
 }
 
 void MaterialCache::CreateBuildInMaterials()
 {
+	LOG_INFO("Creating built-in materials...");
+	auto start = std::chrono::steady_clock::now();
 	// BasicTexture3D material
 	MaterialSettings setBasicTexture3D;
 	setBasicTexture3D.materialName = std::string{ "BasicTexture3D" };
@@ -34,6 +40,7 @@ void MaterialCache::CreateBuildInMaterials()
 		basicTexture3DMat->AddTexture("test_cube_color");
 		//basicTexture3DMat->AddTexture("PNG_transparency_demonstration_1");
 	}
+	LOG_DEBUG("Creating material: BasicTexture3D");
 	basicTexture3DMat->InitializeRenderResources();
 
 	// FlatColorFiltering material
@@ -49,6 +56,7 @@ void MaterialCache::CreateBuildInMaterials()
 	{
 		flatColorFilteringMat->AddTexture("D4FontTextureSegoeScript");
 	}
+	LOG_DEBUG("Creating material: FlatColorFiltering");
 	flatColorFilteringMat->InitializeRenderResources();
 
 	// Test sprite 2d
@@ -64,7 +72,7 @@ void MaterialCache::CreateBuildInMaterials()
 	{
 		testSprite2dMat->AddTexture("PNG_transparency_demonstration_1");
 	}
-
+	LOG_DEBUG("Creating material: Quad2D");
 	testSprite2dMat->InitializeRenderResources();
 
 	MaterialSettings rectangle2D;
@@ -77,24 +85,35 @@ void MaterialCache::CreateBuildInMaterials()
 	AddMaterial(rectangle2D);
 	Material* rectangle2DMat = GetMaterial(rectangle2D.materialName);
 	rectangle2DMat->SetVec4("Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	LOG_DEBUG("Creating material: Rectangle2D");
 	rectangle2DMat->InitializeRenderResources();
 
+	auto end = std::chrono::steady_clock::now();
+	float totalMs =
+		std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("Built-in materials created in " +
+		std::to_string(totalMs) + " ms.");
 }
 
 void MaterialCache::AddMaterial(MaterialSettings matSettings)
 {
-    if (matSettings.materialName.empty())
+	if (matSettings.materialName.empty())
+	{
+		LOG_ERROR("Attempted to add material with empty name.");
         return;
+	}
 
     auto it = mMaterials.find(matSettings.materialName);
     if (it != mMaterials.end() && it->second)
     {
-        std::cout << "Replacing material: " << matSettings.materialName << "\n";
+		LOG_WARNING("Replacing existing material: " + matSettings.materialName);
         it->second->ReleaseRenderResources();
     }
 
     mMaterials[matSettings.materialName] =
         std::make_shared<Material>(mRenderer, matSettings);
+	LOG_DEBUG("Material added: " + matSettings.materialName);
 }
 
 Material* MaterialCache::GetMaterial(std::string materialName)
@@ -111,6 +130,7 @@ void MaterialCache::RemoveMaterial(std::string materialName)
 {
 	if (auto it = mMaterials.find(materialName); it != mMaterials.end())
 	{
+		LOG_INFO("Removing material: " + materialName);
 		it->second->ReleaseRenderResources();
 		mMaterials.erase(it);
 	}
@@ -118,6 +138,7 @@ void MaterialCache::RemoveMaterial(std::string materialName)
 
 void MaterialCache::ReleaseAll()
 {
+	LOG_INFO("Releasing all materials.");
 	OnRenderResourcesRelease();
 }
 

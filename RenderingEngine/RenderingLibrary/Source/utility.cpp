@@ -91,6 +91,13 @@ AppConfig Utility::ReadConfigFile()
 
 		if (appConfigData.contains("logLevel"))
 			cfg.logLevel = appConfigData["logLevel"].get<std::string>();
+
+		if (appConfigData.contains("useSmoothedFPS"))
+			cfg.useSmoothedFPS = appConfigData["useSmoothedFPS"].get<bool>();
+
+		if (appConfigData.contains("targetFPS"))
+			cfg.targetFPS = appConfigData["targetFPS"].get<float>();
+
 	}
 	catch (const std::exception& e)
 	{

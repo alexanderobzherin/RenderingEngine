@@ -1,6 +1,5 @@
 #include "model_material.hpp"
 #include "assimp/scene.h"
-#include "utility.hpp"
 
 namespace rendering_engine
 {

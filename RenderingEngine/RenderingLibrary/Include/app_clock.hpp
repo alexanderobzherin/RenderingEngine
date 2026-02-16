@@ -57,11 +57,11 @@ public:
 	AppClock& operator=(AppClock &&) = default;
 	~AppClock() = default;
 	/// Returns the timestamp when the clock was started.
-	const std::chrono::high_resolution_clock::time_point& StartTime() const;
+	const std::chrono::steady_clock::time_point& StartTime() const;
 	/// Returns the most recent recorded time (current frame).
-	const std::chrono::high_resolution_clock::time_point& CurrentTime() const;
+	const std::chrono::steady_clock::time_point& CurrentTime() const;
 	/// Returns the time recorded at the previous frame.
-	const std::chrono::high_resolution_clock::time_point& LastTime() const;
+	const std::chrono::steady_clock::time_point& LastTime() const;
 	/// Resets the clock to the current system time.
 	void Reset();
 	/**
@@ -75,9 +75,9 @@ public:
 	void UpdateAppTime(AppTime& appTime);
 
 private:
-	std::chrono::high_resolution_clock::time_point mStartTime;
-	std::chrono::high_resolution_clock::time_point mCurrentTime;
-	std::chrono::high_resolution_clock::time_point mLastTime;
+	std::chrono::steady_clock::time_point mStartTime;
+	std::chrono::steady_clock::time_point mCurrentTime;
+	std::chrono::steady_clock::time_point mLastTime;
 };
 
 } //rendering_engine

@@ -8,6 +8,7 @@
 #include <vector>
 #include "boost/filesystem.hpp"
 #include "utility.hpp"
+#include "logger.hpp"
 
 namespace rendering_engine
 {
@@ -18,16 +19,20 @@ TextureCache::TextureCache(IRenderer* renderer)
 	mTotalSizeRAM(0),
 	mTotalSizeGPU(0)
 {
+	LOG_INFO("TextureCache created.");
 	mRenderer->RegisterObserver(this);
 }
 
 TextureCache::~TextureCache()
 {
+	LOG_DEBUG("TextureCache destroyed.");
 	mRenderer->UnregisterObserver(this);
 }
 
 void TextureCache::LoadTexturesFromFolder(std::string pathToFolder)
 {
+	LOG_INFO("Loading textures from folder: " + pathToFolder);
+	auto start = std::chrono::steady_clock::now();
 	// 1. Check if path is valid and exist
 	boost::filesystem::path pathToDirectory = boost::filesystem::path(pathToFolder);
 	const bool isValidFolderPath = boost::filesystem::exists(boost::filesystem::path(pathToFolder)) && boost::filesystem::is_directory(boost::filesystem::path(pathToFolder));
@@ -45,6 +50,14 @@ void TextureCache::LoadTexturesFromFolder(std::string pathToFolder)
 			UploadTextureToGPU(textureName);
 		}
 	}
+
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("Loaded " + std::to_string(mTextures.size()) +
+		" textures from folder in " +
+		std::to_string(ms) + " ms. RAM usage: " +
+		std::to_string(mTotalSizeRAM) + " bytes.");
 }
 
 void TextureCache::LoadTexture(std::string textureName, ImageData imageData)
@@ -59,6 +72,8 @@ void TextureCache::LoadTexture(std::string textureName, ImageData imageData)
 
 void TextureCache::LoadTexturesFromPackage()
 {
+	LOG_INFO("Loading textures from package.");
+	auto start = std::chrono::steady_clock::now();
 	const auto& entries = Utility::GetPackEntries();
 
 	std::string folderEntry = { "Textures/" };
@@ -72,8 +87,8 @@ void TextureCache::LoadTexturesFromPackage()
 			std::vector<uint8_t> binaryFileData = Utility::ReadPackedFile(virtualPath);
 			if (binaryFileData.empty())
 			{
-				std::cerr << "[TextureCache] Could not read packed texture: "
-					<< virtualPath << std::endl;
+				LOG_ERROR("[TextureCache] Could not read packed texture: "
+					+ virtualPath);
 				continue;
 			}
 
@@ -85,6 +100,13 @@ void TextureCache::LoadTexturesFromPackage()
 			}
 		}
 	}
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_INFO("Loaded " + std::to_string(mTextures.size()) +
+		" textures from package in " +
+		std::to_string(ms) + " ms. RAM usage: " +
+		std::to_string(mTotalSizeRAM) + " bytes.");
 }
 
 std::string TextureCache::UploadTextureToRAM(std::string path)
@@ -108,10 +130,19 @@ std::string TextureCache::UploadTextureToRAM(std::string path)
 	{
 		return std::string{};
 	}
+	LOG_DEBUG("Uploading texture to RAM: " + filename);
+	auto start = std::chrono::steady_clock::now();
 	mTextures[filename] = std::make_shared<ImageDataGpu>(path, mRenderer);
 
 	size_t size = mTextures.at(filename)->GetSizeInRAM();
 	mTotalSizeRAM += size;
+
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_DEBUG("Texture loaded to RAM: " + filename +
+		" (" + std::to_string(size) +
+		" bytes, " + std::to_string(ms) + " ms)");
 
 	return filename;
 }
@@ -124,10 +155,18 @@ std::string TextureCache::UploadTextureToRAM(std::string textureFileName, std::v
 	{
 		return std::string{};
 	}
+	LOG_DEBUG("Uploading texture to RAM: " + textureName);
+	auto start = std::chrono::steady_clock::now();
 	mTextures[textureName] = std::make_shared<ImageDataGpu>(fileBytes, mRenderer);
 
 	size_t size = mTextures.at(textureName)->GetSizeInRAM();
 	mTotalSizeRAM += size;
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_DEBUG("Texture loaded to RAM: " + textureName +
+		" (" + std::to_string(size) +
+		" bytes, " + std::to_string(ms) + " ms)");
 
 	return textureName;
 }
@@ -139,39 +178,57 @@ std::string TextureCache::UploadTextureToRAM(std::string textureName, ImageData 
 	{
 		return std::string{};
 	}
+	LOG_DEBUG("Uploading texture to RAM: " + textureName);
+	auto start = std::chrono::steady_clock::now();
 	mTextures[textureName] = std::make_shared<ImageDataGpu>(imageData, mRenderer);
 
 	size_t size = mTextures.at(textureName)->GetSizeInRAM();
 	mTotalSizeRAM += size;
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_DEBUG("Texture loaded to RAM: " + textureName +
+		" (" + std::to_string(size) +
+		" bytes, " + std::to_string(ms) + " ms)");
 
 	return textureName;
 }
 
-void TextureCache::UploadTextureToGPU(std::string filename)
+void TextureCache::UploadTextureToGPU(std::string textureName)
 {
+	LOG_DEBUG("Uploading texture to GPU: " + textureName);
+	auto start = std::chrono::steady_clock::now();
 	// If texture is not loaded in RAM yet, skip loading to GPU.
-	if (auto search = mTextures.find(filename); search == mTextures.end())
+	if (auto search = mTextures.find(textureName); search == mTextures.end())
 	{
 		return;
 	}
-	if (mTextures[filename]->IsOnGPU())
+	if (mTextures[textureName]->IsOnGPU())
 	{
 		return;
 	}
 
-	mTextures[filename]->UploadToGPU();
-	size_t size = mTextures[filename]->GetSizeInGPU();
+	mTextures[textureName]->UploadToGPU();
+	size_t size = mTextures[textureName]->GetSizeInGPU();
 	mTotalSizeGPU += size;
+
+	auto end = std::chrono::steady_clock::now();
+	float ms = std::chrono::duration<float, std::milli>(end - start).count();
+
+	LOG_DEBUG("Texture uploaded to GPU: " + textureName +
+		" (" + std::to_string(size) +
+		" bytes, " + std::to_string(ms) + " ms)");
 }
 	
-void TextureCache::ReleaseTextureFromGPU(std::string filename)
+void TextureCache::ReleaseTextureFromGPU(std::string textureName)
 {
-	if (auto search = mTextures.find(filename); search == mTextures.end())
+	LOG_DEBUG("Releasing texture from GPU: " + textureName);
+	if (auto search = mTextures.find(textureName); search == mTextures.end())
 	{
 		return;
 	}
 
-	auto& texture = mTextures[filename];
+	auto& texture = mTextures[textureName];
 	size_t size = texture->GetSizeInGPU();
 	texture->ReleaseFromGPU();
 
@@ -189,6 +246,10 @@ void TextureCache::ReleaseAllFromGPU()
 
 void TextureCache::ReleaseAll()
 {
+	LOG_INFO("Releasing all textures. RAM usage before clear: " +
+		std::to_string(mTotalSizeRAM) +
+		", GPU usage: " +
+		std::to_string(mTotalSizeGPU));
 	ReleaseAllFromGPU();
 	mTextures.clear();
 	mTotalSizeRAM = 0;

@@ -9,7 +9,6 @@
 #include "texture_cache.hpp"
 
 #include <stdexcept>
-#include <iostream>
 
 namespace rendering_engine
 {
@@ -183,7 +182,6 @@ void VulkanRenderResources::CreateUniformBuffers()
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             mMaterialParametersBuffers[i], mMaterialParametersMemory[i]);
     }
-    std::cout << "Mat UBO buf[0]=" << (void*)mMaterialParametersBuffers[0] << "\n";
 }
 
 void VulkanRenderResources::CreateDescriptorPool()

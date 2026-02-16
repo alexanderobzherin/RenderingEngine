@@ -300,7 +300,6 @@ private:
 
     void CreateCommandBuffers();
 
-    //void CreateSyncObjects();
     void CreateFrameSyncObjects();
     void CreateSwapchainSyncObjects();
 
