@@ -13,5 +13,9 @@
     ]
   },
 
-  "logLevel": "Info"
+  "logLevel": "Info",
+
+  "useSmoothedFPS": true,
+  "targetFPS": 60,
+  "showStatsOverlay": true
 }

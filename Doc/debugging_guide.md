@@ -1,5 +1,26 @@
 # Debugging Guide
 
+## Logging During Debugging
+
+Engine logging level is controlled via the application configuration file:
+```json
+"logLevel": "Debug"
+```
+
+Available levels:
+
+- Debug
+- Info
+- Warning
+- Error
+
+
+During debugging, "Debug" level is recommended to expose
+timing, memory, and asset-loading details.
+
+For performance testing without excessive console output,
+consider using "Info".
+
 ## Debugging Applications on Unix (VS Code + GDB)
 
 To debug a Rendering Engine application on Unix-like systems (FreeBSD/Linux) using Visual Studio Code and GDB, it is needed to create a dedicated launch configuration.

@@ -16,5 +16,6 @@
   "logLevel": "Debug",
 
   "useSmoothedFPS": false,
-  "targetFPS": 0
+  "targetFPS": 0,
+  "showStatsOverlay": true
 }
