@@ -144,7 +144,7 @@ void CoreApplication::Run()
         mWindowSystem->PollEvents();
 
         const auto updateStart = std::chrono::steady_clock::now();
-        Update(mAppTime->ElapsedAppTimeMilliseconds());
+        Update(mAppTime->ElapsedAppTimeSeconds());
         const auto updateEnd = std::chrono::steady_clock::now();
 
         const auto drawStart = std::chrono::steady_clock::now();
@@ -242,6 +242,11 @@ ScreenSettings CoreApplication::GetScreenSettings() const
     ss.width = mWidth;
     
     return ss;
+}
+
+FrameMetrics CoreApplication::GetFrameMetrics() const
+{
+    return mFrameMetrics;
 }
 
 } // rendering_engine

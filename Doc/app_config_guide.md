@@ -21,7 +21,22 @@ A configuration file has the following structure:
   "appName": "@PROJECT_NAME@",
   "isFullScreen": false,
   "screenWidth": 800,
-  "screenHeight": 600
+  "screenHeight": 600,
+
+  "text": {
+    "scripts": [
+      "Latin"
+    ],
+    "fontSizePreload": [
+      10
+    ]
+  },
+
+  "logLevel": "Info",
+
+  "useSmoothedFPS": true,
+  "targetFPS": 60,
+  "showStatsOverlay": true
 }
 ```
 Default values are used if the configuration file is missing or contains invalid data.
@@ -39,6 +54,18 @@ struct AppConfig
 	float screenWidth = 800.0f;
 	/** @brief Desired window height in pixels (ignored in full-screen mode). */
 	float screenHeight = 600.0f;
+	/** @brief Unicode scripts to preload for text rendering. */
+	std::vector<std::string> textScripts{"Latin"};
+	/** @brief Font sizes to preload at startup. */
+	std::vector<int> fontSizePreload{10};
+	/** @brief Logging verbosity level ("Error", "Warning", "Info", "Debug"). */
+	std::string logLevel{"Info"};
+	/** @brief Enable FPS smoothing and frame pacing behavior. */
+	bool useSmoothedFPS = true;
+	/** @brief Target frame rate (0 = uncapped). */
+	float targetFPS = 60.0f;
+	/** @brief Enable on-screen statistics overlay. */
+	bool showStatsOverlay = true;
 };
 ```
 For details on how configuration loading is implemented, refer to:
@@ -46,5 +73,120 @@ For details on how configuration loading is implemented, refer to:
 RenderingEngine\RenderingLibrary\Include\utility.hpp
 ```
 
-<- [Back to Developer Guide Page](developer_guide.md)
+## Configuration Parameters
+
+### appName
+Application name used in:
+- Window title
+- Log output
+
+### isFullScreen
+If true, application starts in full-screen mode.
+Window size parameters are ignored.
+
+### screenWidth / screenHeight
+Window size in pixels (used only when not full-screen).
+
+### text.fontSizePreload
+List of font sizes to preload at application startup.
+Preloading font sizes:
+- Reduces runtime stutter caused by on-demand glyph rasterization
+- Increases application startup time
+
+Each specified size will generate a separate font atlas for every requested script.
+
+### text.scripts
+List of Unicode script ranges to preload.
+Supported scripts available for preloading:
+
+```
+Latin, Cyrillic, Greek, Han, HanExtensionA, Hiragana, Katakana, KatakanaPhoneticExtensions, Hangul.
+```
+
+If a script is specified in the configuration file, the engine will create a font atlas for that script using all sizes defined in ```text.fontSizePreload```.
+
+If a script is not specified but is used in a ```TextBlock2D```, the engine will still render the text.
+In this case, glyph rasterization will be performed on demand at runtime.
+
+#### Performance Considerations
+
+Some scripts contain very large Unicode ranges (for example, Han).
+Preloading an entire script range may:
+- Increase startup time
+- Increase RAM usage
+- Increase GPU memory usage
+
+If your application does not render extensive text for such scripts, it may be more efficient not to preload them.
+For guidance on measuring startup time, RAM usage, and GPU memory usage, see:
+[Performance Profiling and Analysis Guide](performance_profiling_guide.md)
+
+#### Scripts Requiring Text Shaping
+
+Certain writing systems require text shaping to correctly apply contextual glyph rules and ligatures.
+For these scripts:
+- The text rendering pipeline includes an additional shaping stage
+- Full script atlas preloading is typically unnecessary
+
+To enable shaping for a text block:
+```cpp
+struct TextBlock2D::Properties
+{
+    bool textShapeEnabled = true;
+};
+```
+
+Refer to the API documentation of ```TextBlock2D``` for further details.
+
+Scripts requiring shaping include:
+```
+ Hebrew, Arabic, Aramaic, Thaana, Devanagari, Bengali, Gurmukhi, Gujarati, Oriya, Tamil, Telugu, Kannada, Malayalam, Sinhala,
+ Thai, Lao, Myanmar, Khmer, Tibetan.
+```
+
+### logLevel
+
+Controls engine logging verbosity.
+
+Available values:
+```
+"Error"
+"Warning"
+"Info"
+"Debug"
+```
+
+### useSmoothedFPS
+
+Enables FPS smoothing and frame pacing behavior.
+When enabled:
+- FPS values are exponentially smoothed
+- Frame pacing attempts to match targetFPS
+- Produces more stable runtime behavior
+
+When disabled:
+- Raw frame timing is used
+- Recommended for performance bottleneck analysis
+
+
+### targetFPS
+Specifies the desired frame rate cap.
+
+Examples:
+
+| targetFPS | Behavior |
+|:----:|:----:|
+| 0 | Uncapped |
+|60 | Cap at 60 FPS |
+| 120 | Cap at 120 FPS |
+
+### showStatsOverlay
+
+Enables runtime statistics overlay.
+Displays:
+
+- FPS
+- Frame time
+- Update time
+- Draw time
+- Memory usage (if available)
 

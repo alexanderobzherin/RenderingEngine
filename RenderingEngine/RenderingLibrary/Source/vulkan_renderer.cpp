@@ -1017,6 +1017,7 @@ void VulkanRenderer::CreateSwapChain()
     SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(mPhysicalDevice);
 
     VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
+    // TO Disable VSync  VkPresentModeKHR presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
     VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
     VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
 

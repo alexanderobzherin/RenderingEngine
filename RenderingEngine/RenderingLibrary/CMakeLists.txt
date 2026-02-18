@@ -93,6 +93,8 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/create_actor_2d_subobject.hpp
 
 	${PROJECT_SOURCE_DIR}/Include/logger.hpp
+
+	${PROJECT_SOURCE_DIR}/Include/stats_overlay.hpp
 )
 
 set(RenderingLibrary_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/Include/")
@@ -164,6 +166,8 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/actor_2d.cpp
 
 	${PROJECT_SOURCE_DIR}/Source/logger.cpp
+
+	${PROJECT_SOURCE_DIR}/Source/stats_overlay.cpp
 )
 
 

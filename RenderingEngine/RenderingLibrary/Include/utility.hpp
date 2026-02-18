@@ -33,14 +33,18 @@ struct AppConfig
 	float screenWidth = 800.0f;
 	/** @brief Desired window height in pixels (ignored in full-screen mode). */
 	float screenHeight = 600.0f;
-
+	/** @brief Unicode scripts to preload for text rendering. */
 	std::vector<std::string> textScripts{"Latin"};
+	/** @brief Font sizes to preload at startup. */
 	std::vector<int> fontSizePreload{10};
-
+	/** @brief Logging verbosity level ("Error", "Warning", "Info", "Debug"). */
 	std::string logLevel{"Info"};
-
+	/** @brief Enable FPS smoothing and frame pacing behavior. */
 	bool useSmoothedFPS = true;
+	/** @brief Target frame rate (0 = uncapped). */
 	float targetFPS = 60.0f;
+	/** @brief Enable on-screen statistics overlay. */
+	bool showStatsOverlay = true;
 };
 
 /**

@@ -17,6 +17,7 @@
 #pragma once
 
 #include "scene.hpp"
+#include "scene_manager.hpp"
 
 #include "static_mesh.hpp"
 #include "sprite_2d.hpp"

@@ -31,12 +31,26 @@ struct ScreenSettings
     unsigned int height;
 };
 
+/**
+ * @struct FrameMetrics
+ * @brief Stores CPU timing statistics for a rendered frame.
+ *
+ * Contains frame duration, update time, draw time,
+ * and FPS values (raw and smoothed).
+ *
+ * All time values are in milliseconds.
+ */
 struct FrameMetrics
 {
+    /** Total frame duration (ms). */
     float frameDurationMs = 0.0f;
+    /** Time spent in Update() (ms). */
     float updateTimeMs = 0.0f;
+    /** Time spent in Draw() (ms). */
     float drawTimeMs = 0.0f;
+    /** Instantaneous FPS (1000 / frameDurationMs). */
     float fpsRaw = 0.0f;
+    /** Smoothed FPS value. */
     float fpsSmoothed = 0.0f;
 };
 
@@ -73,6 +87,11 @@ public:
      * @return A structure describing screen configuration parameters.
      */
     virtual ScreenSettings GetScreenSettings() const = 0;
-
+    /**
+     * @brief Returns performance metrics of the last processed frame.
+     *
+     * @return FrameMetrics structure containing timing and FPS data.
+     */
+    virtual FrameMetrics GetFrameMetrics() const = 0;
 };
 } //rendering_engine

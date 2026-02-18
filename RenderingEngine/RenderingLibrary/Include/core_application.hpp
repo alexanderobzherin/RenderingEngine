@@ -90,6 +90,8 @@ public:
 	void Shutdown() override;
 	/** @copydoc IApplication::GetScreenSettings */
 	ScreenSettings GetScreenSettings() const override;
+	/** @copydoc IApplication::GetFrameMetrics */
+	FrameMetrics GetFrameMetrics() const override;
 
 protected:
 	bool bIsFullScreen;

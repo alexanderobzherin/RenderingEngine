@@ -98,6 +98,9 @@ AppConfig Utility::ReadConfigFile()
 		if (appConfigData.contains("targetFPS"))
 			cfg.targetFPS = appConfigData["targetFPS"].get<float>();
 
+		if (appConfigData.contains("showStatsOverlay"))
+			cfg.showStatsOverlay = appConfigData["showStatsOverlay"].get<bool>();
+		
 	}
 	catch (const std::exception& e)
 	{

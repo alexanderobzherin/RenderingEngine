@@ -8,6 +8,9 @@
 #include "actor.hpp"
 #include "actor_2d.hpp"
 #include "logger.hpp"
+#include "utility.hpp"
+#include "stats_overlay.hpp"
+#include "i_application.hpp"
 
 namespace rendering_engine
 {
@@ -15,7 +18,8 @@ namespace rendering_engine
 
 Scene::Scene(SceneManager& sceneManager)
 	:
-	mSceneManager(sceneManager)
+	mSceneManager(sceneManager),
+	mStatsOverlay(nullptr)
 {}
 
 void Scene::Initialize()
@@ -25,6 +29,17 @@ void Scene::Initialize()
 
 	mActiveCamera2D = std::make_shared<Camera2D>(*mSceneManager.GetApplication());
 	mActiveCamera2D->Initialize();
+
+	AppConfig appConfig = Utility::ReadConfigFile();
+	if (appConfig.showStatsOverlay)
+	{
+		mStatsOverlay = SpawnActor2D<StatsOverlay>();
+		const float screenWidth = mSceneManager.GetApplication()->GetScreenSettings().width;
+		const float screenHeight = mSceneManager.GetApplication()->GetScreenSettings().height;
+		const float x = screenWidth / 2 - 200.0f;
+		const float y = -screenHeight / 2 + 130.0f;
+		mStatsOverlay->SetPosition(glm::vec2(x, y));
+	}
 }
 
 void Scene::Update(float deltaTime)
@@ -43,12 +58,16 @@ void Scene::Update(float deltaTime)
 	for (auto& actor : mActors)
 	{
 		if (!actor->IsPendingDestroy())
+		{
 			actor->Update(deltaTime);
+		}
 	}
 	for (auto& actor2D : mActors2D)
 	{
 		if (!actor2D->IsPendingDestroy())
+		{
 			actor2D->Update(deltaTime);
+		}
 	}
 
 	for (auto& drawable2D : mDrawables2D)

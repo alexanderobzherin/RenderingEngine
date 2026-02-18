@@ -194,6 +194,15 @@ protected:
 	template <typename T, typename V>
 	T* CreateSubobject(V arg);
 
+	/**
+	 * @brief Returns the owning Scene.
+	 *
+	 * Provides access to the scene that contains this actor.
+	 *
+	 * @return Reference to the parent Scene.
+	 */
+	Scene& GetScene();
+
 protected:
 	SceneComponent2D mRootComponent;
 	bool bUpdateOnTick;

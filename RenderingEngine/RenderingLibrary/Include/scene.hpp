@@ -21,6 +21,7 @@ class Drawable3D;
 class Drawable2D;
 class Actor;
 class Actor2D;
+class StatsOverlay;
 
 /**
  * @class Scene
@@ -247,6 +248,8 @@ private:
 
 	std::vector<Actor2D*> mActors2D;
 	std::vector<Actor2D*> mPendingDestroyActors2D;
+
+	StatsOverlay* mStatsOverlay;
 };	
 
 template <typename T>

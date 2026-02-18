@@ -105,6 +105,11 @@ void Actor2D::Shutdown()
 	mRootComponent.AttachTo(nullptr);
 }
 
+Scene& Actor2D::GetScene()
+{
+	return mScene;
+}
+
 
 
 
