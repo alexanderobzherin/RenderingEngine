@@ -160,20 +160,6 @@ void CoreApplication::Run()
         mFrameMetrics.frameDurationMs =
             std::chrono::duration<float, std::milli>(frameEnd - frameStart).count();
 
-        if (mFrameMetrics.frameDurationMs > 0.0f)
-        {
-            mFrameMetrics.fpsRaw =
-                1000.0f / mFrameMetrics.frameDurationMs;
-
-            const float alpha = 0.1f;
-
-            if (mFrameMetrics.fpsSmoothed == 0.0f)
-                mFrameMetrics.fpsSmoothed = mFrameMetrics.fpsRaw;
-            else
-                mFrameMetrics.fpsSmoothed =
-                alpha * mFrameMetrics.fpsRaw +
-                (1.0f - alpha) * mFrameMetrics.fpsSmoothed;
-        }
 
         // Frame pacing (sleep)
         if (mAppConfig.targetFPS > 0)
@@ -193,6 +179,26 @@ void CoreApplication::Run()
             }
         }
 
+        const auto frameEndTotal = std::chrono::steady_clock::now();
+        const auto frameLengthTotal = std::chrono::duration<float, std::milli>(frameEndTotal - frameStart).count();
+        
+        if (mFrameMetrics.frameDurationMs > 0.0f)
+        {
+            mFrameMetrics.fpsRaw = 1000.0f / frameLengthTotal;
+
+            const float alpha = 0.1f;
+
+            if (mFrameMetrics.fpsSmoothed == 0.0f)
+            {
+                mFrameMetrics.fpsSmoothed = mFrameMetrics.fpsRaw;
+            }
+            else
+            {
+                mFrameMetrics.fpsSmoothed =
+                alpha * mFrameMetrics.fpsRaw +
+                (1.0f - alpha) * mFrameMetrics.fpsSmoothed;
+            }
+        }
     }
 
     LOG_INFO("Main loop exited.");
