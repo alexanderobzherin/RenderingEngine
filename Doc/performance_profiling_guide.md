@@ -29,7 +29,8 @@ Performance-related settings are configured via the application configuration fi
   "logLevel": "Debug",
 
   "useSmoothedFPS": false,
-  "targetFPS": 0
+  "targetFPS": 60,
+  "showStatsOverlay": true
 }
 ```
 
