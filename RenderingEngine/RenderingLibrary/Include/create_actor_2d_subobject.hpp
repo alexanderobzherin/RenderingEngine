@@ -26,10 +26,10 @@ Rectangle2D* Actor2D::CreateSubobject<Rectangle2D>(Rectangle2D::Properties prop)
 template <>
 TextBlock2D* Actor2D::CreateSubobject<TextBlock2D>(TextBlock2D::Properties prop)
 {
-	auto rectangle2D = mScene.Spawn<TextBlock2D>(prop);
-	mWards.push_back(rectangle2D);
-	rectangle2D->UpdateOnTick(bUpdateOnTick);
+	auto textBlock2D = mScene.Spawn<TextBlock2D>(prop);
+	mWards.push_back(textBlock2D);
+	textBlock2D->UpdateOnTick(bUpdateOnTick);
 	
-	return rectangle2D;
+	return textBlock2D;
 }
 } // namespace rendering_engine

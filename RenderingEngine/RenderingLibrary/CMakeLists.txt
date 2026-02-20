@@ -95,6 +95,8 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/logger.hpp
 
 	${PROJECT_SOURCE_DIR}/Include/stats_overlay.hpp
+
+	${PROJECT_SOURCE_DIR}/Include/color_space.hpp
 )
 
 set(RenderingLibrary_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/Include/")
@@ -168,6 +170,8 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/logger.cpp
 
 	${PROJECT_SOURCE_DIR}/Source/stats_overlay.cpp
+
+	${PROJECT_SOURCE_DIR}/Source/color_space.cpp
 )
 
 

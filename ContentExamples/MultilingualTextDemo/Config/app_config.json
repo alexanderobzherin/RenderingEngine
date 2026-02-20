@@ -1,0 +1,21 @@
+{
+  "appName": "MultilingualTextDemo",
+  "isFullScreen": false,
+  "screenWidth": 1600,
+  "screenHeight": 900,
+
+  "text": {
+    "scripts": [
+      "Latin"
+    ],
+    "fontSizePreload": [
+      10
+    ]
+  },
+
+  "logLevel": "Info",
+
+  "useSmoothedFPS": true,
+  "targetFPS": 60,
+  "showStatsOverlay": false
+}

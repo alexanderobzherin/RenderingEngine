@@ -214,6 +214,12 @@ protected:
 	 * @note Do not delete actors manually. Always use Actor2D::Destroy().
 	 */
 	void DestroyActor(Actor2D * actor2D);
+	/**
+	 * @brief Sets the scene background clear color.
+	 *
+	 * @param color Linear-space RGB color.
+	 */
+	void SetBackgroundColor(glm::vec3 color);
 
 private:
 	/**

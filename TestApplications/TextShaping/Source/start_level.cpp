@@ -6,6 +6,7 @@
 #include "static_mesh.hpp"
 #include "text_block_2d.hpp"
 #include "i_application.hpp"
+#include "color_space.hpp"
 
 using namespace rendering_engine;
 
@@ -21,11 +22,13 @@ void StartLevel::Initialize()
 {
 	Scene::Initialize();
 
+	SetBackgroundColor(ColorSpace::SRGBToLinear(glm::vec3(0.0f, 0.118f, 0.227f)));
+
 	auto screenSettings = GetSceneManager().GetApplication()->GetScreenSettings();
 	
-	const float horizDelta = 250.0f;
-	const float vertDelta = 50.0f;
-	const float column_0 = -350.0f;
+	const float horizDelta = 300.0f;
+	const float vertDelta = 51.0f;
+	const float column_0 = -450.0f;
 	const float column_1 = column_0 + horizDelta;
 	const float column_2 = column_1 + horizDelta;
 
@@ -48,15 +51,21 @@ void StartLevel::Initialize()
 	const float row_16 = row_15 + vertDelta;
 	const float row_17 = row_16 + vertDelta;
 
+	const float scriptNameSize = 16.0f;
+	const float headerSize = 20.0f;
+
+	const glm::vec4 headerColor = { ColorSpace::SRGBToLinear(glm::vec3(0.165f, 0.624f, 0.816f)), 1.0f };
+	const auto scriptNameColor = glm::vec4(0.4f, 0.4f, 0.4f, 1.0f);
+
 	const std::string fontName = "RobotoMono-Regular";
 
-	AddTextBlock(fontName, "Shaped text:", glm::vec2(column_1, row_0), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
-	AddTextBlock(fontName, "Not shaped text:", glm::vec2(column_2, row_0), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Shaped text:", glm::vec2(column_1, row_0), false, headerColor, headerSize);
+	AddTextBlock(fontName, "Not shaped text:", glm::vec2(column_2, row_0), false, headerColor, headerSize);
 
 	/// Aramaic
 	const std::string aramaicFontName = "NotoSansSyriac-Regular";
 	const std::string textRendering_Aramaic = "ܡܚܙܘܝܘܬܐ ܕܟܬܒܐ";
-	AddTextBlock(fontName, "Aramaic", glm::vec2(column_0, row_1), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Aramaic", glm::vec2(column_0, row_1), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(aramaicFontName, textRendering_Aramaic, glm::vec2(column_1, row_1));
 	// not shaped
@@ -65,7 +74,7 @@ void StartLevel::Initialize()
 	/// Hebrew
 	const std::string hebrewFontName = "FrankRuhlLibre-Regular";
 	const std::string textRendering_Hebrew = "עיבוד טקסט";
-	AddTextBlock(fontName, "Hebrew", glm::vec2(column_0, row_2), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Hebrew", glm::vec2(column_0, row_2), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(hebrewFontName, textRendering_Hebrew, glm::vec2(column_1, row_2));
 	// not shaped
@@ -74,7 +83,7 @@ void StartLevel::Initialize()
 	/// Arabic
 	const std::string arabicFontName = "Amiri-Regular";
 	const std::string textRendering_Arabic = "عرض النص";
-	AddTextBlock(fontName, "Arabic", glm::vec2(column_0, row_3), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Arabic", glm::vec2(column_0, row_3), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(arabicFontName, textRendering_Arabic, glm::vec2(column_1, row_3));
 	// not shaped
@@ -83,7 +92,7 @@ void StartLevel::Initialize()
 	/// Devanagari
 	const std::string devanagariFontName = "NotoSansDevanagari-Regular";
 	const std::string textRendering_Devanagari = "पाठ प्रतिपादन";
-	AddTextBlock(fontName, "Devanagari", glm::vec2(column_0, row_4), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Devanagari", glm::vec2(column_0, row_4), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(devanagariFontName, textRendering_Devanagari, glm::vec2(column_1, row_4));
 	// not shaped
@@ -92,7 +101,7 @@ void StartLevel::Initialize()
 	/// Bengali
 	const std::string bengaliFontName = "NotoSansBengali-Regular";
 	const std::string textRendering_Bengali = "পাঠ রেন্ডারিং";
-	AddTextBlock(fontName, "Bengali", glm::vec2(column_0, row_5), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Bengali", glm::vec2(column_0, row_5), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(bengaliFontName, textRendering_Bengali, glm::vec2(column_1, row_5));
 	// not shaped
@@ -101,7 +110,7 @@ void StartLevel::Initialize()
 	/// Gurmukhi
 	const std::string gurmukhiFontName = "NotoSansGurmukhi-Regular";
 	const std::string textRendering_Gurmukhi = "ਪਾਠ ਰੈਂਡਰਿੰਗ";
-	AddTextBlock(fontName, "Gurmukhi", glm::vec2(column_0, row_6), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Gurmukhi", glm::vec2(column_0, row_6), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(gurmukhiFontName, textRendering_Gurmukhi, glm::vec2(column_1, row_6));
 	// not shaped
@@ -110,7 +119,7 @@ void StartLevel::Initialize()
 	/// Gujarati
 	const std::string gujaratiFontName = "NotoSansGujarati-Regular";
 	const std::string textRendering_Gujarati = "ટેક્સ્ટ રેન્ડરિંગ";
-	AddTextBlock(fontName, "Gujarati", glm::vec2(column_0, row_7), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Gujarati", glm::vec2(column_0, row_7), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(gujaratiFontName, textRendering_Gujarati, glm::vec2(column_1, row_7));
 	// not shaped
@@ -119,7 +128,7 @@ void StartLevel::Initialize()
 	/// Tamil
 	const std::string tamilFontName = "NotoSansTamil-Regular";
 	const std::string textRendering_Tamil = "உரை வரைதல்";
-	AddTextBlock(fontName, "Tamil", glm::vec2(column_0, row_8), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Tamil", glm::vec2(column_0, row_8), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(tamilFontName, textRendering_Tamil, glm::vec2(column_1, row_8));
 	// not shaped
@@ -128,7 +137,7 @@ void StartLevel::Initialize()
 	/// Telugu
 	const std::string teluguFontName = "NotoSansTelugu-Regular";
 	const std::string textRendering_Telugu = "పాఠ్య చిత్రీకరణ";
-	AddTextBlock(fontName, "Telugu", glm::vec2(column_0, row_9), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Telugu", glm::vec2(column_0, row_9), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(teluguFontName, textRendering_Telugu, glm::vec2(column_1, row_9));
 	// not shaped
@@ -137,7 +146,7 @@ void StartLevel::Initialize()
 	/// Kannada
 	const std::string kannadaFontName = "NotoSansKannada-Regular";
 	const std::string textRendering_Kannada = "ಪಠ್ಯ ರೆಂಡರಿಂಗ್";
-	AddTextBlock(fontName, "Kannada", glm::vec2(column_0, row_10), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Kannada", glm::vec2(column_0, row_10), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(kannadaFontName, textRendering_Kannada, glm::vec2(column_1, row_10));
 	// not shaped
@@ -146,7 +155,7 @@ void StartLevel::Initialize()
 	/// Malayalam
 	const std::string malayalamFontName = "NotoSansMalayalam-Regular";
 	const std::string textRendering_Malayalam = "ടെക്സ്റ്റ് റെൻഡറിംഗ്";
-	AddTextBlock(fontName, "Malayalam", glm::vec2(column_0, row_11), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Malayalam", glm::vec2(column_0, row_11), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(malayalamFontName, textRendering_Malayalam, glm::vec2(column_1, row_11));
 	// not shaped
@@ -155,7 +164,7 @@ void StartLevel::Initialize()
 	/// Thai
 	const std::string thaiFontName = "NotoSansThai-Regular";
 	const std::string textRendering_Thai = "การแสดงผลข้อความ";
-	AddTextBlock(fontName, "Thai", glm::vec2(column_0, row_12), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Thai", glm::vec2(column_0, row_12), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(thaiFontName, textRendering_Thai, glm::vec2(column_1, row_12));
 	// not shaped
@@ -164,7 +173,7 @@ void StartLevel::Initialize()
 	/// Khmer
 	const std::string khmerFontName = "NotoSansKhmer-Regular";
 	const std::string textRendering_Khmer = "ការបង្ហាញអត្ថបទ";
-	AddTextBlock(fontName, "Khmer", glm::vec2(column_0, row_13), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Khmer", glm::vec2(column_0, row_13), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(khmerFontName, textRendering_Khmer, glm::vec2(column_1, row_13));
 	// not shaped
@@ -173,7 +182,7 @@ void StartLevel::Initialize()
 	/// Lao
 	const std::string laoFontName = "NotoSansLao-Regular";
 	const std::string textRendering_Lao = "ການສະແດງຂໍ້ຄວາມ";
-	AddTextBlock(fontName, "Lao", glm::vec2(column_0, row_14), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Lao", glm::vec2(column_0, row_14), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(laoFontName, textRendering_Lao, glm::vec2(column_1, row_14));
 	// not shaped
@@ -182,7 +191,7 @@ void StartLevel::Initialize()
 	/// Myanmar (Burmese)
 	const std::string myanmarFontName = "NotoSansMyanmar-Regular";
 	const std::string textRendering_Myanmar = "စာသားပြသမှု";
-	AddTextBlock(fontName, "Myanmar (Burmese)", glm::vec2(column_0, row_15), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Myanmar (Burmese)", glm::vec2(column_0, row_15), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(myanmarFontName, textRendering_Myanmar, glm::vec2(column_1, row_15));
 	// not shaped
@@ -191,7 +200,7 @@ void StartLevel::Initialize()
 	/// Sinhala
 	const std::string sinhalaFontName = "NotoSansSinhala-Regular";
 	const std::string textRendering_Sinhala = "පෙළ ප්‍රදර්ශනය";
-	AddTextBlock(fontName, "Sinhala", glm::vec2(column_0, row_16), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Sinhala", glm::vec2(column_0, row_16), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(sinhalaFontName, textRendering_Sinhala, glm::vec2(column_1, row_16));
 	// not shaped
@@ -200,7 +209,7 @@ void StartLevel::Initialize()
 	/// Tibetan
 	const std::string tibetanFontName = "NotoSerifTibetan-Regular";
 	const std::string textRendering_Tibetan = "ཡིག་རྟགས་འཆར་སྟོན།";
-	AddTextBlock(fontName, "Tibetan", glm::vec2(column_0, row_17), false, glm::vec4(0.4f, 0.4, 0.4f, 1.0f));
+	AddTextBlock(fontName, "Tibetan", glm::vec2(column_0, row_17), false, scriptNameColor, scriptNameSize);
 	// shaped
 	AddTextBlock(tibetanFontName, textRendering_Tibetan, glm::vec2(column_1, row_17));
 	// not shaped
@@ -210,18 +219,18 @@ void StartLevel::Update(float deltaTime)
 {
 	Scene::Update(deltaTime);
 }
-void StartLevel::AddTextBlock(const std::string& fontName, const std::string& text, glm::vec2 pos, bool textShapeEnabled, glm::vec4 color)
+void StartLevel::AddTextBlock(const std::string& fontName, const std::string& text, glm::vec2 pos, bool textShapeEnabled, glm::vec4 color, float fontSize)
 {
 	TextBlock2D::Properties tbprop;
 	tbprop.fontName = fontName;
 	tbprop.textShapeEnabled = textShapeEnabled;
-	tbprop.fontSize = 16;
+	tbprop.fontSize = fontSize;
 
-	TextBlock2D* notShapedTextBlock = Spawn<TextBlock2D>(tbprop);
+	TextBlock2D* textBlock = Spawn<TextBlock2D>(tbprop);
 
-	notShapedTextBlock->SetText(text);
+	textBlock->SetText(text);
 
-	notShapedTextBlock->SetPosition(pos);
-	notShapedTextBlock->SetTextColor(color);
+	textBlock->SetPosition(pos);
+	textBlock->SetTextColor(color);
 }
 }

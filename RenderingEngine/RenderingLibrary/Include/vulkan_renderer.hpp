@@ -123,6 +123,8 @@ public:
     IMaterialRenderResources* ProvideMaterialRenderResources() const override;
     /** @copydoc IRenderer::ProvideMeshRenderResources */
     IMeshRenderResources* ProvideMeshRenderResources() const override;
+    /** @copydoc IRenderer::SetDefaultColor */
+    void SetDefaultColor(float r, float g, float b) override;
 
     /**
      * @brief Creates a new Vulkan buffer with the specified usage and memory properties.
@@ -363,7 +365,7 @@ private:
     std::uint64_t mFrameSerial = 0;
     std::deque<DeferredItem> mDeferredQueue;
 
-    glm::vec3 mBgColor = {1.0f, 1.0f, 1.0f};
+    glm::vec3 mDefaultColor = {0.0f, 0.0f, 0.0f};
 };
 
-} //rendering_engine
+} // rendering_engine

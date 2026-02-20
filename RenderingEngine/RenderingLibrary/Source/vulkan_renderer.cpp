@@ -203,7 +203,7 @@ void VulkanRenderer::BeginRenderPass()
     renderPassInfo.renderArea.extent = mSwapChainExtent;
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { {mBgColor.r, mBgColor.g, mBgColor.b, 1.0f} };
+    clearValues[0].color = { {mDefaultColor.r, mDefaultColor.g, mDefaultColor.b, 1.0f} };
     clearValues[1].depthStencil = { 1.0f, 0 };
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
@@ -336,6 +336,11 @@ IMaterialRenderResources* VulkanRenderer::ProvideMaterialRenderResources() const
 IMeshRenderResources* VulkanRenderer::ProvideMeshRenderResources() const
 {
     return new VulkanMeshResources(const_cast<VulkanRenderer*>(this));
+}
+
+void VulkanRenderer::SetDefaultColor(float r, float g, float b)
+{
+    mDefaultColor = glm::vec3(r, g, b);
 }
 
 IRenderResources* VulkanRenderer::ProvideRenderResources() const
@@ -1818,7 +1823,7 @@ void VulkanRenderer::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t
     renderPassInfo.renderArea.extent = mSwapChainExtent;
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { {mBgColor.r, mBgColor.g, mBgColor.b, 1.0f} };
+    clearValues[0].color = { {mDefaultColor.r, mDefaultColor.g, mDefaultColor.b, 1.0f} };
     clearValues[1].depthStencil = { 1.0f, 0 };
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();

@@ -1,8 +1,8 @@
 {
   "appName": "TextShaping",
   "isFullScreen": false,
-  "screenWidth": 900,
-  "screenHeight": 1080,
+  "screenWidth": 1600,
+  "screenHeight": 1000,
 
   "text": {
     "scripts": [

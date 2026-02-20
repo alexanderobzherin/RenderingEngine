@@ -2,8 +2,8 @@
 
 # Project details
 PROJECT_NAME           = "Rendering Engine"
-PROJECT_BRIEF          = "Modular Graphics Rendering Engine | v0.2.0"
-PROJECT_NUMBER         = "0.2.0"
+PROJECT_BRIEF          = "Modular Graphics Rendering Engine | v0.2.8"
+PROJECT_NUMBER         = "0.2.8"
 OUTPUT_DIRECTORY       = ../../Build/Docs
 
 HTML_COLORSTYLE = LIGHT

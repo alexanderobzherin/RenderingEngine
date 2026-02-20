@@ -217,4 +217,9 @@ void Scene::FlushDestroyed()
 	mPendingDestroyActors2D.clear();
 }
 
+void Scene::SetBackgroundColor(glm::vec3 color)
+{
+	mSceneManager.GetRenderResourceContext().renderer->SetDefaultColor(color.r, color.g, color.b);
+}
+
 } // namespace rendering_engine

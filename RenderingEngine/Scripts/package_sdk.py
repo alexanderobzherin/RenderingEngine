@@ -50,9 +50,13 @@ VERSION_HEADER = os.path.join(
 DOC_FILES = [
     "README.md",
     "Doc/app_config_guide.md",
+    "Doc/application_development_guide.md",
+    "Doc/ci_cd_guide.md",
     "Doc/debugging_guide.md",
     "Doc/developer_guide.md",
     "Doc/docker_container.md",
+    "Doc/getting_started.md",
+    "Doc/performance_profiling_guide.md",
     "Doc/prepare_environment.md",
     "Doc/project_creation_guide.md",
     "Doc/project_packaging_guide.md",

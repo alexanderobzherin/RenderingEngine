@@ -35,7 +35,8 @@ private:
 					  const std::string& text,
 					  glm::vec2 pos,
 					  bool textShapeEnabled = true,
-					  glm::vec4 color = glm::vec4(1.0f, 1.0, 1.0f, 1.0f));
+					  glm::vec4 color = glm::vec4(1.0f, 1.0, 1.0f, 1.0f),
+					  float fontSize = 22);
 
 };
 

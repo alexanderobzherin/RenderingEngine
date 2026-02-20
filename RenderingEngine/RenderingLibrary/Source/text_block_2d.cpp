@@ -45,6 +45,7 @@ TextBlock2D::TextBlock2D(Scene& scene, std::shared_ptr<TextRenderer> textRendere
     bIsTextShapeEnabled(properties.textShapeEnabled),
     mFontName(properties.fontName),
     mFontSize(properties.fontSize),
+    mLineSpacingScale(properties.lineSpacingScale),
     mTextAlign(properties.textAlign),
     mMaxLineLength(properties.maxLineLength),
     mOutlineThicknessPx(properties.outlineThicknessPx > 2 ? 2 : properties.outlineThicknessPx),
@@ -59,9 +60,6 @@ TextBlock2D::TextBlock2D(Scene& scene, std::shared_ptr<TextRenderer> textRendere
 
     ++sNumOfTextBlocks;
     mTextBlockID = "TextBlock_" + std::to_string(sNumOfTextBlocks);
-
-
-
 }
 
 void TextBlock2D::Initialize()
@@ -370,7 +368,7 @@ void TextBlock2D::ConstructMesh()
         linesOfGlyphQuads.push_back(lineOfGlyphQuads);
         const float lineLength = penX;
 
-        penY += fontMetrics.lineHeight;
+        penY += (fontMetrics.lineHeight * mLineSpacingScale);
 
         if (lineLength > maximumLineLengh)
         {
@@ -436,23 +434,21 @@ void TextBlock2D::ShapeTextAndConstructMesh()
 
     float maximumLineLengh = 0.0f;
     std::vector<float> lineLengths;
-    if (mTextAlign == TextAlign::Center || mTextAlign == TextAlign::Right)
+
+    for (auto& line : linesOfShapedGlyphs)
     {
-        for (auto& line : linesOfShapedGlyphs)
+        float lineLength = 0.0f;
+        for (const auto& glyph : line)
         {
-            float lineLength = 0.0f;
-            for (const auto& glyph : line)
-            {
-                lineLength += glyph.xAdvance;
-            }
-            lineLengths.push_back(lineLength);
-            if (lineLength > maximumLineLengh)
-            {
-                maximumLineLengh = lineLength;
-            }
+            lineLength += glyph.xAdvance;
         }
-        mMaxLineLength = (mMaxLineLength > maximumLineLengh ? mMaxLineLength : maximumLineLengh);
+        lineLengths.push_back(lineLength);
+        if (lineLength > maximumLineLengh)
+        {
+            maximumLineLengh = lineLength;
+        }
     }
+    mMaxLineLength = (mMaxLineLength > maximumLineLengh ? mMaxLineLength : maximumLineLengh);
 
     const FontMetrics& fontMetrics = mFontResources->GetFontMetrics();
     int curLine = 0;
@@ -480,11 +476,11 @@ void TextBlock2D::ShapeTextAndConstructMesh()
         }
 
         penX = 0.0f;
-        penY += fontMetrics.lineHeight;
+        penY += (fontMetrics.lineHeight * mLineSpacingScale);
         ++curLine;
     }
 
-    mDimensions = glm::vec2(mMaxLineLength, linesOfShapedGlyphs.size() * fontMetrics.lineHeight);
+    mDimensions = glm::vec2(mMaxLineLength, linesOfShapedGlyphs.size() * fontMetrics.lineHeight * mLineSpacingScale);
 
     UploadMeshes(meshes);
 

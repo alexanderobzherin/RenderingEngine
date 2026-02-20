@@ -76,6 +76,14 @@ public:
     virtual IMeshRenderResources* ProvideMeshRenderResources() const = 0;
     /** @brief Virtual destructor for safe polymorphic deletion. */
     virtual ~IRenderer() = default;
+    /**
+     * @brief Sets the renderer clear color.
+     *
+     * @param r Red channel (linear space, [0.0–1.0])
+     * @param g Green channel (linear space, [0.0–1.0])
+     * @param b Blue channel (linear space, [0.0–1.0])
+     */
+    virtual void SetDefaultColor(float r, float g, float b) = 0;
 };
 
 } //rendering_engine

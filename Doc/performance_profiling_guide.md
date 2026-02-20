@@ -16,7 +16,7 @@ Performance-related settings are configured via the application configuration fi
 
 ```json
 {
-  "appName": "ActorDrawableAttach",
+  "appName": "@PROJECT_NAME@",
   "isFullScreen": false,
   "screenWidth": 1920,
   "screenHeight": 1024,

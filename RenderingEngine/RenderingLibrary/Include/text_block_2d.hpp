@@ -61,7 +61,7 @@ struct Properties
 	/// Font family name.
 	std::string fontName;
 	/// Font size in pixels.
-	unsigned int fontSize = 10;
+	float fontSize = 10;
 	/// Horizontal text alignment.
 	TextAlign textAlign = TextAlign::Left;
 	/// Maximum line length for layout; zero disables wrapping.
@@ -70,6 +70,8 @@ struct Properties
 	bool textShapeEnabled = false;
 	/// Outline thickness in pixels.
 	float outlineThicknessPx = 0.0f;
+    /// Line height multiplier.
+	float lineSpacingScale = 1.0f;
 
 	Properties()
 	: fontName(TextBlock2D::sDefaultFontName)
@@ -261,7 +263,7 @@ protected:
 	static std::string sDefaultFontName;
 	const std::string mFontName;
 	const unsigned int mFontSize;
-
+	float mLineSpacingScale = 1.0f;
 	std::string mText;
 	float mMaxLineLength = 0.0f;
 	const TextAlign mTextAlign;
