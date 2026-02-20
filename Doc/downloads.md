@@ -20,9 +20,9 @@ Each package contains the Rendering Engine libraries, headers, and supporting to
 
 | Platform | Download |
 |---------|----------|
-| Windows | [RenderingEngine-v0.2.0-SDK-Windows](https://downloads.rendering-engine.alexander-obzherin.info/RenderingEngine-v0.2.0-SDK-Windows.tar.gz) |
-| FreeBSD | [RenderingEngine-v0.2.0-SDK-FreeBSD](https://downloads.rendering-engine.alexander-obzherin.info/RenderingEngine-v0.2.0-SDK-FreeBSD.tar.gz) |
-| Linux | [RenderingEngine-v0.2.0-SDK-Linux](https://downloads.rendering-engine.alexander-obzherin.info/RenderingEngine-v0.2.0-SDK-Linux.tar.gz) |
+| Windows | [RenderingEngine-v0.2.8-SDK-Windows](https://downloads.rendering-engine.alexander-obzherin.info/RenderingEngine-v0.2.8-SDK-Windows.tar.gz) |
+| FreeBSD | [RenderingEngine-v0.2.8-SDK-FreeBSD](https://downloads.rendering-engine.alexander-obzherin.info/RenderingEngine-v0.2.8-SDK-FreeBSD.tar.gz) |
+| Linux | [RenderingEngine-v0.2.8-SDK-Linux](https://downloads.rendering-engine.alexander-obzherin.info/RenderingEngine-v0.2.8-SDK-Linux.tar.gz) |
 
 ---
 
