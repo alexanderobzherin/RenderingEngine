@@ -10,6 +10,8 @@
 #include <vector>
 #include <algorithm>
 
+#include "rendering_engine_export.hpp"
+
 namespace rendering_engine
 {
 
@@ -69,7 +71,7 @@ struct Color
  * @class ImageData
  * @brief Represents raw 2D image data stored in memory.
  */
-class ImageData
+class RE_API ImageData
 {
 public:
 	/**
