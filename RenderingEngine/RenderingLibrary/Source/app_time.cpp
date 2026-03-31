@@ -10,12 +10,12 @@ mElapsedAppTime(0)
 {
 }
 
-const std::chrono::high_resolution_clock::time_point& AppTime::CurrentTime() const
+const std::chrono::steady_clock::time_point& AppTime::CurrentTime() const
 {
 	return mCurrentTime;
 }
 
-void AppTime::SetCurrentTime(const std::chrono::high_resolution_clock::time_point& currentTime)
+void AppTime::SetCurrentTime(const std::chrono::steady_clock::time_point& currentTime)
 {
 	mCurrentTime = currentTime;
 }

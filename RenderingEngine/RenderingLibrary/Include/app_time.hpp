@@ -38,9 +38,9 @@ public:
 	/// Constructs a new AppTime instance with zeroed timers.
 	AppTime();
 	/// Returns the current high-resolution time point.
-	const std::chrono::high_resolution_clock::time_point& CurrentTime() const;
+	const std::chrono::steady_clock::time_point& CurrentTime() const;
 	/// Sets the current high-resolution time point
-	void SetCurrentTime(const std::chrono::high_resolution_clock::time_point& currentTime);
+	void SetCurrentTime(const std::chrono::steady_clock::time_point& currentTime);
 	/// Returns total accumulated application time since start.
 	const std::chrono::milliseconds& TotalAppTime() const;
 	/// Returns total accumulated time in milliseconds (float).
@@ -55,7 +55,7 @@ public:
 	void SetElapsedAppTime(const std::chrono::milliseconds& elapsedAppTime);
 
 private:
-	std::chrono::high_resolution_clock::time_point mCurrentTime;
+	std::chrono::steady_clock::time_point mCurrentTime;
 	std::chrono::milliseconds mTotalAppTime;
 	std::chrono::milliseconds mElapsedAppTime;
 };

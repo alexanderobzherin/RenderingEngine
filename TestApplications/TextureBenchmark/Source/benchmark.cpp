@@ -1,4 +1,4 @@
-#include "..\Include\benchmark.hpp"
+#include "benchmark.hpp"
 #include "logger.hpp"
 #include "image_data.hpp"
 #include "utility.hpp"

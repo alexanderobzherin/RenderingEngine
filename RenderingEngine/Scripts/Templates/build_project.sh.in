@@ -7,7 +7,7 @@ BUILD_MODE="Release"
 if [ "$1" = "--debug" ];then
   BUILD_MODE="Debug"
 elif [ "$1" = "--release" ];then
-  MODE="Release"
+  BUILD_MODE="Release"
 fi
 echo "Build mode: "
 echo "$BUILD_MODE"
