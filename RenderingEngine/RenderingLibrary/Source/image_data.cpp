@@ -200,42 +200,42 @@ void ImageData::DrawImageOnImageAtPos(unsigned int const x, unsigned int const y
 
 std::vector<uint8_t> ImageData::GetImageDataRGBA() const
 {
-	std::vector<uint8_t> result;
-	if(GetHeight() == 0 && GetWidth() == 0)
+	if (mWidth == 0 || mHeight == 0)
 	{
-		return result;
+		return {};
 	}
 
-	for( unsigned int y = 0; y < mHeight; y++ )
-	{
-		for( unsigned int x = 0; x < mWidth; x++ )
-		{
-			result.push_back(GetPixel(x, y).r);
-			result.push_back(GetPixel(x, y).g);
-			result.push_back(GetPixel(x, y).b);
-			result.push_back(GetPixel(x, y).a);
-		}
-	}
+	const size_t totalBytes =
+		static_cast<size_t>(mWidth) * static_cast<size_t>(mHeight) * 4;
+
+	std::vector<uint8_t> result(totalBytes);
+	std::memcpy(result.data(), mData.data(), totalBytes);
+
 	return result;
 }
 
 std::vector<uint8_t> ImageData::GetImageDataRGB() const
 {
-	std::vector<uint8_t> result;
-	if( GetHeight() == 0 && GetWidth() == 0 )
+	if (mWidth == 0 || mHeight == 0)
 	{
-		return result;
+		return {};
 	}
 
-	for( unsigned int y = 0; y < mHeight; y++ )
+	const size_t pixelCount =
+		static_cast<size_t>(mWidth) * static_cast<size_t>(mHeight);
+
+	std::vector<uint8_t> result(pixelCount * 3);
+
+	const Color* src = mData.data();
+	uint8_t* dst = result.data();
+
+	for (size_t i = 0; i < pixelCount; ++i)
 	{
-		for( unsigned int x = 0; x < mWidth; x++ )
-		{
-			result.push_back(GetPixel(x, y).r);
-			result.push_back(GetPixel(x, y).g);
-			result.push_back(GetPixel(x, y).b);
-		}
+		dst[i * 3 + 0] = src[i].r;
+		dst[i * 3 + 1] = src[i].g;
+		dst[i * 3 + 2] = src[i].b;
 	}
+
 	return result;
 }
 
@@ -302,54 +302,43 @@ void ImageData::CleanAllocatedMemory()
 	mHeight = 0;
 }
 
-void ImageData::LoadImageDataRGBA(std::vector<std::uint8_t> const& pixels)
+void ImageData::LoadImageDataRGBA(const std::vector<uint8_t>& pixels)
 {
-	//Check for data numbers matching
-	if( (GetHeight() * GetWidth() * 4) != pixels.size() )
+	const size_t expectedSize =
+		static_cast<size_t>(mWidth) * static_cast<size_t>(mHeight) * 4;
+
+	if (pixels.size() != expectedSize)
 	{
 		throw std::runtime_error("Array data size doesn't match image dimension.");
 	}
-	auto it = pixels.begin();
-	for( unsigned int y = 0; y < GetHeight(); y++ )
-	{
-		for( unsigned int x = 0; x < GetWidth(); x++ )
-		{
-			uint8_t const r = *it;
-			++it;
-			uint8_t const g = *it;
-			++it;
-			uint8_t const b = *it;
-			++it;
-			uint8_t const a = *it;
-			++it;
-			Color const color(r, g, b, a);
-			SetPixel(x, y, color);
-		}
-	}
+
+	mData.resize(mWidth * mHeight);
+
+	std::memcpy(mData.data(), pixels.data(), expectedSize);
 }
 
 void ImageData::LoadImageDataRGB(std::vector<std::uint8_t> const& pixels)
 {
-	//Check for data numbers matching
-	if( (GetHeight() * GetWidth() * 3) != pixels.size() )
+	const size_t pixelCount =
+		static_cast<size_t>(mWidth) * static_cast<size_t>(mHeight);
+
+	const size_t expectedSize = pixelCount * 3;
+	if (pixels.size() != expectedSize)
 	{
 		throw std::runtime_error("Array data size doesn't match image dimension.");
 	}
-	auto it = pixels.begin();
-	for( unsigned int y = 0; y < GetHeight(); y++ )
-	{
-		for( unsigned int x = 0; x < GetWidth(); x++ )
-		{
-			uint8_t const r = static_cast<uint8_t>(*it);
-			++it;
-			uint8_t const g = static_cast<uint8_t>(*it);
-			++it;
-			uint8_t const b = static_cast<uint8_t>(*it);
-			++it;
 
-			Color const color(r, g, b);
-			SetPixel(x, y, color);
-		}
+	mData.resize(pixelCount);
+
+	const uint8_t* src = pixels.data();
+	Color* dst = mData.data();
+
+	for (size_t i = 0; i < pixelCount; ++i)
+	{
+		dst[i].r = src[i * 3 + 0];
+		dst[i].g = src[i * 3 + 1];
+		dst[i].b = src[i * 3 + 2];
+		dst[i].a = 255;
 	}
 }
 

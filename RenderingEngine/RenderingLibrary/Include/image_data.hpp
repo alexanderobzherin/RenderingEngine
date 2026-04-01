@@ -67,6 +67,11 @@ struct Color
 	uint8_t a = 255;
 };
 
+// Color is used for GPU upload and image storage.
+// Must remain tightly packed RGBA8.
+static_assert(sizeof(Color) == 4, "Color must be exactly 4 bytes");
+static_assert(std::is_trivially_copyable_v<Color>, "Color must be trivially copyable");
+
 /**
  * @class ImageData
  * @brief Represents raw 2D image data stored in memory.
