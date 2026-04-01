@@ -3,6 +3,7 @@
 #include "image_data.hpp"
 #include "image_codec_jpeg.hpp"
 #include "image_codec_png.hpp"
+#include "logger.hpp"
 #include <boost/filesystem.hpp>
 #include <stdexcept>
 
@@ -111,70 +112,48 @@ ImageData::~ImageData()
 }
 
 ImageData::ImageData( const ImageData & src )
-	:
-	mWidth( src.GetWidth() ),
-	mHeight( src.GetHeight() )
+	: 
+	mWidth(src.mWidth),
+	mHeight(src.mHeight),
+	mData(src.mData)
 {
-	AllocateMemory(src.mWidth, src.mHeight);
-
-	for( unsigned int y = 0; y < mHeight; y++ )
-	{
-		for( unsigned int x = 0; x < mWidth; x++ )
-		{
-			mData[x][y] = src.mData[x][y];
-		}
-	}
 }
 
 ImageData & ImageData::operator=( const ImageData & rhs )
 {
-	if( this == &rhs )
+	if (this == &rhs)
 	{
 		return *this;
 	}
-	CleanAllocatedMemory();
-	AllocateMemory( rhs.mWidth, rhs.mHeight );
 
-	for( unsigned int y = 0; y < mHeight; y++ )
-	{
-		for( unsigned int x = 0; x < mWidth; x++ )
-		{
-			mData[x][y] = rhs.mData[x][y];
-		}
-	}
-
+	mWidth = rhs.mWidth;
+	mHeight = rhs.mHeight;
+	mData = rhs.mData;
 	return *this;
 }
 
 void ImageData::Fill( Color color )
 {
-	for( unsigned int y = 0; y < mHeight; y++ )
-	{
-		for( unsigned int x = 0; x < mWidth; x++ )
-		{
-			mData[x][y] = color;
-		}
-	}
+	std::fill(mData.begin(), mData.end(), color);
 }
 
 void ImageData::SetPixel( unsigned int x, unsigned int y, Color color )
 {
-	if( x < mWidth && y < mHeight )
+	if (x < mWidth && y < mHeight)
 	{
-		mData[x][y] = color;
+		PixelRef(x, y) = color;
 	}
 }
 
 const Color ImageData::GetPixel( unsigned int x, unsigned int y ) const
 {
-	if( x < mWidth && y < mHeight )
+	if (x >= mWidth || y >= mHeight)
 	{
-		return (mData[x][y]);
+		LOG_ERROR("Out of bounds access in GetPixel");
+		return Color{};
 	}
-	else
-	{
-		throw std::runtime_error("Inapropriate access to data");
-	}
+
+	return PixelRef(x, y);
 }
 
 void ImageData::DrawImageOnImageAtPos(unsigned int const x, unsigned int const y, ImageData& toImage, ImageData& fromImage)
@@ -312,30 +291,15 @@ void ImageData::AllocateMemory( unsigned int width, unsigned int height )
 {
 	mWidth = width;
 	mHeight = height;
-	mData = new Color*[mWidth];
-
-	for( unsigned int x = 0; x < mWidth; x++ )
-	{
-		mData[x] = new Color[mHeight];
-	}
+	mData.resize(static_cast<size_t>(mWidth) * static_cast<size_t>(mHeight));
 }
 
 void ImageData::CleanAllocatedMemory()
 {
-	for( unsigned int x = 0; x < mWidth; x++ )
-	{
-		if( mData[x] )
-		{
-			delete[] mData[x];
-		}
-	}
-	if( mData )
-	{
-		delete[] mData;
-	}
+	mData.clear();
 
-	mWidth = 0U;
-	mHeight = 0U;
+	mWidth = 0;
+	mHeight = 0;
 }
 
 void ImageData::LoadImageDataRGBA(std::vector<std::uint8_t> const& pixels)

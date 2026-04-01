@@ -238,11 +238,26 @@ protected:
 	 */
 	bool LoadTextureJpegFile(char const* filename);
 
+	inline size_t GetLinearIndex(unsigned int x, unsigned int y) const
+	{
+		return static_cast<size_t>(y) * static_cast<size_t>(mWidth) + static_cast<size_t>(x);
+	}
+
+	inline Color& PixelRef(unsigned int x, unsigned int y)
+	{
+		return mData[GetLinearIndex(x, y)];
+	}
+
+	inline const Color& PixelRef(unsigned int x, unsigned int y) const
+	{
+		return mData[GetLinearIndex(x, y)];
+	}
+
 private:
 	unsigned int mWidth;
 	unsigned int mHeight;
 
-	Color** mData;
+	std::vector<Color> mData;
 };
 
 } //namespace rendering_engine
