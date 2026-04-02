@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Docs/Images/multilingual_text_demo.png" alt="Multilingual Text Demo" width="800"/>
+</p>
+
 # MultilingualTextDemo
 
 This demo showcases the text rendering system of the Rendering Engine.
