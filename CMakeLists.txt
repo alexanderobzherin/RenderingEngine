@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "2")
-set(VERSION_PATCH "8")
+set(VERSION_PATCH "9")
 
 #set the project name
 project(RenderingEngineProject VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)

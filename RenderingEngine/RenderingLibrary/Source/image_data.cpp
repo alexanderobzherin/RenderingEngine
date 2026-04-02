@@ -158,19 +158,25 @@ const Color ImageData::GetPixel( unsigned int x, unsigned int y ) const
 
 void ImageData::DrawImageOnImageAtPos(unsigned int const x, unsigned int const y, ImageData& toImage, ImageData& fromImage)
 {
-	//If fromImage can not be placed entirely, it will be cropped on right and bottom side
+	// If fromImage can not be placed entirely, it will be cropped on right and bottom side
 
-	//Source image draw from top left pixel
+	// Source image draw from top left pixel
 
-	//At first check if point pos is inside toImage
-	if( !(x >= 0 && y >= 0 && x < toImage.GetWidth() && y < toImage.GetHeight()) )
+	// At first check if point pos is inside toImage
+	if (x >= toImage.GetWidth() || y >= toImage.GetHeight())
 	{
 		return;
 	}
 
-	//Crop
-	int left;
-	if( (toImage.GetWidth() - x) < fromImage.GetWidth() )
+	if (toImage.GetWidth() == 0U || toImage.GetHeight() == 0U ||
+		fromImage.GetWidth() == 0U || fromImage.GetHeight() == 0U)
+	{
+		return;
+	}
+
+	// Crop
+	unsigned int left;
+	if ((toImage.GetWidth() - x) < fromImage.GetWidth())
 	{
 		left = toImage.GetWidth() - x;
 	}
@@ -179,8 +185,8 @@ void ImageData::DrawImageOnImageAtPos(unsigned int const x, unsigned int const y
 		left = fromImage.GetWidth();
 	}
 
-	int bottom;
-	if( (toImage.GetHeight() - y) < fromImage.GetHeight() )
+	unsigned int bottom;
+	if ((toImage.GetHeight() - y) < fromImage.GetHeight())
 	{
 		bottom = toImage.GetHeight() - y;
 	}
@@ -189,12 +195,24 @@ void ImageData::DrawImageOnImageAtPos(unsigned int const x, unsigned int const y
 		bottom = fromImage.GetHeight();
 	}
 
-	for( int deltaY = 0; deltaY < bottom; deltaY++ )
+	if (left == 0U || bottom == 0U)
 	{
-		for( int deltaX = 0; deltaX < left; deltaX++ )
-		{
-			toImage.SetPixel(x + deltaX, y + deltaY, fromImage.GetPixel(deltaX, deltaY));
-		}
+		return;
+	}
+
+	for (unsigned int deltaY = 0; deltaY < bottom; ++deltaY)
+	{
+		const size_t srcRowOffset =
+			static_cast<size_t>(deltaY) * static_cast<size_t>(fromImage.GetWidth());
+
+		const size_t dstRowOffset =
+			static_cast<size_t>(y + deltaY) * static_cast<size_t>(toImage.GetWidth()) +
+			static_cast<size_t>(x);
+
+		std::memcpy(
+			toImage.mData.data() + dstRowOffset,
+			fromImage.mData.data() + srcRowOffset,
+			static_cast<size_t>(left) * sizeof(Color));
 	}
 }
 
