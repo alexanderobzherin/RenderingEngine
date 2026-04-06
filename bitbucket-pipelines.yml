@@ -30,7 +30,7 @@ pipelines:
             # Upload SDK artifact
             - |
               gsutil cp \
-                Build/Packages/RenderingEngine-v0.2.8-SDK-Linux.tar.gz \
+                Build/Packages/RenderingEngine-v0.2.9-SDK-Linux.tar.gz \
                 gs://downloads.rendering-engine.alexander-obzherin.info/
 
     sdk-windows:
@@ -56,7 +56,7 @@ pipelines:
             - .\build_engine.bat --build-sdk
             # Upload artifact
             - gsutil cp `
-                Build\Packages\RenderingEngine-v0.2.8-SDK-Windows.tar.gz `
+                Build\Packages\RenderingEngine-v0.2.9-SDK-Windows.tar.gz `
                 gs://downloads.rendering-engine.alexander-obzherin.info/
 
     sdk-freebsd:
@@ -79,5 +79,5 @@ pipelines:
             # Upload SDK artifact
             - |
               gcloud storage cp \
-                Build/Packages/RenderingEngine-v0.2.8-SDK-FreeBSD.tar.gz \
+                Build/Packages/RenderingEngine-v0.2.9-SDK-FreeBSD.tar.gz \
                 gs://downloads.rendering-engine.alexander-obzherin.info/
