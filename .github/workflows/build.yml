@@ -1,0 +1,41 @@
+name: Build Rendering Engine
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - devel
+      - main
+      - feature/**
+      - RE-**
+
+jobs:
+  build-linux:
+    name: Build SDK Linux
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential git cmake doxygen graphviz \
+            libvulkan-dev vulkan-tools vulkan-validationlayers \
+            libglfw3-dev libglm-dev libgtest-dev \
+            libjpeg-dev libpng-dev libassimp-dev \
+            pkg-config libfreetype-dev nlohmann-json3-dev \
+            libboost-filesystem-dev curl ca-certificates
+
+      - name: Build SDK
+        run: |
+          chmod +x build_engine.sh
+          ./build_engine.sh --build-sdk
+
+      - name: Upload Linux SDK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RenderingEngine-SDK-Linux
+          path: Build/Packages/*.tar.gz
