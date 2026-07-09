@@ -2,12 +2,10 @@ name: Build Rendering Engine
 
 on:
   workflow_dispatch:
+
   push:
     branches:
-      - devel
       - main
-      - feature/**
-      - RE-**
 
 jobs:
   build-linux:
@@ -38,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: RenderingEngine-SDK-Linux
-          path: Build/Packages/*.tar.gz
+          path: Build/Packages/RenderingEngine-v*-SDK-Linux.tar.gz
 
   build-windows:
     name: Build SDK Windows
