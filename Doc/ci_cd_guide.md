@@ -10,148 +10,300 @@ Documentation is generated from the current codebase
 Resulting artifacts are automatically uploaded to public endpoints
 
 ## CI/CD Infrastructure
+CI/CD for this project is handled via GitHub Actions. The SDK build workflow is defined in:
 
-CI/CD for this project is handled via Bitbucket Pipelines, defined in the repository configuration file:
-bitbucket-pipelines.yml
+```
+.github/workflows/build.yml
+```
 
-The pipelines are dedicated to building the following deliverables:
+The CI/CD pipelines are dedicated to producing the following deliverables:
+
 ```
-- Documentation
-- SDK (Linux)
-- SDK (Windows)
-- SDK (FreeBSD)
+Documentation
+SDK (Linux)
+SDK (Windows)
+SDK (FreeBSD)
 ```
+
 The resulting artifacts are published to:
 Documentation: https://docs.rendering-engine.alexander-obzherin.info
 SDK downloads: https://downloads.rendering-engine.alexander-obzherin.info
 
-Documentation and the Linux SDK are built using Bitbucket’s internal Docker infrastructure. Windows and FreeBSD SDKs are built using self-hosted runners.
+Linux SDK is built using a GitHub-hosted Ubuntu runner. 
+Windows and FreeBSD SDKs are built using self-hosted runners.
 
-## CI Pipelines and Git Branch Mapping
+## Workflow Triggers
 
-Each CI pipeline is mapped to a dedicated Git branch:
-docs - documentation build
-sdk-linux - Linux SDK build
-sdk-windows - Windows SDK build
-sdk-freebsd - FreeBSD SDK build
+The SDK build workflow supports two types of triggers.
 
-A CI build is triggered automatically when changes are pushed to the corresponding CI branch.
+### Automatic Build
 
-Important: CI branches are build-only branches and must not be used for direct development or merged back into main or devel.
+A complete SDK build is triggered automatically when changes are pushed to the ```main``` branch:
+
+```yaml
+push:
+  branches:
+    - main
+```
+
+This starts SDK builds for all supported platforms:
+
+- Linux
+- Windows
+- FreeBSD
+
+The Windows and FreeBSD self-hosted runners must be online for their respective jobs to start.
+
+### Manual Build
+
+The workflow can also be started manually using ```workflow_dispatch```.
+
+To run the workflow manually:
+
+1. Open the GitHub repository.
+2. Select Actions.
+3. Select Build Rendering Engine from the workflow list.
+4. Click Run workflow.
+5. Select the branch to build.
+6. Click Run workflow to start the build.
+
+This allows feature branches to be tested without automatically triggering CI on every feature-branch push.
 
 ## Testing Feature Branches with CI
 
-If a feature branch needs to be tested using a CI pipeline, replay the feature commits on top of the appropriate CI branch.
+Feature branches do not automatically trigger the SDK build workflow.
 
-Example (Windows SDK):
-```bash
-git checkout sdk-windows
-git rebase feature/branch-name
-git push --force-with-lease
+To test a feature branch:
+
+1. Push the feature branch to GitHub.
+2. Open <B>Actions</B> in the GitHub repository.
+3. Select <B>Build Rendering Engine</B>.
+4. Click <B>Run workflow</B>.
+5. Select the required feature branch.
+6. Start the workflow.
+
+## Build Artifacts
+
+Each successful platform build produces a versioned SDK archive:
+
 ```
-Notes:
-CI branches are intentionally rebased
---force-with-lease is required and safe in this context
-CI branches should be treated as disposable build triggers
-
-## Updating CI Artifacts After Main Branch Changes
-
-After the main branch is updated with recent changes, the CI build branches should also be updated to trigger their build jobs and refresh downloadable artifacts.
-
-This guarantees that published SDKs and documentation always reflect the latest stable state of the project.
-
-
-
-## Repository Configuration
-### Required Repository Variable
-
-To enable artifact uploads to Google Cloud Storage, a repository-level variable must be configured:
-```bash
-Repository settings -> Pipelines -> Repository variables -> Add
+Build/Packages/RenderingEngine-v<X.Y.Z>-SDK-Linux.tar.gz
+Build/Packages/RenderingEngine-v<X.Y.Z>-SDK-Windows.tar.gz
+Build/Packages/RenderingEngine-v<X.Y.Z>-SDK-FreeBSD.tar.gz
 ```
-Name: ```GCP_SERVICE_ACCOUNT_JSON_B64```
-Value: Base64-encoded contents of gcp-key.json
-This variable is used by CI pipelines to authenticate with Google Cloud Storage.
 
+## Setting Up a Self-Hosted Runner
 
-# Setting Up a Self-Hosted Runner (Windows)
-1. Create Runner in Bitbucket UI
-```bash
-Repository settings -> Runners -> Add runner
+Self-hosted runners are configured in the GitHub repository:
 ```
-System and architecture: ```Windows (64-bit)```
-Runner name: ```windows-msvc-runner```
-Runner labels: ```bashself.hosted```, ```windows```
+Repository → Settings → Actions → Runners
+```
+Select:
+```
+New self-hosted runner
+```
+GitHub then provides platform-specific commands for:
 
-Bitbucket will provide instructions to download and start the runner. Save this information for future runner restarts.
+1. Downloading the runner package.
+2. Verifying its checksum.
+3. Extracting the package.
+4. Registering the runner with the repository.
+5. Starting the runner.
 
-2. Prepare the Windows Environment
+The registration token shown by GitHub is temporary. Use the commands provided by GitHub when registering a new runner.
+
+### Setting Up the Windows Self-Hosted Runner
+
+#### Create the Runner
+Open:
+```
+Repository → Settings → Actions → Runners → New self-hosted runner
+```
+Select:
+```
+Runner image: Windows
+Architecture: x64
+```
+Create a directory for the runner, for example:
+```
+E:\Development\RenderingEngine\WindowsCIBuild\GitHubRunner\actions-runner
+```
+Run the download, checksum verification, extraction, and configuration commands provided by GitHub.
+
+During configuration, use the additional label:
+```
+sdk-windows
+```
+The resulting runner labels are:
+```
+self-hosted
+Windows
+X64
+sdk-windows
+```
+The workflow selects the runner using:
+```
+runs-on: [self-hosted, Windows, X64, sdk-windows]
+```
+#### Prepare the Windows Environment
 
 Ensure that the Windows machine has all required dependencies installed.
 See [Prepare Environment](prepare_environment.md)
-
-3. Required Components for Windows Runner
 
 The following tools must be available in PATH:
 ```bash
 cl (MSVC)
 git
 cmake
-gsutil
-Java 11 or newer
 ```
 
-4. Start the Runner
+#### Start the Windows Runner
 
-Unpack and execute the runner provided by Bitbucket (from step 1).
+Open PowerShell and navigate to the runner directory:
 
-
-# Setting Up a Self-Hosted Runner (FreeBSD)
-1. Create Runner in Bitbucket UI
 ```bash
-Repository settings -> Runners -> Add runner
+cd E:\Development\RenderingEngine\WindowsCIBuild\GitHubRunner\actions-runner
 ```
-System and architecture: ```Linux Shell```
-Runner name: ```freebsd-runner```
-Runner labels: ```self.hosted```, ```linux.shell```
 
-Bitbucket will provide instructions to download and start the runner. Save this information for future runner restarts.
+Start the runner:
+```bash
+.\run.cmd
+```
 
-2. Prepare the FreeBSD Environment
+A successfully started runner displays:
+```
+Connected to GitHub
+Listening for Jobs
+```
+Keep the terminal open while the runner is required.
 
-Ensure that the FreeBSD system has all required build dependencies installed.
+### Setting Up the FreeBSD Self-Hosted Runner
+
+GitHub does not provide a native FreeBSD runner option. The GitHub Actions Linux x64 self-hosted runner package is used on the FreeBSD build machine.
+
+#### Create the Runner
+
+Open:
+
+```
+Repository → Settings → Actions → Runners → New self-hosted runner
+```
+
+Select:
+
+```
+Runner image: Linux
+Architecture: x64
+```
+
+Create a directory for the runner, for example:
+
+```
+~/Development/FreeBSDCIBuild/GitHubRunner/actions-runner
+```
+
+Run the download, checksum verification, extraction, and configuration commands provided by GitHub.
+
+During configuration, use the additional label:
+
+```
+sdk-freebsd
+```
+
+The resulting runner labels are:
+
+```
+self-hosted
+Linux
+X64
+sdk-freebsd
+```
+
+The workflow selects the runner using:
+
+```
+runs-on: [self-hosted, Linux, X64, sdk-freebsd]
+```
+
+#### Prepare the FreeBSD Environment
+
+Ensure that all Rendering Engine build dependencies are installed.
+
 See [Prepare Environment](prepare_environment.md)
 
-3. Required Components for FreeBSD Runner
-Install required tools:
-```bash
+The following tools must be available:
+
+```
 git
 cmake
 curl
-java
-python3
-gcloud
-sudo pkg install -y google-cloud-sdk
-```
-Bash Compatibility
-Bitbucket runner expects ```/bin/bash```. On FreeBSD, Bash is typically located elsewhere.
-```bash
-which bash
-sudo ln -s /usr/local/bin/bash /bin/bash
+tar
 ```
 
-setsid Compatibility Shim
-Bitbucket runner also expects setsid, which is not available on FreeBSD by default. Create a lightweight compatibility wrapper:
+#### FreeBSD tar Compatibility
+
+The GitHub Actions Linux runner may fail during action preparation on FreeBSD with:
+
+```
+Error: tar: command not found
+```
+
+This can occur even when FreeBSD's native tar is available:
+
+```
+command -v tar
+```
+
+Expected output:
+
+```
+/usr/bin/tar
+```
+
+To provide a tar command in a runner-specific location, create a compatibility directory:
+
+```
+mkdir -p ~/Development/FreeBSDCIBuild/GitHubRunner/bin
+ln -sf /usr/bin/tar ~/Development/FreeBSDCIBuild/GitHubRunner/bin/tar
+```
+
+Create a dedicated runner startup script:
+
+```
+cd ~/Development/FreeBSDCIBuild/GitHubRunner/actions-runner
+ee run-freebsd-runner.sh
+```
+
+Add:
+
 ```bash
-sudo tee /usr/local/bin/setsid >/dev/null <<'EOF'
 #!/bin/sh
-exec "$@"
-EOF
+export PATH="$HOME/Development/FreeBSDCIBuild/GitHubRunner/bin:/usr/local/llvm20/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:$HOME/bin"
 
-sudo chmod +x /usr/local/bin/setsid
+exec ./run.sh
 ```
-4. Start the Runner
-Unpack and execute the runner provided by Bitbucket (from step 1).
+
+Make the script executable:
+
+```bash
+chmod +x run-freebsd-runner.sh
+```
+
+Start the runner using:
+
+```bash
+./run-freebsd-runner.sh
+```
+
+A successfully started runner displays:
+
+```bash
+Connected to GitHub
+Listening for Jobs
+```
+
+Keep the terminal open while the runner is required.
+
 
 # Release Process Tracking
 The process of preparing and publishing releases is formalized in Jira.
