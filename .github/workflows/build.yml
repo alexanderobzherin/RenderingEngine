@@ -39,3 +39,27 @@ jobs:
         with:
           name: RenderingEngine-SDK-Linux
           path: Build/Packages/*.tar.gz
+
+  build-windows:
+    name: Build SDK Windows
+    runs-on: [self-hosted, Windows, X64, sdk-windows]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify toolchain
+        shell: powershell
+        run: |
+          where cl
+          where cmake
+
+      - name: Build SDK
+        shell: cmd
+        run: build_engine.bat --build-sdk
+
+      - name: Upload Windows SDK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RenderingEngine-SDK-Windows
+          path: Build/Packages/RenderingEngine-v*-SDK-Windows.tar.gz
