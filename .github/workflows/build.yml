@@ -63,3 +63,28 @@ jobs:
         with:
           name: RenderingEngine-SDK-Windows
           path: Build/Packages/RenderingEngine-v*-SDK-Windows.tar.gz
+
+  build-freebsd:
+    name: Build SDK FreeBSD
+    runs-on: [self-hosted, Linux, X64, sdk-freebsd]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify toolchain
+        run: |
+          uname -a
+          which cmake
+
+      - name: Build SDK
+        run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+          chmod +x build_engine.sh
+          ./build_engine.sh --build-sdk
+
+      - name: Upload FreeBSD SDK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RenderingEngine-SDK-FreeBSD
+          path: Build/Packages/RenderingEngine-v*-SDK-FreeBSD.tar.gz
