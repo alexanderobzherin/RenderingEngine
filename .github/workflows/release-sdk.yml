@@ -170,6 +170,9 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download SDK packages
         uses: actions/download-artifact@v4
         with:
@@ -191,6 +194,7 @@ jobs:
           RELEASE_TAG: v${{ needs.release-metadata.outputs.version }}
           RELEASE_NAME: ${{ inputs.release_name }}
           IS_PRERELEASE: ${{ inputs.prerelease }}
+          IS_DRAFT: ${{ inputs.draft }}
         run: |
           title="$RELEASE_NAME"
 
@@ -198,15 +202,20 @@ jobs:
             title="Rendering Engine $RELEASE_TAG"
           fi
 
-          prerelease_option=""
+          options=(
+            --target "${{ github.sha }}"
+            --title "$title"
+            --generate-notes
+          )
 
           if [ "$IS_PRERELEASE" = "true" ]; then
-            prerelease_option="--prerelease"
+            options+=(--prerelease)
+          fi
+
+          if [ "$IS_DRAFT" = "true" ]; then
+            options+=(--draft)
           fi
 
           gh release create "$RELEASE_TAG" \
             release-assets/*.tar.gz \
-            --target "${{ github.sha }}" \
-            --title "$title" \
-            --generate-notes \
-            $prerelease_option
+            "${options[@]}"
