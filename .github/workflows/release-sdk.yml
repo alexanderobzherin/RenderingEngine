@@ -1,0 +1,211 @@
+name: Publish SDK Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: "Optional release title"
+        required: false
+        type: string
+
+      prerelease:
+        description: "Mark as a pre-release"
+        required: true
+        default: false
+        type: boolean
+
+      draft:
+        description: "Create as a draft release"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release-metadata:
+    name: Read Release Metadata
+    runs-on: ubuntu-24.04
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read version from CMake
+        id: version
+        shell: bash
+        run: |
+          major=$(sed -n 's/^[[:space:]]*set(VERSION_MAJOR[[:space:]]*"\([^"]*\)").*/\1/p' CMakeLists.txt)
+          minor=$(sed -n 's/^[[:space:]]*set(VERSION_MINOR[[:space:]]*"\([^"]*\)").*/\1/p' CMakeLists.txt)
+          patch=$(sed -n 's/^[[:space:]]*set(VERSION_PATCH[[:space:]]*"\([^"]*\)").*/\1/p' CMakeLists.txt)
+
+          if [ -z "$major" ] || [ -z "$minor" ] || [ -z "$patch" ]; then
+            echo "Unable to read project version from CMakeLists.txt."
+            exit 1
+          fi
+
+          version="${major}.${minor}.${patch}"
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+          echo "Detected Rendering Engine version: $version"
+
+  build-linux:
+    name: Build SDK Linux
+    needs: release-metadata
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential git cmake doxygen graphviz \
+            libvulkan-dev vulkan-tools vulkan-validationlayers \
+            libglfw3-dev libglm-dev libgtest-dev \
+            libjpeg-dev libpng-dev libassimp-dev \
+            pkg-config libfreetype-dev nlohmann-json3-dev \
+            libboost-filesystem-dev curl ca-certificates
+
+      - name: Build SDK
+        run: |
+          chmod +x build_engine.sh
+          ./build_engine.sh --build-sdk
+
+      - name: Validate Linux package version
+        run: |
+          test -f "Build/Packages/RenderingEngine-v${{ needs.release-metadata.outputs.version }}-SDK-Linux.tar.gz"
+
+      - name: Upload Linux SDK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-sdk-linux
+          path: Build/Packages/RenderingEngine-v${{ needs.release-metadata.outputs.version }}-SDK-Linux.tar.gz
+          if-no-files-found: error
+
+  build-windows:
+    name: Build SDK Windows
+    needs: release-metadata
+    runs-on: [self-hosted, Windows, X64, sdk-windows]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify toolchain
+        shell: powershell
+        run: |
+          where.exe cl
+          where.exe cmake
+
+      - name: Build SDK
+        shell: cmd
+        run: build_engine.bat --build-sdk
+
+      - name: Validate Windows package version
+        shell: powershell
+        run: |
+          $package = "Build\Packages\RenderingEngine-v${{ needs.release-metadata.outputs.version }}-SDK-Windows.tar.gz"
+
+          if (-not (Test-Path $package)) {
+              throw "Expected release package was not found: $package"
+          }
+
+      - name: Upload Windows SDK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-sdk-windows
+          path: Build/Packages/RenderingEngine-v${{ needs.release-metadata.outputs.version }}-SDK-Windows.tar.gz
+          if-no-files-found: error
+
+  build-freebsd:
+    name: Build SDK FreeBSD
+    needs: release-metadata
+    runs-on: [self-hosted, Linux, X64, sdk-freebsd]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify toolchain
+        run: |
+          uname -a
+          command -v cmake
+          command -v tar
+
+      - name: Build SDK
+        run: |
+          chmod +x build_engine.sh
+          ./build_engine.sh --build-sdk
+
+      - name: Validate FreeBSD package version
+        run: |
+          test -f "Build/Packages/RenderingEngine-v${{ needs.release-metadata.outputs.version }}-SDK-FreeBSD.tar.gz"
+
+      - name: Upload FreeBSD SDK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-sdk-freebsd
+          path: Build/Packages/RenderingEngine-v${{ needs.release-metadata.outputs.version }}-SDK-FreeBSD.tar.gz
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    needs:
+      - release-metadata
+      - build-linux
+      - build-windows
+      - build-freebsd
+
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Download SDK packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-sdk-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Verify release assets
+        run: |
+          ls -lah release-assets
+
+          test -f "release-assets/RenderingEngine-v${{ needs.release-metadata.outputs.version }}-SDK-Linux.tar.gz"
+          test -f "release-assets/RenderingEngine-v${{ needs.release-metadata.outputs.version }}-SDK-Windows.tar.gz"
+          test -f "release-assets/RenderingEngine-v${{ needs.release-metadata.outputs.version }}-SDK-FreeBSD.tar.gz"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: v${{ needs.release-metadata.outputs.version }}
+          RELEASE_NAME: ${{ inputs.release_name }}
+          IS_PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          title="$RELEASE_NAME"
+
+          if [ -z "$title" ]; then
+            title="Rendering Engine $RELEASE_TAG"
+          fi
+
+          prerelease_option=""
+
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            prerelease_option="--prerelease"
+          fi
+
+          gh release create "$RELEASE_TAG" \
+            release-assets/*.tar.gz \
+            --target "${{ github.sha }}" \
+            --title "$title" \
+            --generate-notes \
+            $prerelease_option
