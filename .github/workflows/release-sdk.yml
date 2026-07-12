@@ -142,10 +142,25 @@ jobs:
           command -v cmake
           command -v tar
 
+      - name: Verify FreeBSD environment
+        run: |
+          echo "PATH=$PATH"
+          echo "uname:"
+          uname -a
+          echo "Python executable:"
+          command -v python3
+          echo "Python platform:"
+          python3 -c 'import sys; print(sys.executable); print(sys.platform)'
+
       - name: Build SDK
         run: |
           chmod +x build_engine.sh
           ./build_engine.sh --build-sdk
+
+      - name: Inspect FreeBSD package
+        run: |
+          echo "Generated SDK packages:"
+          find Build/Packages -maxdepth 1 -type f -print
 
       - name: Validate FreeBSD package version
         run: |
