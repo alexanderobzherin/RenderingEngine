@@ -142,25 +142,11 @@ jobs:
           command -v cmake
           command -v tar
 
-      - name: Verify FreeBSD environment
-        run: |
-          echo "PATH=$PATH"
-          echo "uname:"
-          uname -a
-          echo "Python executable:"
-          command -v python3
-          echo "Python platform:"
-          python3 -c 'import sys; print(sys.executable); print(sys.platform)'
-
       - name: Build SDK
         run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
           chmod +x build_engine.sh
           ./build_engine.sh --build-sdk
-
-      - name: Inspect FreeBSD package
-        run: |
-          echo "Generated SDK packages:"
-          find Build/Packages -maxdepth 1 -type f -print
 
       - name: Validate FreeBSD package version
         run: |
@@ -184,6 +170,9 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download SDK packages
         uses: actions/download-artifact@v4
         with:
@@ -205,6 +194,7 @@ jobs:
           RELEASE_TAG: v${{ needs.release-metadata.outputs.version }}
           RELEASE_NAME: ${{ inputs.release_name }}
           IS_PRERELEASE: ${{ inputs.prerelease }}
+          IS_DRAFT: ${{ inputs.draft }}
         run: |
           title="$RELEASE_NAME"
 
@@ -212,15 +202,20 @@ jobs:
             title="Rendering Engine $RELEASE_TAG"
           fi
 
-          prerelease_option=""
+          options=(
+            --target "${{ github.sha }}"
+            --title "$title"
+            --generate-notes
+          )
 
           if [ "$IS_PRERELEASE" = "true" ]; then
-            prerelease_option="--prerelease"
+            options+=(--prerelease)
+          fi
+
+          if [ "$IS_DRAFT" = "true" ]; then
+            options+=(--draft)
           fi
 
           gh release create "$RELEASE_TAG" \
             release-assets/*.tar.gz \
-            --target "${{ github.sha }}" \
-            --title "$title" \
-            --generate-notes \
-            $prerelease_option
+            "${options[@]}"
