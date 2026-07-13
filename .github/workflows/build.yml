@@ -1,11 +1,7 @@
-name: Build Rendering Engine
+name: Validate SDK Build
 
 on:
   workflow_dispatch:
-
-  push:
-    branches:
-      - main
 
 jobs:
   build-linux:
