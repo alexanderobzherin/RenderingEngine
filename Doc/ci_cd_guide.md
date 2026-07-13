@@ -10,49 +10,47 @@ Documentation is generated from the current codebase
 Resulting artifacts are automatically uploaded to public endpoints
 
 ## CI/CD Infrastructure
-CI/CD for this project is handled via GitHub Actions. The SDK build workflow is defined in:
+CI/CD for this project is handled through GitHub Actions.
 
-```
-.github/workflows/build.yml
-```
+The workflows are defined in:
 
-The CI/CD pipelines are dedicated to producing the following deliverables:
+- `.github/workflows/build.yml`
+- `.github/workflows/release-sdk.yml`
+- `.github/workflows/docs.yml`
 
-```
-Documentation
-SDK (Linux)
-SDK (Windows)
-SDK (FreeBSD)
-```
+### Validate SDK Build
+
+`build.yml` performs cross-platform SDK validation builds for:
+
+- Linux using a GitHub-hosted Ubuntu runner
+- Windows using a self-hosted Windows runner
+- FreeBSD using a self-hosted FreeBSD runner
+
+The workflow is started manually using `workflow_dispatch`, allowing any selected branch to be validated without publishing a release.
+
+Build results are stored as temporary GitHub Actions artifacts.
+
+### Publish SDK Release
+
+`release-sdk.yml` builds, validates, and publishes versioned SDK packages for Linux, Windows, and FreeBSD.
+
+The engine version is read from the root `CMakeLists.txt`. The workflow creates a Git tag and a GitHub Release containing the platform-specific SDK archives.
+
+Release publication is initiated manually through:
+
+`Repository → Actions → Publish SDK Release → Run workflow`
+
+A release should normally be created first as a draft, reviewed, and then published.
+
+### Generate and Deploy Documentation
+
+`docs.yml` generates the Doxygen documentation and deploys the resulting HTML site to GitHub Pages.
+
+The workflow runs automatically when changes are pushed to `main` and can also be started manually using `workflow_dispatch`.
 
 The resulting artifacts are published to:
 Documentation: https://docs.rendering-engine.alexander-obzherin.info
 SDK downloads: https://downloads.rendering-engine.alexander-obzherin.info
-
-Linux SDK is built using a GitHub-hosted Ubuntu runner. 
-Windows and FreeBSD SDKs are built using self-hosted runners.
-
-## Workflow Triggers
-
-The SDK build workflow supports two types of triggers.
-
-### Automatic Build
-
-A complete SDK build is triggered automatically when changes are pushed to the ```main``` branch:
-
-```yaml
-push:
-  branches:
-    - main
-```
-
-This starts SDK builds for all supported platforms:
-
-- Linux
-- Windows
-- FreeBSD
-
-The Windows and FreeBSD self-hosted runners must be online for their respective jobs to start.
 
 ### Manual Build
 
@@ -305,8 +303,10 @@ Listening for Jobs
 Keep the terminal open while the runner is required.
 
 
-# Release Process Tracking
-The process of preparing and publishing releases is formalized in Jira.
-[RE-45 Rendering Engine Development Process and Versioning Rules](https://alexander-obzherin.atlassian.net/browse/RE-45)
+# Development Process and Release Tracking
+
+The standardized development workflow, branching model, versioning rules, and release process are documented in:
+
+[Rendering Engine Development Process and Versioning Rules](development_process.md)
 
 <- [Back to Developer Guide Page](developer_guide.md)

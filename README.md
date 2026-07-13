@@ -1,7 +1,10 @@
-![Docs](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/docs?label=Docs)
-![SDK Linux](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/sdk-linux?label=SDK_Linux)
-![SDK Windows](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/sdk-windows?label=SDK_Windows)
-![SDK FreeBSD](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/sdk-freebsd?label=SDK_FreeBSD)
+[![Validate SDK Build](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/build.yml/badge.svg)](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/build.yml)
+
+[![Documentation](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/docs.yml/badge.svg?branch=main)](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/docs.yml)
+
+[![Publish SDK Release](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/release-sdk.yml/badge.svg)](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/release-sdk.yml)
+
+[![Latest Release](https://img.shields.io/github/v/release/alexanderobzherin/RenderingEngine?label=Latest%20Release)](https://github.com/alexanderobzherin/RenderingEngine/releases/latest)
 
 <p align="center">
     <img src="./Doc/Images/RE_Banner.png" alt="Rendering Engine">

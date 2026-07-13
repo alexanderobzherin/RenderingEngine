@@ -8,9 +8,8 @@ This page provides precompiled **Rendering Engine SDK** packages for supported p
 
 The following badges reflect the current build status of the precompiled SDK packages:
 
-![SDK Linux](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/sdk-linux?label=SDK_Linux)
-![SDK Windows](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/sdk-windows?label=SDK_Windows)
-![SDK FreeBSD](https://img.shields.io/bitbucket/pipelines/AlexanderObzherin/rendering-engine/sdk-freebsd?label=SDK_FreeBSD)
+[![Validate SDK Build](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/build.yml/badge.svg)](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/build.yml)
+[![Latest Release](https://img.shields.io/github/v/release/alexanderobzherin/RenderingEngine?label=Latest%20SDK)](https://github.com/alexanderobzherin/RenderingEngine/releases/latest)
 
 ---
 
@@ -20,9 +19,12 @@ Each package contains the Rendering Engine libraries, headers, and supporting to
 
 | Platform | Download |
 |---------|----------|
-| Windows | [RenderingEngine-v0.2.9-SDK-Windows](https://downloads.rendering-engine.alexander-obzherin.info/RenderingEngine-v0.2.9-SDK-Windows.tar.gz) |
-| FreeBSD | [RenderingEngine-v0.2.9-SDK-FreeBSD](https://downloads.rendering-engine.alexander-obzherin.info/RenderingEngine-v0.2.9-SDK-FreeBSD.tar.gz) |
-| Linux | [RenderingEngine-v0.2.9-SDK-Linux](https://downloads.rendering-engine.alexander-obzherin.info/RenderingEngine-v0.2.9-SDK-Linux.tar.gz) |
+| Windows | [RenderingEngine-v0.2.9-SDK-Windows](https://github.com/alexanderobzherin/RenderingEngine/releases/download/v0.2.9/RenderingEngine-v0.2.9-SDK-Windows.tar.gz) |
+| FreeBSD | [RenderingEngine-v0.2.9-SDK-FreeBSD](https://github.com/alexanderobzherin/RenderingEngine/releases/download/v0.2.9/RenderingEngine-v0.2.9-SDK-FreeBSD.tar.gz) |
+| Linux | [RenderingEngine-v0.2.9-SDK-Linux](https://github.com/alexanderobzherin/RenderingEngine/releases/download/v0.2.9/RenderingEngine-v0.2.9-SDK-Linux.tar.gz) |
+
+
+Browse all published versions on the [GitHub Releases page](https://github.com/alexanderobzherin/RenderingEngine/releases).
 
 ---
 
