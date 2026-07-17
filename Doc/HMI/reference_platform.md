@@ -262,10 +262,21 @@ Summary
 
 The reference platform uses a standard UEFI boot configuration with a GPT partition table. The operating system is installed on a single ext4 root filesystem with a dedicated FAT32 EFI System Partition and a separate swap partition. This simple layout facilitates system maintenance, deployment and recovery.
 
-# Commissioning Summary
+## Network Configuration
 
-The reference HMI platform has been commissioned and documented following a clean Debian GNU/Linux 13.6 installation.
+The HMI target is configured to obtain its IPv4 address via DHCP.
 
-The collected information establishes the baseline hardware configuration, firmware environment, operating system state, runtime services and software inventory prior to installing the Rendering Engine or additional graphics middleware.
+To provide a stable development environment while retaining DHCP flexibility,
+the home router contains a static DHCP reservation mapping the wireless MAC
+address to a fixed IP address.
 
-This information will be used to create `Documentation/HMI/ReferencePlatform.md` and will serve as the reference configuration for future platform bring-up, deployment and validation.
+| Property | Value |
+|----------|-------|
+| Hostname | hmi-target |
+| Interface | wlo1 |
+| MAC Address | 98:FE:3E:08:D5:F9 |
+| Reserved IPv4 | 192.168.1.154 |
+| Gateway | 192.168.1.1 |
+
+This approach preserves automatic gateway/DNS configuration while ensuring a
+stable address for SSH access, deployment scripts and development tooling.
