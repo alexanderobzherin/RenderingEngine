@@ -3,7 +3,7 @@
 #include "image_data.hpp"
 #include "utility.hpp"
 
-#include "boost/filesystem.hpp"
+#include <filesystem>
 #include <chrono>
 
 using namespace rendering_engine;
@@ -21,20 +21,20 @@ void Benchmark::BenchmarkTextureLoadAndCopy(size_t numOfIterations)
 
 	const auto textureFolder = Utility::GetTextureFolderPath();
 
-	boost::filesystem::path pathToDirectory = boost::filesystem::path(textureFolder.string());
-	const bool isValidFolderPath = boost::filesystem::exists(boost::filesystem::path(textureFolder)) && boost::filesystem::is_directory(boost::filesystem::path(textureFolder));
+	std::filesystem::path pathToDirectory = std::filesystem::path(textureFolder.string());
+	const bool isValidFolderPath = std::filesystem::exists(std::filesystem::path(textureFolder)) && std::filesystem::is_directory(std::filesystem::path(textureFolder));
 	if (!isValidFolderPath)
 	{
 		return;
 	}
 
 	std::vector<TextureLoadSummary> summary;
-	for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(pathToDirectory))
+	for (const std::filesystem::directory_entry& x : std::filesystem::directory_iterator{ pathToDirectory })
 	{
-		auto filePath = boost::filesystem::path(x.path());
+		auto filePath = std::filesystem::path(x.path());
 		const std::string ext = filePath.extension().string();
 		const bool isExtensionSupported = (ext == ".png") || (ext == ".jpg" || (ext == ".jpeg"));
-		if (!boost::filesystem::is_regular_file(filePath) || !isExtensionSupported)
+		if (!std::filesystem::is_regular_file(filePath) || !isExtensionSupported)
 		{
 			continue;
 		}
@@ -79,7 +79,7 @@ TextureLoadMetrics Benchmark::LoadTextureFile(std::string const& texturePath)
 	auto endTimeCopy = std::chrono::steady_clock::now();
 	auto durationCopy = std::chrono::duration<double, std::milli>(endTimeCopy - startTimeCopy).count();
 
-	auto path = boost::filesystem::path(texturePath);
+	auto path = std::filesystem::path(texturePath);
 	
 	textureLoadMetrics.file = path.filename().string();
 	textureLoadMetrics.loadTimeMs = durationLoad;

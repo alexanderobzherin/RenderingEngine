@@ -74,7 +74,7 @@ Contains the engine documentation.
 Root folder with all engine-related components.
 
 ##### RenderingEngine/External
-Headers of third-party vendor libraries (GLM, Boost, JSON, etc.).
+Headers of third-party vendor libraries (GLM, JSON, etc.).
 
 ##### RenderingEngine/MaterialCompiler
 A tool that reads material definitions, generates shader source code, and initiates shader compilation.

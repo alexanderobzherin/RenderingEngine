@@ -72,7 +72,7 @@ endif()
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
-find_package(Boost REQUIRED COMPONENTS filesystem)
+
 #add the executable
 add_executable(TextureBenchmark ${HEADER_FILES} ${SRC_FILES})
 
@@ -100,13 +100,11 @@ if(WIN32 AND RE_DEV_MODE)
 	target_link_libraries(TextureBenchmark 
 		PRIVATE
 		RenderingEngine
-		Boost::filesystem
 	)
 else()	
 	target_link_libraries(TextureBenchmark 
 		PRIVATE
 			RenderingEngine::RenderingEngine 
-			Boost::filesystem
 	)
 endif()
 

@@ -4,7 +4,7 @@
 #include "image_codec_jpeg.hpp"
 #include "image_codec_png.hpp"
 #include "logger.hpp"
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <stdexcept>
 
 namespace rendering_engine
@@ -27,10 +27,10 @@ ImageData::ImageData(std::string filepath)
 	:
 	ImageData::ImageData()
 {
-	auto const pathToTexture = boost::filesystem::path(filepath);
-	if( boost::filesystem::exists(pathToTexture) && boost::filesystem::is_regular_file(pathToTexture) )
+	auto const pathToTexture = std::filesystem::path(filepath);
+	if(std::filesystem::exists(pathToTexture) && std::filesystem::is_regular_file(pathToTexture) )
 	{
-		boost::filesystem::path const pathToTexture = boost::filesystem::path(filepath);
+		std::filesystem::path const pathToTexture = std::filesystem::path(filepath);
 		
 		size_t const dot = pathToTexture.string().find_last_of(".");
 		std::string const fileExtension = pathToTexture.string().substr(dot + 1);

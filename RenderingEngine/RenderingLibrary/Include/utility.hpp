@@ -9,7 +9,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include "boost/filesystem.hpp"
+#include <filesystem>
+#include <unordered_map>
 
 #include "rendering_engine_export.hpp"
 
@@ -103,19 +104,19 @@ public:
     static std::vector<std::string> GetListOfFilesInDirectory( std::string directory );
 	/**
 	 * @brief Returns the absolute path of the running application.
-	 * @return Application path as boost::filesystem::path.
+	 * @return Application path as std::filesystem::path.
 	 */
-	static boost::filesystem::path GetApplicationPath();
+	static std::filesystem::path GetApplicationPath();
 	/**
 	 * @brief Returns the build output directory path.
-	 * @return Build path as boost::filesystem::path.
+	 * @return Build path as std::filesystem::path.
 	 */
-	static boost::filesystem::path GetBuildPath();
+	static std::filesystem::path GetBuildPath();
 	/**
 	 * @brief Returns the directory path containing compiled shader binaries.
-	 * @return Shader binary path as boost::filesystem::path.
+	 * @return Shader binary path as std::filesystem::path.
 	 */
-	static boost::filesystem::path GetShadersBinaryPath();
+	static std::filesystem::path GetShadersBinaryPath();
 	/**
 	 * @brief Returns a list of file names in a directory matching the specified extension.
 	 * @param directory Directory path.
@@ -125,28 +126,28 @@ public:
 	static std::vector<std::string> GetListOfFileNamesInDirectory(const char* directory, std::string extToSearch);
 
 	/// @brief Resolves project root folder (handles Release/Debug/Binaries layouts).
-	static boost::filesystem::path ResolveProjectRoot();
+	static std::filesystem::path ResolveProjectRoot();
 
 	/// @brief Returns absolute path to Content.
-	static boost::filesystem::path GetContentFolderPath();
+	static std::filesystem::path GetContentFolderPath();
 
 	/// @brief Returns absolute path to Content/Textures.
-	static boost::filesystem::path GetTextureFolderPath();
+	static std::filesystem::path GetTextureFolderPath();
 
 	/// @brief Returns absolute path to Content/Models.
-	static boost::filesystem::path GetModelsFolderPath();
+	static std::filesystem::path GetModelsFolderPath();
 
 	/// @brief Returns absolute path to Content/Fonts.
-	static boost::filesystem::path GetFontsFolderPath();
+	static std::filesystem::path GetFontsFolderPath();
 
 	/// @brief Returns absolute path to Content/Shaders.
-	static boost::filesystem::path GetShadersFolderPath();
+	static std::filesystem::path GetShadersFolderPath();
 
 	/// @brief Returns absolute path to Config/app_config.json.
-	static boost::filesystem::path GetConfigFilePath();
+	static std::filesystem::path GetConfigFilePath();
 
 	/// @brief Returns absolute path to Logs folder.
-	static boost::filesystem::path GetLogsFolderPath();
+	static std::filesystem::path GetLogsFolderPath();
 
 	/**
      * @brief Checks whether packed assets (Pack.bin / Pack.json) exist.
@@ -171,22 +172,22 @@ public:
 		Utility( const Utility& rhs );
 		Utility& operator=( const Utility& rhs );
 
-		static boost::filesystem::path FindPath( std::string fileOrFolderName, std::string searchingFrom = "../../" );
+		static std::filesystem::path FindPath( std::string fileOrFolderName, std::string searchingFrom = "../../" );
 
 	public:
-		static boost::filesystem::path sApplicationPath;
-		static boost::filesystem::path const sDefaultShadersBinaryRelativePath;
-		static boost::filesystem::path sBuildPath;
-		static boost::filesystem::path sShadersBinaryPath;
-		static boost::filesystem::path const sContentRelativePathFolder;
-		static boost::filesystem::path const sContentPackageFilePath;
-		static boost::filesystem::path const sContentPackEntriesFilePath;
-		static boost::filesystem::path const sTextureRelativePathFolder;
-		static boost::filesystem::path const sModelsRelativePathFolder;
-		static boost::filesystem::path const sFontsRelativePathFolder;
-		static boost::filesystem::path const sShadersRelativePathFolder;
-		static boost::filesystem::path const sAppConfigFilePath;
-		static boost::filesystem::path const sLogFolderPath;
+		static std::filesystem::path sApplicationPath;
+		static std::filesystem::path const sDefaultShadersBinaryRelativePath;
+		static std::filesystem::path sBuildPath;
+		static std::filesystem::path sShadersBinaryPath;
+		static std::filesystem::path const sContentRelativePathFolder;
+		static std::filesystem::path const sContentPackageFilePath;
+		static std::filesystem::path const sContentPackEntriesFilePath;
+		static std::filesystem::path const sTextureRelativePathFolder;
+		static std::filesystem::path const sModelsRelativePathFolder;
+		static std::filesystem::path const sFontsRelativePathFolder;
+		static std::filesystem::path const sShadersRelativePathFolder;
+		static std::filesystem::path const sAppConfigFilePath;
+		static std::filesystem::path const sLogFolderPath;
 		
 };
 

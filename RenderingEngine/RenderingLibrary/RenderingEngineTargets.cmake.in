@@ -12,7 +12,6 @@ set_target_properties(RenderingEngine::RenderingEngine PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES
         "${PACKAGE_PREFIX_DIR}/RenderingEngine/RenderingLibrary/Include"
         "${PACKAGE_PREFIX_DIR}/RenderingEngine/External/glm"
-        "${PACKAGE_PREFIX_DIR}/RenderingEngine/External/boost"
 )
 
 # IMPORTANT:

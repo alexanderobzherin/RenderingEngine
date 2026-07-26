@@ -43,7 +43,7 @@ void VulkanMaterialResources::Initialize(Material * material)
 	}
 	else
 	{
-		boost::filesystem::path matPath = Utility::GetShadersFolderPath() / matName;
+		std::filesystem::path matPath = Utility::GetShadersFolderPath() / matName;
 	
 		spvVert = Utility::ReadShaderBinaryFile((matPath / std::string(matName + "_vert.spv")).string());
 		spvFrag = Utility::ReadShaderBinaryFile((matPath / std::string(matName + "_frag.spv")).string());

@@ -6,7 +6,7 @@
 #include "i_renderer.hpp"
 #include <string>
 #include <vector>
-#include "boost/filesystem.hpp"
+#include <filesystem>
 #include "utility.hpp"
 #include "logger.hpp"
 
@@ -34,15 +34,15 @@ void TextureCache::LoadTexturesFromFolder(std::string pathToFolder)
 	LOG_INFO("Loading textures from folder: " + pathToFolder);
 	auto start = std::chrono::steady_clock::now();
 	// 1. Check if path is valid and exist
-	boost::filesystem::path pathToDirectory = boost::filesystem::path(pathToFolder);
-	const bool isValidFolderPath = boost::filesystem::exists(boost::filesystem::path(pathToFolder)) && boost::filesystem::is_directory(boost::filesystem::path(pathToFolder));
+	std::filesystem::path pathToDirectory = std::filesystem::path(pathToFolder);
+	const bool isValidFolderPath = std::filesystem::exists(std::filesystem::path(pathToFolder)) && std::filesystem::is_directory(std::filesystem::path(pathToFolder));
 	if (!isValidFolderPath)
 	{
 		return;
 	}
 	// 2. Iterate through files in the folder.
 	//    if file is in the list of supported extensions
-	for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(pathToDirectory))
+	for (const std::filesystem::directory_entry& x : std::filesystem::directory_iterator(pathToDirectory))
 	{
 		auto textureName = UploadTextureToRAM(x.path().string());
 		if (!textureName.empty())
@@ -111,8 +111,8 @@ void TextureCache::LoadTexturesFromPackage()
 
 std::string TextureCache::UploadTextureToRAM(std::string path)
 {
-	auto filePath = boost::filesystem::path(path);
-	if (!boost::filesystem::is_regular_file(filePath))
+	auto filePath = std::filesystem::path(path);
+	if (!std::filesystem::is_regular_file(filePath))
 	{
 		return std::string{};
 	}
@@ -149,7 +149,7 @@ std::string TextureCache::UploadTextureToRAM(std::string path)
 
 std::string TextureCache::UploadTextureToRAM(std::string textureFileName, std::vector<uint8_t> const& fileBytes)
 {
-	auto textureName = boost::filesystem::path(textureFileName).stem().string();
+	auto textureName = std::filesystem::path(textureFileName).stem().string();
 	// If texture is already loaded into RAM yet, do not add again.
 	if (auto search = mTextures.find(textureName); search != mTextures.end())
 	{

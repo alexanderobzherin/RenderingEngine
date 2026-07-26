@@ -37,7 +37,6 @@ target_link_libraries(RenderingEngine_gtests
         ${GTEST_LIBRARIES}
         glfw
         glm::glm
-        Boost::filesystem
         Threads::Threads
         ${JPEG_LIBRARIES}
         PNG::PNG

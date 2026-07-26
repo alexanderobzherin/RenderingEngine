@@ -1,6 +1,6 @@
 #include "model_cache.hpp"
 #include "i_renderer.hpp"
-#include "boost/filesystem.hpp"
+#include <filesystem>
 #include "mesh_data_gpu.hpp"
 #include "utility.hpp"
 #include "logger.hpp"
@@ -31,15 +31,15 @@ void ModelCache::LoadModelsFromFolder(std::string pathToFolder)
 	LOG_INFO("Loading models from folder: " + pathToFolder);
 	auto start = std::chrono::steady_clock::now();
 	// 1. Check if path is valid and exist
-	boost::filesystem::path pathToDirectory = boost::filesystem::path(pathToFolder);
-	const bool isValidFolderPath = boost::filesystem::exists(boost::filesystem::path(pathToFolder)) && boost::filesystem::is_directory(boost::filesystem::path(pathToFolder));
+	std::filesystem::path pathToDirectory = std::filesystem::path(pathToFolder);
+	const bool isValidFolderPath = std::filesystem::exists(std::filesystem::path(pathToFolder)) && std::filesystem::is_directory(std::filesystem::path(pathToFolder));
 	if (!isValidFolderPath)
 	{
 		return;
 	}
 	// 2. Iterate through files in the folder.
 	//    if file is in the list of supported extensions
-	for (boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(pathToDirectory))
+	for (const std::filesystem::directory_entry& x : std::filesystem::directory_iterator(pathToDirectory))
 	{
 		(void)UploadModelToRAM(x.path().string());
 	}
@@ -129,8 +129,8 @@ void ModelCache::LoadCustomMesh(std::string meshName, std::vector<glm::vec2> pos
 
 std::string ModelCache::UploadModelToRAM(std::string path)
 {
-	auto filePath = boost::filesystem::path(path);
-	if (!boost::filesystem::is_regular_file(filePath))
+	auto filePath = std::filesystem::path(path);
+	if (!std::filesystem::is_regular_file(filePath))
 	{
 		return std::string{};
 	}
@@ -168,7 +168,7 @@ std::string ModelCache::UploadModelToRAM(std::string path)
 
 std::string ModelCache::UploadModelToRAM(std::string fileName, std::vector<uint8_t> const& fileBytes)
 {
-	auto modelName = boost::filesystem::path(fileName).stem().string();
+	auto modelName = std::filesystem::path(fileName).stem().string();
 
 	// If model is already loaded into RAM yet, do not add again.
 	if (auto search = mModels.find(modelName); search != mModels.end())

@@ -47,7 +47,6 @@ The following libraries are required:
 - [Vulkan SDK](https://vulkan.lunarg.com/)
 - [GLFW](https://www.glfw.org/)
 - [GLM](https://github.com/g-truc/glm)
-- [Boost::Filesystem](https://www.boost.org/)
 - [GTest](https://github.com/google/googletest)
 - [libjpeg-turbo](https://libjpeg-turbo.org/)
 - [libpng](http://www.libpng.org/)

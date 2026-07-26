@@ -74,7 +74,7 @@ jobs:
             libglfw3-dev libglm-dev libgtest-dev \
             libjpeg-dev libpng-dev libassimp-dev \
             pkg-config libfreetype-dev nlohmann-json3-dev \
-            libboost-filesystem-dev curl ca-certificates
+            curl ca-certificates
 
       - name: Build SDK
         run: |

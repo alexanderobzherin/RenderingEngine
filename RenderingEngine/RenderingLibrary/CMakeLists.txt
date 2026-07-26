@@ -209,7 +209,6 @@ target_include_directories(RenderingEngine
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Include>
         $<INSTALL_INTERFACE:RenderingEngine/RenderingLibrary/Include>
         $<INSTALL_INTERFACE:RenderingEngine/External/glm>
-        $<INSTALL_INTERFACE:RenderingEngine/External/boost>
 )
 
 if(UNIX)
@@ -229,7 +228,6 @@ target_link_libraries(RenderingEngine
 		PNG::PNG
 		assimp::assimp
 		glm::glm
-		Boost::filesystem
 		nlohmann_json::nlohmann_json
 )
 

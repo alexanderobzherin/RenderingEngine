@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "2")
-set(VERSION_PATCH "9")
+set(VERSION_PATCH "10")
 
 #set the project name
 project(RenderingEngineProject VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
@@ -71,8 +71,6 @@ endif()
 find_package(glfw3 CONFIG REQUIRED)
 
 find_package(glm CONFIG REQUIRED)
-
-find_package(Boost REQUIRED COMPONENTS filesystem)
 
 find_package(GTest REQUIRED)
 
@@ -139,20 +137,6 @@ message(STATUS "GLM include dir: ${GLM_INCLUDE_DIR}")
 install(
     DIRECTORY ${GLM_INCLUDE_DIR}/glm
     DESTINATION RenderingEngine/External/glm
-)
-
-find_path(BOOST_FS_INCLUDE_DIR
-          NAMES boost/filesystem.hpp
-          REQUIRED)
-
-if(NOT BOOST_FS_INCLUDE_DIR)
-    message(FATAL_ERROR "Boost filesystem headers not found on this system.")
-endif()
-
-message(STATUS "Boost include dir: ${BOOST_FS_INCLUDE_DIR}")
-install(
-    DIRECTORY ${BOOST_FS_INCLUDE_DIR}/boost
-    DESTINATION RenderingEngine/External/boost
 )
 
 # ======================================================================

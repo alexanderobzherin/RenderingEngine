@@ -24,7 +24,7 @@ FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRender
 	mErrorResult(FT_Err_Ok),
 	mFace(0)
 {
-    mFontName = boost::filesystem::path(filepath).stem().string();
+    mFontName = std::filesystem::path(filepath).stem().string();
 
     mErrorResult = FT_New_Face(mTextRenderer->GetFontLibrary(), filepath.c_str(), 0, &mFace);
     if (mErrorResult)

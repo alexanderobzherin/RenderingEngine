@@ -235,21 +235,21 @@ void TextRenderer::LoadFontsAvailableInFolder(std::string pathToFolder)
 {
 	LOG_INFO("Scanning font folder: " + pathToFolder);
 	// 1. Check if path is valid and exist
-	boost::filesystem::path pathToDirectory = boost::filesystem::path(pathToFolder);
-	const bool isValidFolderPath = boost::filesystem::exists(boost::filesystem::path(pathToFolder)) && boost::filesystem::is_directory(boost::filesystem::path(pathToFolder));
+	std::filesystem::path pathToDirectory = std::filesystem::path(pathToFolder);
+	const bool isValidFolderPath = std::filesystem::exists(std::filesystem::path(pathToFolder)) && std::filesystem::is_directory(std::filesystem::path(pathToFolder));
 	if (!isValidFolderPath)
 	{
 		return;
 	}
 	// 2. Iterate through files in the folder.
 	//    if file is in the list of supported extensions
-	for (boost::filesystem::recursive_directory_iterator it(pathToDirectory), end;
+	for (std::filesystem::recursive_directory_iterator it(pathToDirectory), end;
 		it != end;
 		++it)
 	{
-		const boost::filesystem::path& filePath = it->path();
+		const std::filesystem::path& filePath = it->path();
 
-		if (!boost::filesystem::is_regular_file(filePath))
+		if (!std::filesystem::is_regular_file(filePath))
 			continue;
 
 		const std::string ext = filePath.extension().string();
@@ -317,7 +317,7 @@ void TextRenderer::LoadFontsAvailableInPackage()
 		const std::string& virtualPath = entry.first;
 		if (virtualPath.rfind(folderEntry, 0) == 0) // starts with Fonts/
 		{
-			auto fontFilePath = boost::filesystem::path(virtualPath);
+			auto fontFilePath = std::filesystem::path(virtualPath);
 			const std::string ext = fontFilePath.extension().string();
 			if (ext != ".ttf" && ext != ".otf")
 				continue;

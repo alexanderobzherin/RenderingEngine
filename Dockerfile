@@ -21,5 +21,4 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
     libassimp-dev \
     pkg-config \
     libfreetype-dev \
-    nlohmann-json3-dev \
-    libboost-filesystem-dev
+    nlohmann-json3-dev

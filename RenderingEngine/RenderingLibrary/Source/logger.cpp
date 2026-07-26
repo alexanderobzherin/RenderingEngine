@@ -6,7 +6,7 @@
 
 #include "utility.hpp"
 
-#include "boost/filesystem.hpp"
+#include <filesystem>
 #include <chrono>
 #include <iomanip>
 #include <sstream>
@@ -44,9 +44,9 @@ void Logger::Initialize(const std::string& appName)
         return;
 
     auto logFolderPath = Utility::GetLogsFolderPath();
-    if (!boost::filesystem::exists(logFolderPath))
+    if (!std::filesystem::exists(logFolderPath))
     {
-        boost::filesystem::create_directory(logFolderPath);
+        std::filesystem::create_directory(logFolderPath);
     }
 
     // System clock for human-readable timestamp

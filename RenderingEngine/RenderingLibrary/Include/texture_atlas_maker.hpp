@@ -10,7 +10,7 @@
 #include <memory>
 #include <fstream>
 #include <sstream>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include "image_data.hpp"
 
 namespace rendering_engine

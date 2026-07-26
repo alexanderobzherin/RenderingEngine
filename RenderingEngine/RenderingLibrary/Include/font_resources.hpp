@@ -7,9 +7,10 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include <unordered_map>
 #include <algorithm>
-
-#include "boost/filesystem.hpp"
+#include <vector>
+#include <filesystem>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H

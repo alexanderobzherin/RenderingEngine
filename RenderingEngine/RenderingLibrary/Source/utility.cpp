@@ -3,7 +3,7 @@
 
 namespace rendering_engine
 {
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 path const Utility::sDefaultShadersBinaryRelativePath = {"/Content/Shaders/"};
 path const Utility::sContentRelativePathFolder = path{} / "Content";
@@ -25,7 +25,7 @@ path const Utility::sContentPackEntriesFilePath = path{} / "Content" / "Pack.jso
 
 void Utility::InitializePaths(int argc, char* argv[])
 {
-	sApplicationPath = boost::filesystem::path(argv[0]);
+	sApplicationPath = std::filesystem::path(argv[0]);
 
 	sBuildPath = FindPath( "Build" );
 	sShadersBinaryPath = sBuildPath += sDefaultShadersBinaryRelativePath;
@@ -137,13 +137,13 @@ std::vector<std::string> Utility::GetListOfFilesInDirectory( std::string directo
 	try
 	{
 		//check if parameter string is directory
-		if( boost::filesystem::exists( boost::filesystem::path( directory ) ) && boost::filesystem::is_directory( boost::filesystem::path( directory ) ) )
+		if( std::filesystem::exists( std::filesystem::path( directory ) ) && std::filesystem::is_directory(std::filesystem::path( directory ) ) )
 		{
-			boost::filesystem::path pathToDirectory = boost::filesystem::path( directory );
+			std::filesystem::path pathToDirectory = std::filesystem::path( directory );
 
-			if( boost::filesystem::is_directory( pathToDirectory ) )
+			if(std::filesystem::is_directory( pathToDirectory ) )
 			{
-				for( boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator( pathToDirectory ) )
+				for(const std::filesystem::directory_entry& x : std::filesystem::directory_iterator( pathToDirectory ) )
 				{
 					size_t dot = x.path().string().find_last_of( "." );
 
@@ -156,7 +156,7 @@ std::vector<std::string> Utility::GetListOfFilesInDirectory( std::string directo
 			}
 		}
 	}
-	catch( const boost::filesystem::filesystem_error& ex )
+	catch( const std::filesystem::filesystem_error& ex )
 	{
 		std::cout << ex.what() << '\n';
 	}
@@ -164,30 +164,31 @@ std::vector<std::string> Utility::GetListOfFilesInDirectory( std::string directo
 	return shaderFileNames;
 }
 
-boost::filesystem::path Utility::GetApplicationPath()
+std::filesystem::path Utility::GetApplicationPath()
 {
 	return sApplicationPath;
 }
 
-boost::filesystem::path Utility::GetBuildPath()
+std::filesystem::path Utility::GetBuildPath()
 {
 	return sBuildPath;
 }
 
-boost::filesystem::path Utility::GetShadersBinaryPath()
+std::filesystem::path Utility::GetShadersBinaryPath()
 {
 	return sShadersBinaryPath;
 }
 
 
-boost::filesystem::path Utility::FindPath(std::string fileOrFolderName, std::string searchingFrom)
+std::filesystem::path Utility::FindPath(std::string fileOrFolderName, std::string searchingFrom)
 {
-	boost::filesystem::path result;
-	for( boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(searchingFrom) )
+	std::filesystem::path result;
+	for(const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(searchingFrom) )
 	{
-		if( x.path().filename().string() == fileOrFolderName )
+		if( entry.path().filename().string() == fileOrFolderName )
 		{
-			result = x.path().generic_path();
+			result = entry.path();
+			break;
 		}
 	}
 	return result;
@@ -200,13 +201,13 @@ std::vector<std::string> Utility::GetListOfFileNamesInDirectory(const char* dire
 	try
 	{
 		//check if parameter string is directory
-		if( boost::filesystem::exists(boost::filesystem::path(directory)) && boost::filesystem::is_directory(boost::filesystem::path(directory)) )
+		if(std::filesystem::exists(std::filesystem::path(directory)) && std::filesystem::is_directory(std::filesystem::path(directory)) )
 		{
-			boost::filesystem::path pathToDirectory = boost::filesystem::path(directory);
+			std::filesystem::path pathToDirectory = std::filesystem::path(directory);
 
-			if( boost::filesystem::is_directory(pathToDirectory) )
+			if(std::filesystem::is_directory(pathToDirectory) )
 			{
-				for( boost::filesystem::directory_entry& x : boost::filesystem::directory_iterator(pathToDirectory) )
+				for(const std::filesystem::directory_entry& x : std::filesystem::directory_iterator(pathToDirectory) )
 				{
 					size_t dot = x.path().string().find_last_of(".");
 
@@ -218,7 +219,7 @@ std::vector<std::string> Utility::GetListOfFileNamesInDirectory(const char* dire
 			}
 		}
 	}
-	catch( const boost::filesystem::filesystem_error& ex )
+	catch( const std::filesystem::filesystem_error& ex )
 	{
 		std::cout << ex.what() << '\n';
 	}
@@ -226,9 +227,9 @@ std::vector<std::string> Utility::GetListOfFileNamesInDirectory(const char* dire
 	return imageFileNames;
 }
 
-boost::filesystem::path Utility::ResolveProjectRoot()
+std::filesystem::path Utility::ResolveProjectRoot()
 {
-	auto exeDir = boost::filesystem::canonical(boost::filesystem::path(boost::filesystem::current_path())); // default
+	auto exeDir = std::filesystem::canonical(std::filesystem::path(std::filesystem::current_path())); // default
 	if (exeDir.filename() == "Debug" || exeDir.filename() == "Release")
 		exeDir = exeDir.parent_path(); // step out of Debug/Release
 	if (exeDir.filename() == "Binaries")
@@ -236,37 +237,37 @@ boost::filesystem::path Utility::ResolveProjectRoot()
 	return exeDir;
 }
 
-boost::filesystem::path Utility::GetContentFolderPath()
+std::filesystem::path Utility::GetContentFolderPath()
 {
 	return ResolveProjectRoot() / sContentRelativePathFolder;
 }
 
-boost::filesystem::path Utility::GetTextureFolderPath()
+std::filesystem::path Utility::GetTextureFolderPath()
 {
 	return ResolveProjectRoot() / sTextureRelativePathFolder;
 }
 
-boost::filesystem::path Utility::GetModelsFolderPath()
+std::filesystem::path Utility::GetModelsFolderPath()
 {
 	return ResolveProjectRoot() / sModelsRelativePathFolder;
 }
 
-boost::filesystem::path Utility::GetFontsFolderPath()
+std::filesystem::path Utility::GetFontsFolderPath()
 {
 	return ResolveProjectRoot() / sFontsRelativePathFolder;
 }
 
-boost::filesystem::path Utility::GetShadersFolderPath()
+std::filesystem::path Utility::GetShadersFolderPath()
 {
 	return ResolveProjectRoot() / sShadersRelativePathFolder;
 }
 
-boost::filesystem::path Utility::GetConfigFilePath()
+std::filesystem::path Utility::GetConfigFilePath()
 {
 	return ResolveProjectRoot() / sAppConfigFilePath;
 }
 
-boost::filesystem::path Utility::GetLogsFolderPath()
+std::filesystem::path Utility::GetLogsFolderPath()
 {
 	return ResolveProjectRoot() / sLogFolderPath;
 }
@@ -274,8 +275,8 @@ boost::filesystem::path Utility::GetLogsFolderPath()
 bool Utility::IsPackageProvided()
 {
 	const auto root = ResolveProjectRoot();
-	return boost::filesystem::exists(root / sContentPackageFilePath) &&
-		boost::filesystem::exists(root / sContentPackEntriesFilePath);
+	return std::filesystem::exists(root / sContentPackageFilePath) &&
+		std::filesystem::exists(root / sContentPackEntriesFilePath);
 }
 
 const PackEntries& Utility::GetPackEntries()
@@ -286,9 +287,9 @@ const PackEntries& Utility::GetPackEntries()
 	sPackEntries.clear();
 
 	// Path to Pack.json
-	const boost::filesystem::path jsonPath = ResolveProjectRoot() / sContentPackEntriesFilePath;
+	const std::filesystem::path jsonPath = ResolveProjectRoot() / sContentPackEntriesFilePath;
 
-	if (!boost::filesystem::exists(jsonPath))
+	if (!std::filesystem::exists(jsonPath))
 	{
 		sPackEntriesLoaded = true;
 		return sPackEntries; // empty
@@ -329,8 +330,8 @@ std::vector<uint8_t> Utility::ReadPackedFile(const std::string& entryPath)
 	const path binPath = ResolveProjectRoot() / sContentPackageFilePath;
 	const path jsonPath = ResolveProjectRoot() / sContentPackEntriesFilePath;
 
-	if (!boost::filesystem::exists(binPath) ||
-		!boost::filesystem::exists(jsonPath))
+	if (!std::filesystem::exists(binPath) ||
+		!std::filesystem::exists(jsonPath))
 	{
 		std::cerr << "[Utility::ReadPackedFile] Missing Pack.bin or Pack.json\n";
 		return data;

@@ -18,7 +18,7 @@ Responsibilities:
   - Read engine version from Intermediate/Generated/version.h.
   - Copy the installed RenderingEngine library, headers, and CMake config
     into a distributable SDK layout.
-  - Copy vendored headers (glm, boost, nlohmann_json, Vulkan headers if used).
+  - Copy vendored headers (glm, nlohmann_json, Vulkan headers if used).
   - Copy project templates and the create_project.py helper.
   - Copy and patch ContentExamples into SDK-user mode (RE_DEV_MODE=OFF).
   - Emit documentation files and a human-readable Manifest.txt.
@@ -215,7 +215,7 @@ def main():
         copy_tree(installed_mc_root, sdk_material_compiler_root)
 
         # --------------------------------------------------------------
-        # 3. External vendored headers (glm, boost, json, vulkan,...)
+        # 3. External vendored headers (glm, json, vulkan,...)
         # --------------------------------------------------------------
         installed_external_root = os.path.join(installed_engine_root, "External")
         copy_tree(installed_external_root, os.path.join(sdk_rendering_engine_root, "External"))

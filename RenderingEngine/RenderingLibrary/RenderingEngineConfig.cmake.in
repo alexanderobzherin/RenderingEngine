@@ -27,7 +27,6 @@ set(RenderingEngine_EXTERNAL_DIR
 set(RenderingEngine_INCLUDE_DIRS
     "${RenderingEngine_INCLUDE_DIR}"
     "${RenderingEngine_EXTERNAL_DIR}/glm"
-    "${RenderingEngine_EXTERNAL_DIR}/boost"
 )
 
 # IMPORTANT:
