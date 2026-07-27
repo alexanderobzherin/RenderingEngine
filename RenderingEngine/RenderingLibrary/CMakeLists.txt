@@ -219,8 +219,17 @@ endif()
 
 if(UNIX)
     set(RE_JPEG_LINK_TARGET ${RE_JPEG_STATIC_LIBRARY})
+	set(
+        RE_PNG_LINK_TARGET
+        ${RE_PNG_STATIC_LIBRARY}
+        ZLIB::ZLIB
+    )
 else()
     set(RE_JPEG_LINK_TARGET JPEG::JPEG)
+	set(
+        RE_PNG_LINK_TARGET
+        PNG::PNG
+    )
 endif()
 target_link_libraries(RenderingEngine
     PRIVATE
@@ -229,7 +238,7 @@ target_link_libraries(RenderingEngine
 		freetype
 		harfbuzz::harfbuzz
 		${RE_JPEG_LINK_TARGET}
-		PNG::PNG
+		${RE_PNG_LINK_TARGET}
 		assimp::assimp
 		glm::glm
 		nlohmann_json::nlohmann_json

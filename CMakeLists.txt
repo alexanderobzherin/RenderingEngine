@@ -77,6 +77,9 @@ find_package(GTest REQUIRED)
 set(JPEG_STATIC ON)
 find_package(JPEG REQUIRED)
 
+set(PNG_STATIC ON)
+find_package(PNG REQUIRED)
+find_package(ZLIB REQUIRED)
 if(UNIX AND NOT WIN32)
     find_library(
         RE_JPEG_STATIC_LIBRARY
@@ -87,14 +90,29 @@ if(UNIX AND NOT WIN32)
         NO_DEFAULT_PATH
         REQUIRED
     )
-
     message(STATUS
         "Rendering Engine static JPEG library: ${RE_JPEG_STATIC_LIBRARY}"
     )
-endif()
 
-set(PNG_STATIC ON)
-find_package(PNG REQUIRED)
+    find_library(
+        RE_PNG_STATIC_LIBRARY
+        NAMES
+            libpng16.a
+            libpng.a
+        PATHS
+            /usr/local/lib
+            /usr/lib
+            /usr/lib/x86_64-linux-gnu
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    message(
+        STATUS
+        "Rendering Engine static PNG library: "
+        "${RE_PNG_STATIC_LIBRARY}"
+    )
+endif()
 
 find_package(assimp CONFIG REQUIRED)
 
