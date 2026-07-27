@@ -39,14 +39,70 @@ Variable value: ```Path\To\glslc.exe```
 
 ### Ubuntu
 
-#### 1. Install dependencies:
+#### 1. Install build tools and dependencies:
 
 ```bash
 sudo apt update
-sudo apt install cmake build-essential libglfw3-dev libglm-dev libgtest-dev libjpeg-dev libpng-dev libassimp-dev libfreetype6-dev libharfbuzz-dev pkg-config nlohmann-json3-dev
+sudo apt install git cmake build-essential nasm pkg-config libglfw3-dev libglm-dev libgtest-dev libpng-dev libassimp-dev libfreetype6-dev libharfbuzz-dev pkg-config nlohmann-json3-dev
 ```
 
-#### 2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
+#### 2. Build and install the static PIC-enabled libjpeg-turbo library:
+
+Rendering Engine is built as a shared library and statically incorporates
+libjpeg-turbo on Unix-like systems. The static libjpeg archive provided by
+Ubuntu is not built with position-independent code and therefore cannot be
+linked into `libRenderingEngine.so`.
+
+Build and install libjpeg-turbo 2.1.5 with static linkage and
+position-independent code enabled:
+
+```bash
+mkdir -p ~/Development/ThirdPartySources
+cd ~/Development/ThirdPartySources
+
+git clone \
+    --branch 2.1.5 \
+    --depth 1 \
+    https://github.com/libjpeg-turbo/libjpeg-turbo.git
+
+cd libjpeg-turbo
+
+cmake \
+    -S . \
+    -B build-static-pic \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DCMAKE_INSTALL_LIBDIR=/usr/local/lib \
+    -DENABLE_SHARED=OFF \
+    -DENABLE_STATIC=ON \
+    -DWITH_JPEG8=ON \
+    -DWITH_TURBOJPEG=OFF
+
+cmake --build build-static-pic --parallel
+
+ctest \
+    --test-dir build-static-pic \
+    --output-on-failure
+
+sudo cmake --install build-static-pic
+```
+
+Verify that the static library and headers were installed:
+
+```bash
+ls -lh /usr/local/lib/libjpeg.a
+ls -l /usr/local/include/jpeglib.h
+```
+
+The expected installation paths are:
+
+```text
+/usr/local/lib/libjpeg.a
+/usr/local/include/jpeglib.h
+```
+
+#### 3. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
 Note: As of May 2025, LunarG has discontinued updating Vulkan SDK packages in the official Ubuntu repositories.
 The following approaches are now officially recommended:
 

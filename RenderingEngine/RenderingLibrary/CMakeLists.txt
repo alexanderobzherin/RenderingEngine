@@ -217,14 +217,18 @@ if(UNIX)
 	)
 endif()
 
-
+if(UNIX)
+    set(RE_JPEG_LINK_TARGET ${RE_JPEG_STATIC_LIBRARY})
+else()
+    set(RE_JPEG_LINK_TARGET JPEG::JPEG)
+endif()
 target_link_libraries(RenderingEngine
     PRIVATE
 		Vulkan::Vulkan
 		glfw
 		freetype
 		harfbuzz::harfbuzz
-		JPEG::JPEG
+		${RE_JPEG_LINK_TARGET}
 		PNG::PNG
 		assimp::assimp
 		glm::glm

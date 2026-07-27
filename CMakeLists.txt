@@ -77,6 +77,22 @@ find_package(GTest REQUIRED)
 set(JPEG_STATIC ON)
 find_package(JPEG REQUIRED)
 
+if(UNIX AND NOT WIN32)
+    find_library(
+        RE_JPEG_STATIC_LIBRARY
+        NAMES libjpeg.a
+        PATHS
+            /usr/local/lib
+            /usr/local/lib64
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    message(STATUS
+        "Rendering Engine static JPEG library: ${RE_JPEG_STATIC_LIBRARY}"
+    )
+endif()
+
 set(PNG_STATIC ON)
 find_package(PNG REQUIRED)
 
