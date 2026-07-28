@@ -158,6 +158,124 @@ ls -lh /usr/local/lib/libpng16.a
 ls -l /usr/local/include/png.h
 ```
 
+#### 4. Building FreeType (Unix)
+
+Rendering Engine statically links **FreeType** into `libRenderingEngine.so`.
+A custom static PIC build is therefore required instead of the distribution package.
+
+Clone the repository:
+
+```bash
+git clone https://gitlab.freedesktop.org/freetype/freetype.git
+cd freetype
+git checkout VER-2-13-2
+```
+
+Configure:
+
+```bash
+cmake -S . -B build-static-pic \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DFT_REQUIRE_ZLIB=ON \
+    -DFT_REQUIRE_PNG=ON \
+    -DFT_REQUIRE_HARFBUZZ=OFF \
+    -DFT_DISABLE_BROTLI=ON \
+    -DFT_DISABLE_BZIP2=ON
+```
+
+Build and install:
+
+```bash
+cmake --build build-static-pic -j$(nproc)
+sudo cmake --install build-static-pic
+```
+
+Verify:
+
+```bash
+pkg-config --modversion freetype2
+pkg-config --variable=libdir freetype2
+pkg-config --libs --static freetype2
+```
+
+Expected library:
+
+```text
+/usr/local/lib/libfreetype.a
+```
+
+Expected headers:
+
+```text
+/usr/local/include/freetype2
+```
+
+#### 5. Building HarfBuzz (Unix)
+
+Rendering Engine statically links **HarfBuzz** into `libRenderingEngine.so`.
+
+Clone the repository:
+
+```bash
+git clone https://github.com/harfbuzz/harfbuzz.git
+cd harfbuzz
+git checkout 8.3.0
+```
+
+Configure:
+
+```bash
+meson setup build-static-pic \
+    --buildtype=release \
+    --default-library=static \
+    --prefix=/usr/local \
+    --libdir=lib \
+    -Db_staticpic=true \
+    -Dfreetype=enabled \
+    -Dglib=disabled \
+    -Dgobject=disabled \
+    -Dgraphite2=disabled \
+    -Dicu=disabled \
+    -Dcairo=disabled \
+    -Dintrospection=disabled \
+    -Ddocs=disabled \
+    -Ddoc_tests=false \
+    -Dutilities=disabled \
+    -Dtests=disabled \
+    -Dbenchmark=disabled
+```
+
+Build and install:
+
+```bash
+meson compile -C build-static-pic
+sudo meson install -C build-static-pic
+```
+
+Verify:
+
+```bash
+pkg-config --modversion harfbuzz
+pkg-config --variable=libdir harfbuzz
+pkg-config --libs --static harfbuzz
+```
+
+Expected library:
+
+```text
+/usr/local/lib/libharfbuzz.a
+```
+
+Expected headers:
+
+```text
+/usr/local/include/harfbuzz
+```
+
 #### 4. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
 Note: As of May 2025, LunarG has discontinued updating Vulkan SDK packages in the official Ubuntu repositories.
 The following approaches are now officially recommended:

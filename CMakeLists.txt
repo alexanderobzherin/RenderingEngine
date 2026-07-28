@@ -112,25 +112,80 @@ if(UNIX AND NOT WIN32)
         "Rendering Engine static PNG library: "
         "${RE_PNG_STATIC_LIBRARY}"
     )
+
+    find_package(Threads REQUIRED)
+
+    find_library(
+        RE_HARFBUZZ_STATIC_LIBRARY
+        NAMES libharfbuzz.a
+        PATHS
+            /usr/local/lib
+            /usr/local/lib64
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    find_path(
+        RE_HARFBUZZ_INCLUDE_DIR
+        NAMES hb.h
+        PATHS
+            /usr/local/include/harfbuzz
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    message(
+        STATUS
+        "Rendering Engine static HarfBuzz library: "
+        "${RE_HARFBUZZ_STATIC_LIBRARY}"
+    )
+
+    message(
+        STATUS
+        "Rendering Engine HarfBuzz include directory: "
+        "${RE_HARFBUZZ_INCLUDE_DIR}"
+    )
+
+    find_library(
+        RE_FREETYPE_STATIC_LIBRARY
+        NAMES libfreetype.a
+        PATHS
+            /usr/local/lib
+            /usr/local/lib64
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    find_path(
+        RE_FREETYPE_INCLUDE_DIR
+        NAMES ft2build.h
+        PATHS
+            /usr/local/include/freetype2
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    message(
+        STATUS
+        "Rendering Engine static FreeType library: "
+        "${RE_FREETYPE_STATIC_LIBRARY}"
+    )
+
+    message(
+        STATUS
+        "Rendering Engine FreeType include directory: "
+        "${RE_FREETYPE_INCLUDE_DIR}"
+    )
+endif()
+
+if(WIN32)
+    find_package(harfbuzz CONFIG REQUIRED)
+    find_package(freetype CONFIG REQUIRED)
 endif()
 
 find_package(assimp CONFIG REQUIRED)
 
 find_package(nlohmann_json CONFIG QUIET)
-
-find_package(harfbuzz CONFIG REQUIRED)
-
-if(WIN32)
-find_package(freetype CONFIG REQUIRED)
-else()
-find_package(PkgConfig)
-pkg_check_modules(freetype2 REQUIRED freetype2)
-include_directories(${FREETYPE2_INCLUDE_DIRS})
-message(STATUS "freetype2: found ${freetype2_FOUND}")
-message(STATUS "freetype2 DIR:  ${freetype2_INCLUDE_DIRS}")
-message(STATUS "freetype2 LIBRARIES:  ${freetype2_LIBRARIES}")
-message(STATUS "freetype2 LINK LIBRARIES:  ${freetype2_LINK_LIBRARIES}")
-endif()
 
 add_subdirectory(RenderingEngine)
 if(NOT RE_BUILD_ENGINE_ONLY)

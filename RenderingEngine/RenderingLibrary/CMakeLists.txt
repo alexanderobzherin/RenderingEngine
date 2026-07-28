@@ -211,45 +211,46 @@ target_include_directories(RenderingEngine
         $<INSTALL_INTERFACE:RenderingEngine/External/glm>
 )
 
-if(UNIX)
-	target_include_directories(RenderingEngine PUBLIC
-	${freetype2_INCLUDE_DIRS}
-	)
-endif()
+if(UNIX AND NOT WIN32)
+    target_include_directories(RenderingEngine
+        PRIVATE
+            ${RE_HARFBUZZ_INCLUDE_DIR}
+            ${RE_FREETYPE_INCLUDE_DIR}
+    )
 
-if(UNIX)
-    set(RE_JPEG_LINK_TARGET ${RE_JPEG_STATIC_LIBRARY})
-	set(
-        RE_PNG_LINK_TARGET
+    set(RE_JPEG_LINK_TARGET
+        ${RE_JPEG_STATIC_LIBRARY}
+    )
+
+    set(RE_TEXT_RENDERING_LINK_TARGETS
+        ${RE_HARFBUZZ_STATIC_LIBRARY}
+        ${RE_FREETYPE_STATIC_LIBRARY}
         ${RE_PNG_STATIC_LIBRARY}
         ZLIB::ZLIB
+        Threads::Threads
+        m
     )
 else()
-    set(RE_JPEG_LINK_TARGET JPEG::JPEG)
-	set(
-        RE_PNG_LINK_TARGET
+    set(RE_JPEG_LINK_TARGET
+        JPEG::JPEG
+    )
+
+    set(RE_TEXT_RENDERING_LINK_TARGETS
+        harfbuzz::harfbuzz
+        freetype
         PNG::PNG
     )
 endif()
+
 target_link_libraries(RenderingEngine
     PRIVATE
-		Vulkan::Vulkan
-		glfw
-		freetype
-		harfbuzz::harfbuzz
-		${RE_JPEG_LINK_TARGET}
-		${RE_PNG_LINK_TARGET}
-		assimp::assimp
-		glm::glm
-		nlohmann_json::nlohmann_json
+        Vulkan::Vulkan
+        glfw
+
+        ${RE_JPEG_LINK_TARGET}
+        ${RE_TEXT_RENDERING_LINK_TARGETS}
+
+        assimp::assimp
+        glm::glm
+        nlohmann_json::nlohmann_json
 )
-
-if(WIN32)
-    target_link_libraries(RenderingEngine 
-	PRIVATE 
-	freetype
-	harfbuzz::harfbuzz)
-else()
-    target_link_libraries(RenderingEngine PRIVATE ${FREETYPE2_LIBRARIES})
-endif()
-
