@@ -176,14 +176,43 @@ if(UNIX AND NOT WIN32)
         "Rendering Engine FreeType include directory: "
         "${RE_FREETYPE_INCLUDE_DIR}"
     )
+        find_library(
+        RE_ASSIMP_STATIC_LIBRARY
+        NAMES libassimp.a
+        PATHS
+            /usr/local/lib
+            /usr/local/lib64
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    find_path(
+        RE_ASSIMP_INCLUDE_DIR
+        NAMES assimp/Importer.hpp
+        PATHS
+            /usr/local/include
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    message(
+        STATUS
+        "Rendering Engine static Assimp library: "
+        "${RE_ASSIMP_STATIC_LIBRARY}"
+    )
+
+    message(
+        STATUS
+        "Rendering Engine Assimp include directory: "
+        "${RE_ASSIMP_INCLUDE_DIR}"
+    )
 endif()
 
 if(WIN32)
     find_package(harfbuzz CONFIG REQUIRED)
     find_package(freetype CONFIG REQUIRED)
+    find_package(assimp CONFIG REQUIRED)
 endif()
-
-find_package(assimp CONFIG REQUIRED)
 
 find_package(nlohmann_json CONFIG QUIET)
 

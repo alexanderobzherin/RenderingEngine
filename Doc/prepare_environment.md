@@ -276,7 +276,119 @@ Expected headers:
 /usr/local/include/harfbuzz
 ```
 
-#### 4. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
+#### 6. Building Assimp (Unix)
+The Rendering Engine uses Assimp internally for loading 3D model formats.
+
+On Unix-like systems, Assimp is built as a static position-independent library and linked into `libRenderingEngine.so`. This prevents the Rendering Engine SDK from requiring a separate `libassimp.so` runtime dependency.
+
+The validated Assimp version is:
+
+```text
+5.4.3
+```
+
+Assimp 5.4.3 is used instead of 5.3.0 because the upstream 5.3.0 installation may omit the bundled utf8cpp headers required by installed Assimp headers.
+
+Clone the repository:
+
+```bash
+mkdir -p ~/Development/ThirdPartySources
+cd ~/Development/ThirdPartySources
+
+git clone https://github.com/assimp/assimp.git
+cd assimp
+```
+
+Checkout the validated version:
+
+```
+git checkout v5.4.3
+git describe --tags --exact-match
+```
+
+Expected output:
+
+```
+v5.4.3
+```
+
+Configure Assimp:
+
+```
+cmake -S . -B build-static-pic \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DASSIMP_BUILD_TESTS=OFF \
+    -DASSIMP_BUILD_ASSIMP_TOOLS=OFF \
+    -DASSIMP_BUILD_SAMPLES=OFF \
+    -DASSIMP_BUILD_DOCS=OFF \
+    -DASSIMP_BUILD_ZLIB=OFF \
+    -DASSIMP_WARNINGS_AS_ERRORS=OFF
+
+```
+
+Build and install:
+
+```
+cmake --build build-static-pic -j"$(nproc)"
+sudo cmake --install build-static-pic
+```
+
+The expected static library is:
+
+```
+/usr/local/lib/libassimp.a
+```
+
+The expected public headers are installed under:
+
+```
+/usr/local/include/assimp
+```
+
+Verify the installation
+
+Check the static archive:
+
+```
+ls -lh /usr/local/lib/libassimp.a
+```
+
+Check the installed Assimp version:
+
+```
+PKG_CONFIG_PATH=/usr/local/lib/pkgconfig \
+    pkg-config --modversion assimp
+```
+
+Expected output:
+
+```
+5.4.3
+```
+
+Verify that the required utf8cpp headers were installed:
+
+```
+find /usr/local/include \
+    \( -name utf8.h -o -path '*utf8cpp*' \) \
+    -print
+```
+
+Verify that Assimp references external zlib symbols rather than embedding zlib:
+
+```
+nm /usr/local/lib/libassimp.a \
+    | grep " U " \
+    | grep -E 'inflate|deflate'
+```
+
+
+
+#### 7. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
 Note: As of May 2025, LunarG has discontinued updating Vulkan SDK packages in the official Ubuntu repositories.
 The following approaches are now officially recommended:
 

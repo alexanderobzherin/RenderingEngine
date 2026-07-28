@@ -216,6 +216,7 @@ if(UNIX AND NOT WIN32)
         PRIVATE
             ${RE_HARFBUZZ_INCLUDE_DIR}
             ${RE_FREETYPE_INCLUDE_DIR}
+			${RE_ASSIMP_INCLUDE_DIR}
     )
 
     set(RE_JPEG_LINK_TARGET
@@ -230,6 +231,10 @@ if(UNIX AND NOT WIN32)
         Threads::Threads
         m
     )
+
+	set(RE_ASSIMP_LINK_TARGET
+        ${RE_ASSIMP_STATIC_LIBRARY}
+    )
 else()
     set(RE_JPEG_LINK_TARGET
         JPEG::JPEG
@@ -240,6 +245,10 @@ else()
         freetype
         PNG::PNG
     )
+
+	set(RE_ASSIMP_LINK_TARGET
+        assimp::assimp
+    )
 endif()
 
 target_link_libraries(RenderingEngine
@@ -249,8 +258,7 @@ target_link_libraries(RenderingEngine
 
         ${RE_JPEG_LINK_TARGET}
         ${RE_TEXT_RENDERING_LINK_TARGETS}
-
-        assimp::assimp
+		${RE_ASSIMP_LINK_TARGET}
         glm::glm
         nlohmann_json::nlohmann_json
 )
