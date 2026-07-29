@@ -35,7 +35,7 @@ target_link_libraries(RenderingEngine_gtests
     PRIVATE
         ${Vulkan_LIBRARY}
         ${GTEST_LIBRARIES}
-        glfw
+        ${RE_GLFW_LINK_TARGET}
         glm::glm
         Threads::Threads
         ${JPEG_LIBRARIES}

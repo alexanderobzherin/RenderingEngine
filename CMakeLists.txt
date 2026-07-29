@@ -206,12 +206,51 @@ if(UNIX AND NOT WIN32)
         "Rendering Engine Assimp include directory: "
         "${RE_ASSIMP_INCLUDE_DIR}"
     )
+
+    find_package(Threads REQUIRED)
+
+    find_file(
+        RE_GLFW_STATIC_LIBRARY
+        NAMES glfw3 glfw libglfw3.a
+        PATHS
+            /usr/local/lib
+            /usr/local/lib64
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    find_path(
+        RE_GLFW_INCLUDE_DIR
+        NAMES GLFW/glfw3.h
+        PATHS
+            /usr/local/include
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    add_library(RE_GLFW_STATIC STATIC IMPORTED GLOBAL)
+
+    set_target_properties(
+        RE_GLFW_STATIC
+        PROPERTIES
+            IMPORTED_LOCATION "${RE_GLFW_STATIC_LIBRARY}"
+            INTERFACE_INCLUDE_DIRECTORIES "${RE_GLFW_INCLUDE_DIR}"
+            INTERFACE_LINK_LIBRARIES
+                "Threads::Threads;${CMAKE_DL_LIBS};m;rt"
+    )
+
+    set(RE_GLFW_LINK_TARGET RE_GLFW_STATIC)
+
+    message(STATUS "GLFW static library: ${RE_GLFW_STATIC_LIBRARY}")
+    message(STATUS "GLFW include directory: ${RE_GLFW_INCLUDE_DIR}")
 endif()
 
 if(WIN32)
     find_package(harfbuzz CONFIG REQUIRED)
     find_package(freetype CONFIG REQUIRED)
     find_package(assimp CONFIG REQUIRED)
+    find_package(glfw3 CONFIG REQUIRED)
+    set(RE_GLFW_LINK_TARGET glfw)
 endif()
 
 find_package(nlohmann_json CONFIG QUIET)

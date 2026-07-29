@@ -251,11 +251,14 @@ else()
     )
 endif()
 
+target_link_options(RenderingEngine PRIVATE
+    "-Wl,--exclude-libs,ALL"
+)
+
 target_link_libraries(RenderingEngine
     PRIVATE
         Vulkan::Vulkan
-        glfw
-
+        ${RE_GLFW_LINK_TARGET}
         ${RE_JPEG_LINK_TARGET}
         ${RE_TEXT_RENDERING_LINK_TARGETS}
 		${RE_ASSIMP_LINK_TARGET}

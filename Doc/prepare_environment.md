@@ -386,9 +386,91 @@ nm /usr/local/lib/libassimp.a \
     | grep -E 'inflate|deflate'
 ```
 
+#### 7. Building GLFW (Unix)
 
+The Rendering Engine statically links GLFW into `libRenderingEngine.so` to eliminate the runtime dependency on `libglfw.so`. This allows SDK users to deploy only the Rendering Engine library without requiring a matching GLFW installation.
 
-#### 7. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
+The Rendering Engine has been validated with:
+
+```text
+- **GLFW 3.4**
+```
+
+Clone the repository:
+
+```bash
+git clone https://github.com/glfw/glfw.git
+cd glfw
+git checkout 3.4
+```
+
+Install the required development packages:
+
+```bash
+sudo apt update
+sudo apt install \
+    libwayland-dev \
+    libxkbcommon-dev \
+    xorg-dev
+```
+
+Configure a static Position Independent Code (PIC) build:
+
+```bash
+cmake -S . -B build-static-pic \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DGLFW_BUILD_X11=ON \
+    -DGLFW_BUILD_WAYLAND=ON \
+    -DGLFW_BUILD_EXAMPLES=OFF \
+    -DGLFW_BUILD_TESTS=OFF \
+    -DGLFW_BUILD_DOCS=OFF
+```
+
+Build and install:
+
+```bash
+cmake --build build-static-pic -j"$(nproc)"
+sudo cmake --install build-static-pic
+```
+
+The installation should produce:
+
+```
+/usr/local/lib/libglfw3.a
+```
+
+Confirm that the expected version is installed:
+
+```bash
+PKG_CONFIG_PATH=/usr/local/lib/pkgconfig \
+pkg-config --modversion glfw3
+```
+
+Expected output:
+
+```
+3.4.0
+```
+
+Confirm that the static library is present:
+
+```bash
+find /usr/local/lib \
+    -maxdepth 1 \
+    -name 'libglfw3.a'
+```
+
+Expected output:
+
+```
+/usr/local/lib/libglfw3.a
+```
+
+#### 8. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
 Note: As of May 2025, LunarG has discontinued updating Vulkan SDK packages in the official Ubuntu repositories.
 The following approaches are now officially recommended:
 

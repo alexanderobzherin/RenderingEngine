@@ -17,7 +17,7 @@ Model::Model(const std::string& filename, bool flipUVs)
         flags |= aiProcess_FlipUVs;
     }
 
-    const aiScene* scene = importer.ReadFile(filename, flags);
+    const aiScene* scene = importer.ReadFile(filename.c_str(), flags);
 
     if( scene == nullptr )
     {
