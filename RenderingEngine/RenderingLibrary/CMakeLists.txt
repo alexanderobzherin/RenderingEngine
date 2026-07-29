@@ -251,9 +251,11 @@ else()
     )
 endif()
 
+if(NOT WIN32)
 target_link_options(RenderingEngine PRIVATE
     "-Wl,--exclude-libs,ALL"
 )
+endif()
 
 target_link_libraries(RenderingEngine
     PRIVATE
