@@ -491,8 +491,182 @@ sudo apt install vulkan-sdk
 1. Install dependencies:
 
 ```bash
-sudo pkg install pkgconf glfw glm libjpeg-turbo png googletest assimp freetype2 harfbuzz vulkan-loader vulkan-headers shaderc nlohmann-json
+sudo pkg install pkgconf glm googletest vulkan-loader vulkan-headers shaderc nlohmann-json
 ```
 Some of these packages may be built from ports, but this does not affect the build process or functionality, so you may use either pkg or make install clean under /usr/ports/...
+
+Build Static dependencies in FreeBSD
+
+### libjpeg-turbo
+
+```
+git clone \
+    --branch 2.1.5 \
+    --depth 1 \
+    https://github.com/libjpeg-turbo/libjpeg-turbo.git
+
+cd libjpeg-turbo
+
+cmake \
+    -S . \
+    -B build-static-pic \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DCMAKE_INSTALL_LIBDIR=/usr/local/lib \
+    -DENABLE_SHARED=OFF \
+    -DENABLE_STATIC=ON \
+    -DWITH_JPEG8=ON \
+    -DWITH_TURBOJPEG=OFF
+
+cmake --build build-static-pic --parallel
+
+ctest \
+    --test-dir build-static-pic \
+    --output-on-failure
+
+sudo cmake --install build-static-pic
+```
+
+### libpng
+
+```
+git clone \
+    https://github.com/pnggroup/libpng.git
+
+cd libpng
+
+git checkout v1.6.58
+
+cmake \
+    -S . \
+    -B build-static-pic \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DCMAKE_INSTALL_LIBDIR=/usr/local/lib \
+    -DPNG_SHARED=OFF \
+    -DPNG_STATIC=ON \
+    -DPNG_TESTS=ON \
+    -DPNG_TOOLS=OFF
+
+cmake --build build-static-pic --parallel
+
+ctest \
+    --test-dir build-static-pic \
+    --output-on-failure
+
+sudo cmake --install build-static-pic
+```
+
+### Freetype
+
+```
+git clone https://gitlab.freedesktop.org/freetype/freetype.git
+cd freetype
+git checkout VER-2-13-2
+git clean -xfd
+
+cmake \
+>     -S . \
+>     -B build-static-pic \
+>     -DCMAKE_BUILD_TYPE=Release \
+>     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+>     -DBUILD_SHARED_LIBS=OFF \
+>     -DCMAKE_INSTALL_PREFIX=/usr/local \
+>     -DCMAKE_INSTALL_LIBDIR=lib \
+>     -DFT_REQUIRE_ZLIB=ON \
+>     -DFT_REQUIRE_PNG=ON \
+>     -DFT_DISABLE_HARFBUZZ=ON \
+>     -DFT_DISABLE_BROTLI=ON \
+>     -DFT_DISABLE_BZIP2=ON
+
+cmake --build build-static-pic -j"$(nproc)"
+sudo cmake --install build-static-pic
+```
+
+### HarfBuzz
+
+```
+git clone https://github.com/harfbuzz/harfbuzz.git
+cd harfbuzz
+git checkout 8.3.0
+git clean -xfd
+
+PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/libdata/pkgconfig \
+> meson setup build-static-pic \
+>     --buildtype=release \
+>     --default-library=static \
+>     --prefix=/usr/local \
+>     --libdir=lib \
+>     -Db_staticpic=true \
+>     -Dfreetype=enabled \
+>     -Dglib=disabled \
+>     -Dgobject=disabled \
+>     -Dgraphite2=disabled \
+>     -Dicu=disabled \
+>     -Dcairo=disabled \
+>     -Dintrospection=disabled \
+>     -Ddocs=disabled \
+>     -Ddoc_tests=false \
+>     -Dutilities=disabled \
+>     -Dtests=disabled \
+>     -Dbenchmark=disabled
+
+meson compile -C build-static-pic
+sudo meson install -C build-static-pic
+```
+
+### Assimp
+
+```
+git clone https://github.com/assimp/assimp.git
+cd assimp
+git checkout v5.4.3
+git clean -xfd
+
+cmake \
+>     -S . \
+>     -B build-static-pic \
+>     -DCMAKE_BUILD_TYPE=Release \
+>     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+>     -DBUILD_SHARED_LIBS=OFF \
+>     -DCMAKE_INSTALL_PREFIX=/usr/local \
+>     -DCMAKE_INSTALL_LIBDIR=lib \
+>     -DASSIMP_BUILD_TESTS=OFF \
+>     -DASSIMP_BUILD_ASSIMP_TOOLS=OFF \
+>     -DASSIMP_BUILD_SAMPLES=OFF \
+>     -DASSIMP_BUILD_DOCS=OFF \
+>     -DASSIMP_BUILD_ZLIB=OFF \
+>     -DASSIMP_BUILD_MINIZIP=ON \
+>     -DASSIMP_WARNINGS_AS_ERRORS=OFF
+
+cmake --build build-static-pic -j"$(nproc)"
+sudo cmake --install build-static-pic
+```
+
+### GLFW
+
+```
+git clone https://github.com/glfw/glfw.git
+cd glfw
+git checkout 3.4
+git clean -xfd
+
+cmake -S . -B build-static-pic \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DGLFW_BUILD_X11=ON \
+    -DGLFW_BUILD_WAYLAND=ON \
+    -DGLFW_BUILD_EXAMPLES=OFF \
+    -DGLFW_BUILD_TESTS=OFF \
+    -DGLFW_BUILD_DOCS=OFF
+    
+cmake --build build-static-pic -j"$(nproc)"
+sudo cmake --install build-static-pic
+```
 
 <- [Back to Developer Guide Page](developer_guide.md)
