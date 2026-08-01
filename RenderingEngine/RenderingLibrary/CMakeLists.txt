@@ -181,7 +181,10 @@ endif()
 
 #add shared library
 add_library(RenderingEngine SHARED ${HEADER_FILES} ${SRC_FILES})
-target_compile_definitions(RenderingEngine PRIVATE RENDERING_ENGINE_BUILD)
+target_compile_definitions(RenderingEngine 
+							PRIVATE 
+							RENDERING_ENGINE_BUILD
+							GLFW_INCLUDE_NONE)
 
 #specify the compiling properties
 set_target_properties(RenderingEngine PROPERTIES

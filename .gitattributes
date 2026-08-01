@@ -1,0 +1,13 @@
+# Unix scripts
+*.sh text eol=lf
+
+# GitHub Actions
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# CMake
+*.cmake text eol=lf
+CMakeLists.txt text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf

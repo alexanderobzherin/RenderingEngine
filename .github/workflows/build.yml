@@ -12,16 +12,59 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install build tools and system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            build-essential git cmake doxygen graphviz \
-            libvulkan-dev vulkan-tools vulkan-validationlayers \
-            libglfw3-dev libglm-dev libgtest-dev \
-            libjpeg-dev libpng-dev libassimp-dev \
-            pkg-config libfreetype-dev nlohmann-json3-dev \
-            curl ca-certificates
+            build-essential \
+            git \
+            cmake \
+            meson \
+            ninja-build \
+            nasm \
+            pkg-config \
+            doxygen \
+            graphviz \
+            libvulkan-dev \
+            vulkan-tools \
+            vulkan-validationlayers \
+            libglm-dev \
+            libgtest-dev \
+            nlohmann-json3-dev \
+            zlib1g-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libwayland-dev \
+            wayland-protocols \
+            libxkbcommon-dev \
+            curl \
+            ca-certificates
+
+      - name: Build static implementation dependencies
+        run: |
+          chmod +x RenderingEngine/Scripts/build_static_dependencies_unix.sh
+          STATIC_DEPS_WORK_DIR="${RUNNER_TEMP}/RenderingEngineThirdPartySources" \
+            RenderingEngine/Scripts/build_static_dependencies_unix.sh
+
+      - name: Verify static implementation dependencies
+        run: |
+          test -f /usr/local/lib/libjpeg.a
+          test -f /usr/local/lib/libpng16.a
+          test -f /usr/local/lib/libfreetype.a
+          test -f /usr/local/lib/libharfbuzz.a
+          test -f /usr/local/lib/libassimp.a
+          test -f /usr/local/lib/libglfw3.a
+
+          ls -lh \
+            /usr/local/lib/libjpeg.a \
+            /usr/local/lib/libpng16.a \
+            /usr/local/lib/libfreetype.a \
+            /usr/local/lib/libharfbuzz.a \
+            /usr/local/lib/libassimp.a \
+            /usr/local/lib/libglfw3.a
 
       - name: Build SDK
         run: |
@@ -33,6 +76,7 @@ jobs:
         with:
           name: RenderingEngine-SDK-Linux
           path: Build/Packages/RenderingEngine-v*-SDK-Linux.tar.gz
+          if-no-files-found: error
 
   build-windows:
     name: Build SDK Windows

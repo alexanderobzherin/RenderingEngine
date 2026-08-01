@@ -1,4 +1,5 @@
 #include "standalone_window_system.hpp"
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include "i_application.hpp"
 
