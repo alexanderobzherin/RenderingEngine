@@ -65,17 +65,52 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install build tools and system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            build-essential git cmake doxygen graphviz \
-            libvulkan-dev vulkan-tools vulkan-validationlayers \
-            libglfw3-dev libglm-dev libgtest-dev \
-            libjpeg-dev libpng-dev libassimp-dev \
-            pkg-config libfreetype-dev nlohmann-json3-dev \
-            curl ca-certificates
+            build-essential \
+            git \
+            cmake \
+            meson \
+            ninja-build \
+            nasm \
+            pkg-config \
+            doxygen \
+            graphviz \
+            libvulkan-dev \
+            vulkan-tools \
+            vulkan-validationlayers \
+            libglm-dev \
+            libgtest-dev \
+            nlohmann-json3-dev \
+            zlib1g-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libwayland-dev \
+            wayland-protocols \
+            libxkbcommon-dev \
+            curl \
+            ca-certificates
 
+      - name: Build static implementation dependencies
+        run: |
+          chmod +x RenderingEngine/Scripts/build_static_dependencies_unix.sh
+          STATIC_DEPS_WORK_DIR="${RUNNER_TEMP}/RenderingEngineThirdPartySources" \
+            RenderingEngine/Scripts/build_static_dependencies_unix.sh
+
+      - name: Verify static implementation dependencies
+        run: |
+          test -f /usr/local/lib/libjpeg.a
+          test -f /usr/local/lib/libpng16.a
+          test -f /usr/local/lib/libfreetype.a
+          test -f /usr/local/lib/libharfbuzz.a
+          test -f /usr/local/lib/libassimp.a
+          test -f /usr/local/lib/libglfw3.a
+          
       - name: Build SDK
         run: |
           chmod +x build_engine.sh
@@ -138,9 +173,33 @@ jobs:
 
       - name: Verify toolchain
         run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
           uname -a
-          command -v cmake
-          command -v tar
+          which cmake
+          which meson
+          which ninja
+          which nasm
+          which pkg-config
+          which git
+
+      - name: Build static implementation dependencies
+        run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
+          chmod +x RenderingEngine/Scripts/build_static_dependencies_unix.sh
+
+          STATIC_DEPS_WORK_DIR="${RUNNER_TEMP:-/tmp}/RenderingEngineThirdPartySources" \
+            RenderingEngine/Scripts/build_static_dependencies_unix.sh
+
+      - name: Verify static implementation dependencies
+        run: |
+          test -f /usr/local/lib/libjpeg.a
+          test -f /usr/local/lib/libpng16.a
+          test -f /usr/local/lib/libfreetype.a
+          test -f /usr/local/lib/libharfbuzz.a
+          test -f /usr/local/lib/libassimp.a
+          test -f /usr/local/lib/libglfw3.a
 
       - name: Build SDK
         run: |
