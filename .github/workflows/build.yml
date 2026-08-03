@@ -112,8 +112,41 @@ jobs:
 
       - name: Verify toolchain
         run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
           uname -a
           which cmake
+          which meson
+          which ninja
+          which nasm
+          which pkg-config
+          which git
+
+      - name: Build static implementation dependencies
+        run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
+          chmod +x RenderingEngine/Scripts/build_static_dependencies_unix.sh
+
+          STATIC_DEPS_WORK_DIR="${RUNNER_TEMP:-/tmp}/RenderingEngineThirdPartySources" \
+            RenderingEngine/Scripts/build_static_dependencies_unix.sh
+
+      - name: Verify static implementation dependencies
+        run: |
+          test -f /usr/local/lib/libjpeg.a
+          test -f /usr/local/lib/libpng16.a
+          test -f /usr/local/lib/libfreetype.a
+          test -f /usr/local/lib/libharfbuzz.a
+          test -f /usr/local/lib/libassimp.a
+          test -f /usr/local/lib/libglfw3.a
+
+          ls -lh \
+            /usr/local/lib/libjpeg.a \
+            /usr/local/lib/libpng16.a \
+            /usr/local/lib/libfreetype.a \
+            /usr/local/lib/libharfbuzz.a \
+            /usr/local/lib/libassimp.a \
+            /usr/local/lib/libglfw3.a
 
       - name: Build SDK
         run: |
@@ -126,3 +159,4 @@ jobs:
         with:
           name: RenderingEngine-SDK-FreeBSD
           path: Build/Packages/RenderingEngine-v*-SDK-FreeBSD.tar.gz
+          if-no-files-found: error
