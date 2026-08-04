@@ -91,12 +91,5 @@ Project templates and script tools used to generate new applications.
 ##### UserApplications
 A placeholder directory where SDK users can store their own projects.
 
-### Current Restrictions and Future Improvements
-
-SDK-user applications must currently be built in Release mode to match the precompiled engine.
-Debug mode is supported only in Dev Mode (source-tree builds).
-
-More flexibility (e.g., debug-build SDK) is planned for a future milestone.
-
 
 <- [Back to Developer Guide Page](developer_guide.md)

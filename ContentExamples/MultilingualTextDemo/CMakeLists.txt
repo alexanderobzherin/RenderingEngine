@@ -76,6 +76,19 @@ endif()
 #add the executable
 add_executable(MultilingualTextDemo ${HEADER_FILES} ${SRC_FILES})
 
+if(WIN32 AND NOT RE_DEV_MODE)
+    set_property(
+        TARGET MultilingualTextDemo
+        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
+    )
+
+    target_compile_definitions(
+        MultilingualTextDemo
+        PRIVATE
+            _ITERATOR_DEBUG_LEVEL=0
+    )
+endif()
+
 target_include_directories(MultilingualTextDemo PUBLIC
 ${PROJECT_SOURCE_DIR}/Assets/Shaders/
 )

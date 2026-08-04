@@ -76,6 +76,22 @@ endif()
 #add the executable
 add_executable(TextureBenchmark ${HEADER_FILES} ${SRC_FILES})
 
+if(WIN32 AND NOT RE_DEV_MODE)
+    # The precompiled Windows SDK contains a Release Rendering Engine DLL.
+    # Keep Debug consumer builds ABI-compatible with that binary while
+    # preserving application debug symbols and breakpoints.
+    set_property(
+        TARGET TextureBenchmark
+        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
+    )
+
+    target_compile_definitions(
+        TextureBenchmark
+        PRIVATE
+            _ITERATOR_DEBUG_LEVEL=0
+    )
+endif()
+
 target_include_directories(TextureBenchmark PUBLIC
 ${PROJECT_SOURCE_DIR}/Assets/Shaders/
 )
