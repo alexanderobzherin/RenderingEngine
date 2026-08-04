@@ -9,6 +9,7 @@ set -eu
 
 # Default options
 BUILD_TYPE="Debug"
+BUILD_TYPE_EXPLICIT=false
 BUILD_ENGINE_ONLY="OFF"
 SOURCE_DIR="$(pwd)"
 BUILD_DIR="${SOURCE_DIR}/Build"
@@ -32,26 +33,23 @@ for arg in "$@"; do
   case $arg in
     --debug)
       BUILD_TYPE="Debug"
-      shift
+      BUILD_TYPE_EXPLICIT=true
       ;;
     --release)
       BUILD_TYPE="Release"
-      shift
+      BUILD_TYPE_EXPLICIT=true
       ;;
     --engine-only)
       BUILD_ENGINE_ONLY="ON"
-      shift
       ;;
     --build-sdk)
       BUILD_SDK=true
-      shift
       ;;
     --docs-only)
       DOCS_ONLY=true
-      shift
       ;;
     --help|-h)
-      echo "Usage: $0 [--debug|--release] [--engine-only] [--docs-only]"
+      echo "Usage: $0 [--debug|--release] [--engine-only] [--build-sdk] [--docs-only]"
       exit 0
       ;;
     *)
@@ -78,6 +76,10 @@ PATH_TO_BUILD=$(pwd)
 
 if [ "$BUILD_SDK" = true ]; then
     BUILD_ENGINE_ONLY=true
+fi
+
+if [ "$BUILD_SDK" = true ] && [ "$BUILD_TYPE_EXPLICIT" = false ]; then
+    BUILD_TYPE="Release"
 fi
 
 # Run root cmake file
