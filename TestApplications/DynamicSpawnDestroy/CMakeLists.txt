@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 #set the project name
-project(DynamicSpawnDestroy LANGUAGES CXX)
+project(DynamicSpawnDestroy VERSION 0.1.0 LANGUAGES CXX)
 
 #set header files
 file(GLOB_RECURSE HEADER_FILES
