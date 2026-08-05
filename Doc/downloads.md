@@ -15,16 +15,16 @@ The following badges reflect the current build status of the precompiled SDK pac
 
 ## Download Precompiled Rendering Engine SDK
 
+Precompiled SDK packages are available from the GitHub Releases page.
 Each package contains the Rendering Engine libraries, headers, and supporting tools required to develop applications using the SDK.
+Download the package matching your platform:
 
-| Platform | Download |
-|---------|----------|
-| Windows | [RenderingEngine-v0.2.9-SDK-Windows](https://github.com/alexanderobzherin/RenderingEngine/releases/download/v0.2.9/RenderingEngine-v0.2.9-SDK-Windows.tar.gz) |
-| FreeBSD | [RenderingEngine-v0.2.9-SDK-FreeBSD](https://github.com/alexanderobzherin/RenderingEngine/releases/download/v0.2.9/RenderingEngine-v0.2.9-SDK-FreeBSD.tar.gz) |
-| Linux | [RenderingEngine-v0.2.9-SDK-Linux](https://github.com/alexanderobzherin/RenderingEngine/releases/download/v0.2.9/RenderingEngine-v0.2.9-SDK-Linux.tar.gz) |
+- Windows
+- Linux
+- FreeBSD
 
-
-Browse all published versions on the [GitHub Releases page](https://github.com/alexanderobzherin/RenderingEngine/releases).
+See:
+[Latest Release](https://github.com/alexanderobzherin/RenderingEngine/releases)
 
 ---
 

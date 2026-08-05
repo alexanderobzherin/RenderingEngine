@@ -40,24 +40,26 @@ Comprehensive documentation, including Getting Started guides, SDK downloads, an
 
 ---
 
-## Dependencies
+## Build and Runtime Requirements
 
-The following libraries are required:
+Rendering Engine supports three usage environments:
 
-- [Vulkan SDK](https://vulkan.lunarg.com/)
-- [GLFW](https://www.glfw.org/)
-- [GLM](https://github.com/g-truc/glm)
-- [GTest](https://github.com/google/googletest)
-- [libjpeg-turbo](https://libjpeg-turbo.org/)
-- [libpng](http://www.libpng.org/)
-- [Assimp](https://github.com/assimp/assimp)
-- [FreeType](https://freetype.org/)
-- [HarfBuzz](https://harfbuzz.github.io/)
-- [nlohmann/json](https://json.nlohmann.me/)
+- **Engine development** — building the engine and its tools from source.
+- **SDK consumer development** — building applications against the precompiled SDK.
+- **Application runtime** — deploying and running packaged applications.
 
-All listed dependencies use permissive or industry-standard licenses suitable for commercial and non-commercial use.
+Building the engine from source requires a C++ toolchain, CMake, the Vulkan SDK,
+and the engine's third-party build dependencies.
 
-Detailed build and setup instructions are provided in the online documentation.
+SDK consumers require a C++ toolchain, CMake, the Vulkan SDK, and the precompiled
+Rendering Engine SDK.
+
+Packaged applications have a minimal runtime dependency set consisting primarily
+of the Vulkan loader, zlib on Unix platforms, and standard operating-system
+runtime libraries.
+
+For platform-specific setup instructions, see
+[Prepare Environment](Doc/prepare_environment.md).
 
 ---
 

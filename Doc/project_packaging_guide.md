@@ -50,7 +50,7 @@ Build/UserApplications/<ApplicationName>/Packages/
 
 The package has the following directory structure:
 
-```bash
+```text
 └───<ApplicationName>-v<X.Y.Z>-<Platform>
     ├───Binaries    --> executable + required shared libraries
     ├───Config      --> application configuration files
