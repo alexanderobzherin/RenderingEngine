@@ -306,6 +306,78 @@ def collect_unix_shared_libs(executable, dst_dir):
             print(f"[COPY] Unix shared lib: {lib_path} -> {dest}")
 
 
+def set_unix_package_runpath(executable):
+    """
+    Replace the copied executable's existing RPATH/RUNPATH with $ORIGIN.
+
+    The packaged executable and libRenderingEngine.so are placed in the same
+    Binaries directory, so $ORIGIN makes the package independent of absolute
+    paths from the development environment.
+
+    chrpath can replace an existing RPATH/RUNPATH but cannot add one when the
+    ELF binary contains no such entry.
+    """
+    chrpath = shutil.which("chrpath")
+    if chrpath is None:
+        raise RuntimeError(
+            "chrpath is required to package applications on Linux and FreeBSD.\n"
+            "Install it with:\n"
+            "  Ubuntu/Debian: sudo apt install chrpath\n"
+            "  FreeBSD:       sudo pkg install chrpath"
+        )
+
+    if not os.path.isfile(executable):
+        raise RuntimeError(
+            f"Cannot update RUNPATH because the executable does not exist: "
+            f"{executable}"
+        )
+
+    try:
+        subprocess.run(
+            [chrpath, "-r", "$ORIGIN", executable],
+            check=True,
+            text=True,
+            capture_output=True
+        )
+    except subprocess.CalledProcessError as error:
+        details = (error.stderr or error.stdout or "").strip()
+        raise RuntimeError(
+            f"Failed to set package-relative RUNPATH on:\n"
+            f"  {executable}\n"
+            f"chrpath output:\n"
+            f"  {details}\n\n"
+            "The executable must already contain an RPATH or RUNPATH entry."
+        ) from error
+
+    try:
+        result = subprocess.run(
+            [chrpath, "-l", executable],
+            check=True,
+            text=True,
+            capture_output=True
+        )
+    except subprocess.CalledProcessError as error:
+        details = (error.stderr or error.stdout or "").strip()
+        raise RuntimeError(
+            f"Failed to verify RUNPATH on:\n"
+            f"  {executable}\n"
+            f"chrpath output:\n"
+            f"  {details}"
+        ) from error
+
+    runpath_info = result.stdout.strip()
+
+    if "$ORIGIN" not in runpath_info:
+        raise RuntimeError(
+            f"Package RUNPATH verification failed for:\n"
+            f"  {executable}\n"
+            f"Observed chrpath output:\n"
+            f"  {runpath_info}"
+        )
+
+    print(f"[OK] Package RUNPATH set: {runpath_info}")
+
+
 # --------------------------------------------------------------------------------------
 # PACKED ASSET SUPPORT
 # --------------------------------------------------------------------------------------
@@ -454,7 +526,10 @@ def main():
     logs_dst = ensure_dir(os.path.join(out_dir, "Logs"))
 
     # Copy executable
-    shutil.copy2(os.path.join(binary_dir, exe), bin_dst)
+    source_executable = os.path.join(binary_dir, exe)
+    packaged_executable = os.path.join(bin_dst, exe)
+
+    shutil.copy2(source_executable, packaged_executable)
     print(f"[COPY] {exe} -> Binaries/{plat}")
 
     # Copy local shared libraries from binary dir
@@ -475,9 +550,13 @@ def main():
                 shutil.copy2(src, bin_dst)
                 print(f"[COPY] {f} (local shared lib)")
 
-        # Collect additional non-system .so libs via ldd
-        exe_path = os.path.join(binary_dir, exe)
-        collect_unix_shared_libs(exe_path, bin_dst)
+        # Inspect the original build artifact while its build-tree RUNPATH is still
+        # available, then collect any non-system shared libraries required by it.
+        collect_unix_shared_libs(source_executable, bin_dst)
+
+        # Convert only the copied package executable to a package-relative RUNPATH.
+        # libRenderingEngine.so is stored beside the executable in Binaries/.
+        set_unix_package_runpath(packaged_executable)
 
     # ----------------------------------------------------------------------------------
     # Resolve asset and config folders (cross-platform)

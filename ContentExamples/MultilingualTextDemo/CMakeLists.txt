@@ -94,13 +94,22 @@ ${PROJECT_SOURCE_DIR}/Assets/Shaders/
 )
 
 if(UNIX)
-	set_target_properties(MultilingualTextDemo PROPERTIES
+	set_target_properties(MultilingualTextDemo 
+	PROPERTIES
 		CXX_STANDARD 17
 		CXX_STANDARD_REQUIRED ON
 		COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra;-finput-charset=UTF-8"
 		RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${PROJECT_BINARY_DIR}/Debug"
 		RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Release"
-)
+	)
+	if(CMAKE_BUILD_TYPE STREQUAL "Release")
+		add_custom_command(
+			TARGET MultilingualTextDemo
+			POST_BUILD
+			COMMAND ${CMAKE_STRIP} $<TARGET_FILE:MultilingualTextDemo>
+			COMMENT "Stripping Release executable"
+		)
+	endif()
 elseif(WIN32)
 	set_target_properties(MultilingualTextDemo PROPERTIES
 		CXX_STANDARD 17

@@ -110,7 +110,7 @@ and/or create new projects. See: [Project Creation Guide](project_creation_guide
 
 ```bash
 sudo apt update
-sudo apt install git cmake build-essential nasm pkg-config libglm-dev libgtest-dev nlohmann-json3-dev
+sudo apt install git cmake build-essential nasm pkg-config libglm-dev libgtest-dev nlohmann-json3-dev chrpath
 ```
 
 2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
@@ -161,7 +161,7 @@ Run
 
 ```bash
 sudo apt update
-sudo apt install git cmake build-essential nasm pkg-config
+sudo apt install git cmake build-essential nasm pkg-config chrpath
 ```
 
 2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
@@ -199,7 +199,7 @@ and/or create new projects. See: [Project Creation Guide](project_creation_guide
 1. Install build tools and libraries:
 
 ```bash
-sudo pkg install pkgconf glm googletest vulkan-loader vulkan-headers shaderc nlohmann-json
+sudo pkg install pkgconf glm googletest vulkan-loader vulkan-headers shaderc nlohmann-json chrpath
 ```
 
 2. Download the source code:
@@ -233,7 +233,7 @@ Run
 1. Install build tools and libraries:
 
 ```bash
-sudo pkg install pkgconf glm vulkan-loader shaderc 
+sudo pkg install pkgconf glm vulkan-loader shaderc chrpath
 ```
 
 2. Download latest release from 
