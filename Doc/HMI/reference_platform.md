@@ -183,7 +183,7 @@ The complete software inventory of the reference platform was captured immediate
 The attached package list serves as the software baseline for future platform bring-up and deployment.
 
 Attachment:
-- `debian13-baseline-packages.txt`
+- [debian13-baseline-packages.txt](https://github.com/user-attachments/files/30120484/debian13-baseline-packages.txt)
 
 *****************************
 
@@ -280,3 +280,181 @@ address to a fixed IP address.
 
 This approach preserves automatic gateway/DNS configuration while ensuring a
 stable address for SSH access, deployment scripts and development tooling.
+
+---
+
+# Minimal Xorg and Vulkan Runtime
+
+The reference platform uses a deliberately minimal graphical userspace rather
+than a conventional desktop environment.
+
+The kernel-side graphics stack is provided by the Linux `i915` driver and DRM/KMS.
+The userspace graphics runtime is installed separately.
+
+## Installed Graphics Components
+
+The following packages are installed explicitly:
+
+```bash
+apt install --no-install-recommends \
+    xserver-xorg-core \
+    xinit \
+    x11-xserver-utils \
+    mesa-vulkan-drivers \
+    vulkan-tools
+```
+
+Their primary roles are:
+
+|Package |	Purpose|
+|--------|--------|
+|`xserver-xorg-core` |	X.Org display server|
+|`xinit` |	Minimal X session startup support|
+|`x11-xserver-utils` | X server utilities including `xrandr` and `xset`|
+|`mesa-vulkan-drivers` | Mesa userspace Vulkan drivers|
+|`vulkan-tools` | Vulkan diagnostic and validation tools including `vulkaninfo` and `vkcube`|
+
+
+The installation uses `--no-install-recommends` to avoid pulling in a desktop
+environment, display manager, window manager, terminal emulator, or other
+desktop-oriented components that are not required by the HMI runtime.
+
+## Graphics Device Access
+
+The Intel graphics device is exposed through DRM:
+
+```text
+/dev/dri/card0
+/dev/dri/renderD128
+```
+
+`card0` exposes the primary DRM device used for display/KMS operations, while `renderD128` provides a render node for userspace GPU workloads that do not require display-control privileges.
+
+The HMI runtime user belongs to both the video and render groups:
+
+```bash
+video
+render
+```
+
+This allows graphical applications to access the required DRM devices without running the applications as root.
+
+## Vulkan Validation
+
+The installed Vulkan runtime was validated with:
+
+```bash
+vulkaninfo --summary
+```
+
+The physical GPU was successfully enumerated as:
+
+```text
+deviceName = Intel(R) Graphics (ADL-N)
+deviceType = PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU
+driverName = Intel open-source Mesa driver
+driverInfo = Mesa 25.0.7-2+deb13u1
+```
+
+Mesa also exposes the `llvmpipe` software Vulkan implementation. During the graphical validation, `vkcube` explicitly selected the physical Intel Alder Lake-N GPU for rendering.
+
+This validation was performed before starting Xorg, confirming that Vulkan
+device discovery and the Mesa Intel Vulkan driver operate independently of the
+X display server.
+
+## Xorg Validation
+
+For initial commissioning, Xorg was started remotely and attached explicitly to
+the physical virtual terminal:
+
+```bash
+Xorg :0 vt1 -keeptty
+```
+
+This command is a commissioning/validation procedure and is not intended to be
+the final HMI startup mechanism.
+
+The Xorg log confirmed:
+
+```bash
+modeset(0): using drv /dev/dri/card0
+modeset(0): glamor X acceleration enabled on Mesa Intel(R) Graphics (ADL-N)
+modeset(0): glamor initialized
+modeset(0): [DRI2] DRI driver: iris
+```
+
+No GNOME, KDE, display manager, or window manager was installed or required for this validation session.
+
+## Display Detection
+
+The physical display configuration was inspected with:
+
+```bash
+DISPLAY=:0 xrandr --query
+```
+
+The GreenTouch display is detected as:
+
+```bash
+HDMI-1 connected primary
+1920x1080 @ 60 Hz
+```
+
+The display is currently operating in landscape orientation. Portrait
+configuration is performed separately as part of the touchscreen/display setup.
+
+## Standalone Vulkan Rendering Test
+
+Hardware-accelerated graphical rendering was validated with:
+
+```bash
+DISPLAY=:0 vkcube
+```
+
+`vkcube` reported:
+
+```bash
+Selected WSI platform: xcb
+Selected GPU 0: Intel(R) Graphics (ADL-N), type: IntegratedGpu
+```
+
+The rotating Vulkan cube rendered successfully on the physical GreenTouch
+display.
+
+This validates the graphics path from the Vulkan application through the Mesa
+Intel driver and Xorg to the physical Intel GPU and display.
+
+## Display Idle Behaviour
+
+During extended testing, the X display blanked after 600 seconds even though
+vkcube continued running.
+
+Inspection with:
+
+```bash
+DISPLAY=:0 xset q
+```
+
+showed:
+
+```bash
+Screen Saver:
+  timeout: 600
+
+DPMS:
+  DPMS is Enabled
+  Off: 600
+```
+
+Temporary validation commands:
+
+```bash
+DISPLAY=:0 xset s off
+DISPLAY=:0 xset -dpms
+```
+
+restored continuous display output.
+
+These settings were applied only to the commissioning session. Persistent HMI
+screen-blanking and DPMS configuration will be defined together with the
+portrait display configuration.
