@@ -1,4 +1,10 @@
-# System Identity
+# Target HMI Reference Platform
+
+This document specifies the industrial HMI reference platform and the workflow
+used to validate, test, and demonstrate graphical applications built with the
+Rendering Engine.
+
+## System Identity
 
 ```
 hostnamectl
@@ -21,7 +27,7 @@ dpkg --print-architecture
 
 ******************************
 
-# Hardware Inventory – CPU
+## Hardware Inventory – CPU
 
 ```
 lscpu
@@ -45,7 +51,7 @@ L3: 6 MiB
 
 ********************************
 
-# Hardware Inventory – Memory
+## Hardware Inventory – Memory
 
 ```
 free -h
@@ -67,7 +73,7 @@ Swap partition: 16 GB
 
 ********************************
 
-# Hardware Inventory – Storage
+## Hardware Inventory – Storage
 
 ```
 lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL
@@ -89,7 +95,7 @@ The platform intentionally uses a simple GPT partition layout without LVM or fil
 
 ********************************
 
-# Hardware Inventory – Graphics
+## Hardware Inventory – Graphics
 
 ```
 lspci
@@ -107,18 +113,18 @@ lsmod | grep i915
 
 The minimal Debian installation already includes the kernel-side Intel graphics stack. Xorg, Mesa Vulkan, GLFW and Rendering Engine runtime components have not yet been installed.
 
-### Storage Controller
+## Storage Controller
 
 - Controller: Intel Alder Lake-N SATA AHCI
 - Linux storage device: `/dev/sda`
 
-### Ethernet
+## Ethernet
 
 - Two Intel I226-V Ethernet controllers are present.
 
 ********************************
 
-# Hardware Inventory – Network Adapters
+## Hardware Inventory – Network Adapters
 
 ```
 ip -br link
@@ -142,7 +148,7 @@ The minimal Debian installation includes kernel support for all detected network
 
 *****************************
 
-# Hardware Inventory – Input Devices
+## Hardware Inventory – Input Devices
 
 ```
 lsusb
@@ -152,10 +158,10 @@ dmesg | grep -i -E "usb|hid|ilitek"
 
 ---
 
-# USB Controllers
+### USB Controllers
 The Linux xHCI driver exposes four USB root hubs corresponding to the USB controllers integrated into the Intel platform.
 
-# Touchscreen
+### Touchscreen
 Vendor: 222A
 Product: 0001
 Manufacturer: ILI Technology Corp.
@@ -171,12 +177,12 @@ a native multitouch device
 a mouse-compatible HID device
 allowing legacy software to receive mouse events while modern software can consume absolute touch events.
 
-# Bluetooth
+### Bluetooth
 Intel AX201 Bluetooth
 
 *****************************
 
-# Software Inventory
+## Software Inventory
 
 The complete software inventory of the reference platform was captured immediately after the initial installation of Debian GNU/Linux 13.6 and before installing any additional graphics libraries, development tools or Rendering Engine components.
 
@@ -187,7 +193,7 @@ Attachment:
 
 *****************************
 
-# Runtime Services
+## Runtime Services
 
 ```
 systemctl --type=service --state=running
@@ -228,7 +234,7 @@ No graphical display manager, desktop environment services, graphics middleware,
 
 ************************
 
-# Boot Environment
+## Boot Environment
 
 ```
 efibootmgr
@@ -283,7 +289,7 @@ stable address for SSH access, deployment scripts and development tooling.
 
 ---
 
-# Minimal Xorg and Vulkan Runtime
+## Minimal Xorg and Vulkan Runtime
 
 The reference platform uses a deliberately minimal graphical userspace rather
 than a conventional desktop environment.
@@ -291,7 +297,7 @@ than a conventional desktop environment.
 The kernel-side graphics stack is provided by the Linux `i915` driver and DRM/KMS.
 The userspace graphics runtime is installed separately.
 
-## Installed Graphics Components
+### Installed Graphics Components
 
 The following packages are installed explicitly:
 
@@ -319,7 +325,7 @@ The installation uses `--no-install-recommends` to avoid pulling in a desktop
 environment, display manager, window manager, terminal emulator, or other
 desktop-oriented components that are not required by the HMI runtime.
 
-## Graphics Device Access
+### Graphics Device Access
 
 The Intel graphics device is exposed through DRM:
 
@@ -339,7 +345,7 @@ render
 
 This allows graphical applications to access the required DRM devices without running the applications as root.
 
-## Vulkan Validation
+### Vulkan Validation
 
 The installed Vulkan runtime was validated with:
 
@@ -362,7 +368,7 @@ This validation was performed before starting Xorg, confirming that Vulkan
 device discovery and the Mesa Intel Vulkan driver operate independently of the
 X display server.
 
-## Xorg Validation
+### Xorg Validation
 
 For initial commissioning, Xorg was started remotely and attached explicitly to
 the physical virtual terminal:
@@ -385,7 +391,7 @@ modeset(0): [DRI2] DRI driver: iris
 
 No GNOME, KDE, display manager, or window manager was installed or required for this validation session.
 
-## Display Detection
+### Display Detection
 
 The physical display configuration was inspected with:
 
@@ -400,10 +406,7 @@ HDMI-1 connected primary
 1920x1080 @ 60 Hz
 ```
 
-The display is currently operating in landscape orientation. Portrait
-configuration is performed separately as part of the touchscreen/display setup.
-
-## Standalone Vulkan Rendering Test
+### Standalone Vulkan Rendering Test
 
 Hardware-accelerated graphical rendering was validated with:
 
@@ -424,37 +427,155 @@ display.
 This validates the graphics path from the Vulkan application through the Mesa
 Intel driver and Xorg to the physical Intel GPU and display.
 
-## Display Idle Behaviour
+## Display Configuration
 
-During extended testing, the X display blanked after 600 seconds even though
-vkcube continued running.
+The GreenTouch display is connected through `HDMI-1` and uses the native
+1920 × 1080 mode at 60 Hz.
 
-Inspection with:
+For the HMI reference platform, the physical display is mounted in portrait
+orientation. The Linux virtual console and Xorg display environment are
+configured independently.
 
-```bash
-DISPLAY=:0 xset q
+### Linux Virtual Console
+
+Persistent framebuffer-console rotation is configured through the Linux kernel
+command line in `/etc/default/grub`:
+
+```text
+GRUB_CMDLINE_LINUX_DEFAULT="quiet fbcon=rotate:3"
 ```
 
-showed:
+After modifying the configuration:
 
-```bash
-Screen Saver:
-  timeout: 600
-
-DPMS:
-  DPMS is Enabled
-  Off: 600
+```text
+update-grub
+reboot
 ```
 
-Temporary validation commands:
+### Xorg Portrait Configuration
 
-```bash
-DISPLAY=:0 xset s off
-DISPLAY=:0 xset -dpms
+Xorg portrait orientation is configured in:
+```text
+/etc/X11/xorg.conf.d/10-monitor.conf
+```
+with:
+
+```text
+Section "Monitor"
+    Identifier "HDMI-1"
+    Option "Rotate" "left"
+EndSection
+
+Section "ServerFlags"
+    Option "BlankTime" "0"
+    Option "StandbyTime" "0"
+    Option "SuspendTime" "0"
+    Option "OffTime" "0"
+EndSection
 ```
 
-restored continuous display output.
+The monitor configuration causes Xorg to expose the display as a logical
+1080 × 1920 portrait display.
 
-These settings were applied only to the commissioning session. Persistent HMI
-screen-blanking and DPMS configuration will be defined together with the
-portrait display configuration.
+The ServerFlags configuration disables Xorg screen blanking and DPMS
+timeouts so that the HMI display remains active during operation.
+
+System-level suspend configuration remains unchanged.
+
+## Application Deployment Workflow
+
+The HMI reference platform uses a deliberately simple remote deployment workflow.
+Applications are built and packaged on the development machine, transferred to
+the target over SSH, and launched remotely for validation on the physical HMI
+display.
+
+### 1. Build the Application
+
+Build the application for the target architecture:
+
+```text
+Operating system: Linux
+Architecture: x86-64 / amd64
+```
+
+For performance-sensitive validation, use a Release build. Release Unix
+application binaries should be stripped.
+
+### 2. Package Rendering Engine Applications
+
+For applications based on the Rendering Engine, use the project packaging
+workflow where possible:
+
+[Project Packaging Guide](../project_packaging_guide.md)
+
+A packaged Rendering Engine application contains the executable, the
+Rendering Engine runtime library, configuration, content, and application
+manifest in a relocatable directory structure.
+
+### 3. Copy the Application to the Transfer Directory
+
+The Ubuntu development environment shares a transfer directory with the
+Windows host.
+
+Example:
+
+```bash
+mkdir -p /media/sf_HMITransfer/Applications
+cp -r <Path/To/ApplicationPackage> /media/sf_HMITransfer/Applications/
+```
+
+### 4. Transfer the Application to the HMI Target
+
+From Windows PowerShell:
+
+```powershell
+scp -r .\Applications\* alexander@hmi-target:~/Applications/
+```
+
+The transferred applications are stored under:
+
+```bash
+/home/alexander/Applications/
+```
+
+If the executable permission is lost during the Windows-mediated transfer,
+restore it on the target:
+
+```bash
+chmod +x ~/Applications/<Application>/Binaries/<Executable>
+```
+
+### 5. Execute a Linux Console Application
+
+Console applications can write directly to the physical Linux virtual console.
+
+Writing directly to `/dev/tty1` may require elevated privileges.
+Example:
+```bash
+su -
+/home/alexander/Applications/HelloHMI > /dev/tty1 2>&1
+```
+This allows the application output to be observed directly on the portrait
+HMI display without installing a desktop environment or terminal emulator.
+
+### 6. Execute a Graphical Application
+
+Start the minimal Xorg environment in the first SSH terminal:
+```bash
+Xorg :0 vt1 -keeptty
+```
+Then launch the graphical application from a second SSH terminal:
+
+```bash
+cd ~/Applications/<ApplicationPackage>
+DISPLAY=:0 ./Binaries/<ApplicationExecutable>
+```
+
+Example:
+```bash
+cd ~/Applications/ActorDrawableAttach-v0.1.1-Linux
+DISPLAY=:0 ./Binaries/ActorDrawableAttach
+```
+
+The application renders directly through the minimal Xorg/Vulkan environment
+on the physical HMI display.
