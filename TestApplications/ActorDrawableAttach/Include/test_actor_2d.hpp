@@ -28,13 +28,13 @@ public:
 	void Update(float deltaTime) override;
 
 private:
-	float mAngularVelocity = 0.3f;
+	float mAngularVelocity = 30.0f;
 
 	Rectangle2D* mRectangle2D;
 	TextBlock2D* mLeftTextBlock2D;
 	TextBlock2D* mRightTextBlock2D;
 	
-	const float mSpeed = 1.0f;
+	const float mSpeed = 60.0f;
 	glm::vec2 mMovementDirection = glm::vec2(1.0f, 0.0f);
 };
 

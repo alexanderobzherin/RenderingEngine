@@ -27,7 +27,7 @@ public:
 	void Update(float deltaTime) override;
 
 private:
-	const float mAngularVelocity = 1.0f;
+	const float mAngularVelocity = 50.0f;
 
 	StaticMesh* mCenterCubeMesh;
 	StaticMesh* mCubeMesh_1;
@@ -40,7 +40,7 @@ private:
 	StaticMesh* mCubeMesh_5_1;
 	StaticMesh* mCubeMesh_6_1;
 
-	const float mSpeed = 0.05f;
+	const float mSpeed = 2.00f;
 	glm::vec3 mMovementDirection = glm::vec3(0.0f, 1.0f, 0.0f);
 };
 

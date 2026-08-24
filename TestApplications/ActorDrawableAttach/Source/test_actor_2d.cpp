@@ -48,7 +48,7 @@ void TestActor2D::Update(float deltaTime)
 	Actor2D::Update(deltaTime);
 
 	const glm::vec2 oldPosition = GetPosition();
-	const glm::vec2 newPosition = oldPosition + (mMovementDirection * mSpeed);
+	const glm::vec2 newPosition = oldPosition + (mMovementDirection * mSpeed * deltaTime);
 	SetPosition(newPosition);
 
 	const glm::vec2 startPos = glm::vec2(0.0f, 0.0f);
@@ -56,7 +56,7 @@ void TestActor2D::Update(float deltaTime)
 	const float distanceFloat = glm::length(distance);
 
 	const float oldRotation = GetRotation();
-	const float newRotation = oldRotation + mAngularVelocity;
+	const float newRotation = oldRotation + mAngularVelocity * deltaTime;
 	SetRotation(newRotation);
 
 	if (distanceFloat > 250.0f)

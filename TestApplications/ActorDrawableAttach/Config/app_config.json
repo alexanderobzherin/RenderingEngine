@@ -1,8 +1,8 @@
 {
   "appName": "ActorDrawableAttach",
-  "isFullScreen": false,
+  "isFullScreen": true,
   "screenWidth": 1920,
-  "screenHeight": 1024,
+  "screenHeight": 1080,
 
   "text": {
     "scripts": [

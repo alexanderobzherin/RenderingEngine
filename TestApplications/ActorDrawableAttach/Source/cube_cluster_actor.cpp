@@ -58,8 +58,6 @@ void CubeClusterActor::Initialize()
 	mCubeMesh_6_1->SetPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
 	
 	SetRotation(glm::vec3(65.0f, 25.0f, 45.0f));
-	const glm::vec3 oldRotation = GetRotation();
-
 }
 
 void CubeClusterActor::Update(float deltaTime)
@@ -67,19 +65,19 @@ void CubeClusterActor::Update(float deltaTime)
 	Actor::Update(deltaTime);
 
 	const glm::vec3 oldRotation = GetRotation();
-	const glm::vec3 newRotation = glm::vec3(oldRotation.x + mAngularVelocity,
+	const glm::vec3 newRotation = glm::vec3(oldRotation.x + mAngularVelocity * deltaTime,
 		0.0f,
-		oldRotation.z + mAngularVelocity);
+		oldRotation.z + mAngularVelocity * deltaTime);
 	SetRotation(newRotation);
 
 	const glm::vec3 oldPosition = GetPosition();
-	const glm::vec3 newPosition = oldPosition + (mMovementDirection * mSpeed);
+	const glm::vec3 newPosition = oldPosition + (mMovementDirection * mSpeed * deltaTime);
 	SetPosition(newPosition);
 
 	const glm::vec3 startPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	const glm::vec3 distance = startPos - newPosition;
 	const float distanceFloat = glm::length(distance);
-	if (distanceFloat > 16.0f)
+	if (distanceFloat > 12.0f)
 	{
 		mMovementDirection *= -1.0f;
 	}

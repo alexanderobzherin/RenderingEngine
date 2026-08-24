@@ -30,8 +30,8 @@ public:
 	void Update(float deltaTime) override;
 
 private:
-	const int mFrequency = 600;
-	int mTicking = 0;
+	const float mRespawnIntervalSeconds = 60.0f;
+	float mElapsedTime = 0.0f;
 	CubeClusterActor* mCubeClusterActor;
 	TestActor2D* mTestActor2D;
 };

@@ -35,10 +35,11 @@ void StartLevel::Update(float deltaTime)
 {
 	Scene::Update(deltaTime);
 
-	mTicking++;
-	if (mTicking > mFrequency)
+    mElapsedTime += deltaTime;
+
+    if (mElapsedTime > mRespawnIntervalSeconds)
 	{
-		mTicking = 0;
+		mElapsedTime = 0.0f;
 
 		mCubeClusterActor->Destroy();
 
