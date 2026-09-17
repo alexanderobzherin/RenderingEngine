@@ -14,7 +14,7 @@ void Drawable2D::Initialize()
 	DrawableComponent::Initialize();
 }
 
-void Drawable2D::Update(float deltaTime)
+void Drawable2D::Update(float)
 {
 	if (bUpdateOnTick)
 	{

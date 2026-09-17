@@ -18,7 +18,7 @@ void Camera2D::Initialize()
 
 }
 
-void Camera2D::Update(float deltaTime)
+void Camera2D::Update(float)
 {
 }
 

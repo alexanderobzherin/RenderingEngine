@@ -61,7 +61,7 @@ const SceneComponent2D& Actor2D::GetTransform() const
 	return mRootComponent;
 }
 
-void Actor2D::Update(float deltaTime)
+void Actor2D::Update(float)
 {
 	if (!bUpdateOnTick)
 		return;

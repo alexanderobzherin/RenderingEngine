@@ -27,7 +27,7 @@ void Camera::Initialize()
 	Reset();
 	UpdateViewMatrix();
 }
-void Camera::Update(float deltaTime)
+void Camera::Update(float)
 {
 	UpdateViewMatrix();
 	UpdateProjectionMatrix();
