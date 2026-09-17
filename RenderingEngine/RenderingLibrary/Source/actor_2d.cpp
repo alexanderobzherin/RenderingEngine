@@ -7,8 +7,8 @@ namespace rendering_engine
 {
 Actor2D::Actor2D(Scene& scene)
 	:
-	mScene(scene),
-	bUpdateOnTick(true)
+	bUpdateOnTick(true),
+	mScene(scene)
 {
 	mRenderContext = mScene.GetSceneManager().GetRenderResourceContext();
 }

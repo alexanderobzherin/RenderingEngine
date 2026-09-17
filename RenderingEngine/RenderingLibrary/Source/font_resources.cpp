@@ -20,12 +20,11 @@ FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRender
 	:
     mRenderResourceContext(rrc),
     mTextRenderer(textRenderer),
+    mFontName(std::filesystem::path(filepath).stem().string()),
     mFontSize(fontSize),
 	mErrorResult(FT_Err_Ok),
 	mFace(0)
 {
-    mFontName = std::filesystem::path(filepath).stem().string();
-
     mErrorResult = FT_New_Face(mTextRenderer->GetFontLibrary(), filepath.c_str(), 0, &mFace);
     if (mErrorResult)
     {
@@ -47,10 +46,10 @@ FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRender
     :
     mRenderResourceContext(rrc),
     mTextRenderer(textRenderer),
-    mErrorResult(FT_Err_Ok),
-    mFace(0),
     mFontName(fontName),
     mFontSize(fontSize),
+    mErrorResult(FT_Err_Ok),
+    mFace(0),
     mFontFileBytes(fileBytes)
 {
     mErrorResult = FT_New_Memory_Face(mTextRenderer->GetFontLibrary(), mFontFileBytes.data(), static_cast<FT_Long>(mFontFileBytes.size()), 0, &mFace);

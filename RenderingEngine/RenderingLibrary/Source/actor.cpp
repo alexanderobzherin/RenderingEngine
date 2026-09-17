@@ -8,8 +8,8 @@ namespace rendering_engine
 
 Actor::Actor(Scene& scene)
 	:
-	mScene(scene),
-	bUpdateOnTick(true)
+	bUpdateOnTick(true),
+	mScene(scene)
 {
 	mRenderContext = mScene.GetSceneManager().GetRenderResourceContext();
 }

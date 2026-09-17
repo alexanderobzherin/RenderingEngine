@@ -10,8 +10,8 @@ SceneComponent2D::SceneComponent2D()
     mPosition{ 0.0f, 0.0f },
     mRotation{ 0.0f },
     mScale{ 1.0f, 1.0f },
-    mWorldMatrix{ 1.0f },
     mLocalMatrix{ 1.0f },
+    mWorldMatrix{ 1.0f },
     mParent(nullptr),
     bIsDirty(true)
 {

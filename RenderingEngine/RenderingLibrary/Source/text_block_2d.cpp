@@ -42,15 +42,15 @@ TextBlock2D::TextBlock2D(Scene& scene, std::shared_ptr<TextRenderer> textRendere
     :
     Drawable2D(textRenderer->GetRenderResourceContext(), scene),
     mTextRenderer(textRenderer),
-    bIsTextShapeEnabled(properties.textShapeEnabled),
+    mColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
     mFontName(properties.fontName),
     mFontSize(properties.fontSize),
     mLineSpacingScale(properties.lineSpacingScale),
-    mTextAlign(properties.textAlign),
     mMaxLineLength(properties.maxLineLength),
-    mOutlineThicknessPx(properties.outlineThicknessPx > 2 ? 2 : properties.outlineThicknessPx),
-    mColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-    mDimensions(glm::vec2(0.0f, 0.0f))
+    mTextAlign(properties.textAlign),
+    mDimensions(glm::vec2(0.0f, 0.0f)),
+    bIsTextShapeEnabled(properties.textShapeEnabled),
+    mOutlineThicknessPx(properties.outlineThicknessPx > 2 ? 2 : properties.outlineThicknessPx)
 {
     mFontResources = mTextRenderer->GetFontResources(mFontName, mFontSize);
     if (!mFontResources)

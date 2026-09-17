@@ -9,8 +9,8 @@ namespace rendering_engine
 
 Material::Material(IRenderer* renderer, MaterialSettings matSettings)
     :
-    mRenderer(renderer),
     mMaterialSettings(matSettings),
+    mRenderer(renderer),
     mGpuHandle(nullptr),
     mParameterLayout(matSettings.parameterLayout)
 {}
