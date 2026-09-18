@@ -31,10 +31,11 @@ void StandaloneDesktopWindow::CreateAppWindow(unsigned int width, unsigned int h
     }
     else
     {
-        mWindow = glfwCreateWindow(mApp.GetScreenSettings().width,
-                                   mApp.GetScreenSettings().height,
-                                   mApp.GetScreenSettings().name.c_str(),
-                                   nullptr, nullptr);
+        mWindow = glfwCreateWindow(width,
+                                   height,
+                                   title.c_str(),
+                                   nullptr, 
+                                   nullptr);
     }
 
     glfwSetWindowUserPointer(mWindow, this);
@@ -69,6 +70,9 @@ const IApplication& StandaloneDesktopWindow::GetApplication()
 
 void StandaloneDesktopWindow::FramebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
+    static_cast<void>(width);
+    static_cast<void>(height);
+
     auto app = reinterpret_cast<StandaloneDesktopWindow*>(glfwGetWindowUserPointer(window));
     app->mFramebufferResized = true;
 }

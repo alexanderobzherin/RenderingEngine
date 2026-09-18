@@ -718,6 +718,9 @@ void VulkanRenderer::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreat
 
 VKAPI_ATTR VkBool32 VKAPI_CALL VulkanRenderer::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 {
+    static_cast<void>(messageType);
+    static_cast<void>(pUserData);
+
     if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
     {
         LOG_ERROR(std::string("Vulkan validation: ") + pCallbackData->pMessage);

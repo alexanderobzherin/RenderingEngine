@@ -25,6 +25,8 @@ path const Utility::sContentPackEntriesFilePath = path{} / "Content" / "Pack.jso
 
 void Utility::InitializePaths(int argc, char* argv[])
 {
+	static_cast<void>(argc);
+
 	sApplicationPath = std::filesystem::path(argv[0]);
 
 	sBuildPath = FindPath( "Build" );
@@ -102,7 +104,7 @@ AppConfig Utility::ReadConfigFile()
 			cfg.showStatsOverlay = appConfigData["showStatsOverlay"].get<bool>();
 		
 	}
-	catch (const std::exception& e)
+	catch (const std::exception&)
 	{
 		return cfg;
 	}
