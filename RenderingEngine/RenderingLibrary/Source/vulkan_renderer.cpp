@@ -962,13 +962,6 @@ void VulkanRenderer::CreateLogicalDevice()
         queueCreateInfos.push_back(queueCreateInfo);
     }
 
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-    queueCreateInfo.queueCount = 1;
-
-    queueCreateInfo.pQueuePriorities = &queuePriority;
-
     VkPhysicalDeviceFeatures deviceFeatures{};
     if (mPhysDevSupportedFeatures.samplerAnisotropy)
     {
@@ -1595,16 +1588,6 @@ std::pair<VkPipelineLayout, VkPipeline> VulkanRenderer::CreateGraphicsPipeline(M
     colorBlending.blendConstants[2] = 0.0f; // Optional
     colorBlending.blendConstants[3] = 0.0f; // Optional
 
-    // To use dynamicState, assign reference to it in pipelineInfo.pDynamicState.
-    std::vector<VkDynamicState> dynamicStates = {
-        VK_DYNAMIC_STATE_VIEWPORT,
-        VK_DYNAMIC_STATE_SCISSOR
-    };
-    VkPipelineDynamicStateCreateInfo dynamicState{};
-    dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-    dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
-    dynamicState.pDynamicStates = dynamicStates.data();
-
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
@@ -1647,7 +1630,19 @@ std::pair<VkPipelineLayout, VkPipeline> VulkanRenderer::CreateGraphicsPipeline(M
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pDepthStencilState = &depthStencil;
     pipelineInfo.pColorBlendState = &colorBlending;
+
+    // To enable dynamic viewport/scissor state:
+    // const std::vector<VkDynamicState> dynamicStates = {
+    //     VK_DYNAMIC_STATE_VIEWPORT,
+    //     VK_DYNAMIC_STATE_SCISSOR
+    // };
+    // VkPipelineDynamicStateCreateInfo dynamicState{};
+    // dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    // dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
+    // dynamicState.pDynamicStates = dynamicStates.data();
+    // Then set: pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.pDynamicState = nullptr;
+
     pipelineInfo.layout = pipelineLayout;
     pipelineInfo.renderPass = mRenderPass;
     pipelineInfo.subpass = 0;
