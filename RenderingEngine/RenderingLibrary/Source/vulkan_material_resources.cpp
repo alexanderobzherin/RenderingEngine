@@ -32,7 +32,6 @@ void VulkanMaterialResources::Initialize(Material * material)
 
 	if (Utility::IsPackageProvided())
 	{
-		const auto& entries = Utility::GetPackEntries();
 		std::string materialEntry = "Shaders/" + matName;
 
 		std::vector<uint8_t> binaryFileDataVert = Utility::ReadPackedFile(materialEntry + "/" + std::string(matName + "_vert.spv"));

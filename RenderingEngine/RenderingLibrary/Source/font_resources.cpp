@@ -80,7 +80,6 @@ FontResources::~FontResources()
 
 void FontResources::LoadGlyphsFromCodePointRange(std::uint32_t begin, std::uint32_t end)
 {
-    auto distance = end - begin;
     std::uint32_t start = begin;
     while (start < end) 
     {
