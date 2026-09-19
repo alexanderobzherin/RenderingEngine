@@ -50,9 +50,9 @@ FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRender
         throw std::runtime_error{ "Failed to set char size!" };
     }
 
-    mFontMetrics.lineHeight = mFace->size->metrics.height >> 6;
-    mFontMetrics.ascender = mFace->size->metrics.ascender >> 6;
-    mFontMetrics.descender = mFace->size->metrics.descender >> 6;
+    mFontMetrics.lineHeight = FreeType26Dot6ToPixelInt(mFace->size->metrics.height);
+    mFontMetrics.ascender = FreeType26Dot6ToPixelInt(mFace->size->metrics.ascender);
+    mFontMetrics.descender = FreeType26Dot6ToPixelInt(mFace->size->metrics.descender);
 }
 
 FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRenderer, std::string fontName, std::vector<uint8_t> const& fileBytes, unsigned int const fontSize)
@@ -87,9 +87,9 @@ FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRender
         throw std::runtime_error{ "Failed to set char size!" };
     }
 
-    mFontMetrics.lineHeight = mFace->size->metrics.height >> 6;
-    mFontMetrics.ascender = mFace->size->metrics.ascender >> 6;
-    mFontMetrics.descender = mFace->size->metrics.descender >> 6;
+    mFontMetrics.lineHeight = FreeType26Dot6ToPixelInt(mFace->size->metrics.height);
+    mFontMetrics.ascender = FreeType26Dot6ToPixelInt(mFace->size->metrics.ascender);
+    mFontMetrics.descender = FreeType26Dot6ToPixelInt(mFace->size->metrics.descender);
 }
 
 FontResources::~FontResources()
@@ -211,7 +211,7 @@ std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmapBy(GlyphIndex
     glyphMetrics.bearingX = mFace->glyph->bitmap_left;
     glyphMetrics.bearingY = mFace->glyph->bitmap_top;
 
-    glyphMetrics.advanceX = mFace->glyph->advance.x >> 6;
+    glyphMetrics.advanceX = FreeType26Dot6ToPixelInt(mFace->glyph->advance.x);
 
     glyphMetrics.padding = padding;
 
@@ -417,6 +417,19 @@ void FontResources::CreateFontAtlasFromList(const std::vector<GlyphIndex>& glyph
     }
 
     mFontAtlases[materialName] = textureName;
+}
+
+std::int32_t FontResources::FreeType26Dot6ToPixelInt(FT_Pos value)
+{
+    const FT_Pos pixelValue = value >> 6;
+
+    if (pixelValue < static_cast<FT_Pos>(std::numeric_limits<std::int32_t>::min()) ||
+        pixelValue > static_cast<FT_Pos>(std::numeric_limits<std::int32_t>::max()))
+    {
+        throw std::out_of_range("FreeType metric exceeds int32_t range.");
+    }
+
+    return static_cast<std::int32_t>(pixelValue);
 }
 
 } // namespace rendering_engine

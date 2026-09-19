@@ -222,10 +222,10 @@ DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char const* filename, unsig
 	  * In this example, we need to make an output work buffer of the right size.
 	  */
 	  /* JSAMPLEs per row in output buffer */
-	const JDIMENSION row_stride = cinfo->output_width * cinfo->output_components;
+	const JDIMENSION rowStride = cinfo->output_width * static_cast<JDIMENSION>(cinfo->output_components);
 	/* Make a one-row-high sample array that will go away when done with image */
 	buffer = (*cinfo->mem->alloc_sarray)
-		((j_common_ptr)cinfo, JPOOL_IMAGE, row_stride, 1);
+		((j_common_ptr)cinfo, JPOOL_IMAGE, rowStride, 1);
 
 	/* Step 6: while (scan lines remain to be read) */
 	/*           jpeg_read_scanlines(...); */
@@ -241,7 +241,7 @@ DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char const* filename, unsig
 		 */
 		(void)jpeg_read_scanlines(cinfo, buffer, 1);
 		/* Assume put_scanline_someplace wants a pointer and sample count. */
-		for(JDIMENSION i = 0; i < row_stride; ++i)
+		for(JDIMENSION i = 0; i < rowStride; ++i)
 		{
 			rgbImageDataVector.push_back(*(buffer[0] + i));
 		}

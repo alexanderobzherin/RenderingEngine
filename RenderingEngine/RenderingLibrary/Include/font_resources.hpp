@@ -203,9 +203,11 @@ protected:
      * @return True if the glyph exists.
      */
     bool HasGlyph(uint32_t codePoint) const;
-
+    
 private:
-	FontResources(FontResources const&);
+    static std::int32_t FreeType26Dot6ToPixelInt(FT_Pos value);
+	
+    FontResources(FontResources const&);
 	FontResources operator=(FontResources const&);
 
 protected:
