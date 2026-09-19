@@ -61,7 +61,7 @@ struct Properties
 	/// Font family name.
 	std::string fontName;
 	/// Font size in pixels.
-	float fontSize = 10;
+	unsigned int fontSize = 10U;
 	/// Horizontal text alignment.
 	TextAlign textAlign = TextAlign::Left;
 	/// Maximum line length for layout; zero disables wrapping.

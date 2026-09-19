@@ -531,7 +531,15 @@ TextBlock2D::GlyphQuad TextBlock2D::MakeGlyphQuad(GlyphIndex glyphIndex, float p
 
 void TextBlock2D::PushQuad(std::string meshName, std::unordered_map<std::string, TextBlock2D::Mesh>& meshes, GlyphQuad glyphQuad, float horizontalShift)
 {
-    const uint32_t vertexBase = meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.size();
+    auto& mesh = meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]);
+
+    if (mesh.positions2D.size() >
+        static_cast<std::size_t>(std::numeric_limits<std::uint32_t>::max()) - 3U)
+    {
+        throw std::overflow_error("TextBlock2D mesh exceeds 32-bit index range.");
+    }
+
+    const std::uint32_t vertexBase = static_cast<std::uint32_t>(mesh.positions2D.size());
 
     const glm::vec2 shift(horizontalShift, 0.0f);
 
@@ -540,31 +548,31 @@ void TextBlock2D::PushQuad(std::string meshName, std::unordered_map<std::string,
     const glm::vec2 vert_2 = glm::vec2(glyphQuad.x1, glyphQuad.y1) + shift;
     const glm::vec2 vert_3 = glm::vec2(glyphQuad.x0, glyphQuad.y1) + shift;
 
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_0);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_1);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_2);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_3);
+    mesh.positions2D.push_back(vert_0);
+    mesh.positions2D.push_back(vert_1);
+    mesh.positions2D.push_back(vert_2);
+    mesh.positions2D.push_back(vert_3);
 
     // UVs
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v0));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u1, glyphQuad.v0));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u1, glyphQuad.v1));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v1));
+    mesh.texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v0));
+    mesh.texCoords.push_back(glm::vec2(glyphQuad.u1, glyphQuad.v0));
+    mesh.texCoords.push_back(glm::vec2(glyphQuad.u1, glyphQuad.v1));
+    mesh.texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v1));
 
     // Colors
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     // Indices
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 0);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 1);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 2);
+    mesh.indices.push_back(vertexBase + 0U);
+    mesh.indices.push_back(vertexBase + 1U);
+    mesh.indices.push_back(vertexBase + 2U);
 
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 2);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 3);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 0);
+    mesh.indices.push_back(vertexBase + 2U);
+    mesh.indices.push_back(vertexBase + 3U);
+    mesh.indices.push_back(vertexBase + 0U);
 }
 
 void TextBlock2D::UploadMeshes(const std::unordered_map<std::string, TextBlock2D::Mesh>& meshes)
