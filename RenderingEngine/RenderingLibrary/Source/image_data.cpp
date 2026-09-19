@@ -270,7 +270,10 @@ bool ImageData::LoadTextureJpegFile(char const* filename)
 	std::vector<std::uint8_t> rgbImageDataVector;
 
 	bool result = ReadJpegFile(filename, width, height, rgbImageDataVector);
-	if(result && (rgbImageDataVector.size() == (3U * width * height)))
+	const size_t expectedSize =
+		static_cast<size_t>(width) * static_cast<size_t>(height) * 3U;
+
+	if (result && rgbImageDataVector.size() == expectedSize)
 	{
 		mWidth = width;
 		mHeight = height;
@@ -295,7 +298,9 @@ bool ImageData::LoadTexturePngFile(char const* filename)
 
 	bool result = ReadPngFile(filename, width, height, rgbaImageDataVector);
 
-	if( result && (rgbaImageDataVector.size() == (4U * width * height)) )
+	const size_t expectedSize =	static_cast<size_t>(width) * static_cast<size_t>(height) * 4U;
+
+	if (result && rgbaImageDataVector.size() == expectedSize)
 	{
 		mWidth = width;
 		mHeight = height;
@@ -322,15 +327,16 @@ void ImageData::CleanAllocatedMemory()
 
 void ImageData::LoadImageDataRGBA(const std::vector<uint8_t>& pixels)
 {
-	const size_t expectedSize =
-		static_cast<size_t>(mWidth) * static_cast<size_t>(mHeight) * 4;
+	const size_t pixelCount = static_cast<size_t>(mWidth) * static_cast<size_t>(mHeight);
+
+	const size_t expectedSize = pixelCount * 4U;
 
 	if (pixels.size() != expectedSize)
 	{
 		throw std::runtime_error("Array data size doesn't match image dimension.");
 	}
 
-	mData.resize(mWidth * mHeight);
+	mData.resize(pixelCount);
 
 	std::memcpy(mData.data(), pixels.data(), expectedSize);
 }

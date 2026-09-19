@@ -8,6 +8,9 @@
 #include "utility.hpp"
 #include "text_renderer.hpp"
 
+#include <limits>
+#include <stdexcept>
+
 #include FT_FREETYPE_H
 #include FT_TRUETYPE_TABLES_H
 
@@ -25,13 +28,23 @@ FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRender
 	mErrorResult(FT_Err_Ok),
 	mFace(0)
 {
+    if (mFontSize >
+        static_cast<unsigned int>(
+            std::numeric_limits<FT_F26Dot6>::max() >> 6))
+    {
+        throw std::out_of_range("Font size exceeds FreeType supported range.");
+    }
+
+    const FT_F26Dot6 fontSize26Dot6 =
+        static_cast<FT_F26Dot6>(mFontSize) << 6;
+
     mErrorResult = FT_New_Face(mTextRenderer->GetFontLibrary(), filepath.c_str(), 0, &mFace);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to create new face!" };
     }
 
-    mErrorResult = FT_Set_Char_Size(mFace, mFontSize << 6, mFontSize << 6, 90, 90);
+    mErrorResult = FT_Set_Char_Size(mFace, fontSize26Dot6, fontSize26Dot6, 90, 90);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to set char size!" };
@@ -52,13 +65,23 @@ FontResources::FontResources(RenderResourceContext rrc, TextRenderer* textRender
     mFace(0),
     mFontFileBytes(fileBytes)
 {
+    if (mFontSize >
+        static_cast<unsigned int>(
+            std::numeric_limits<FT_F26Dot6>::max() >> 6))
+    {
+        throw std::out_of_range("Font size exceeds FreeType supported range.");
+    }
+
+    const FT_F26Dot6 fontSize26Dot6 =
+        static_cast<FT_F26Dot6>(mFontSize) << 6;
+
     mErrorResult = FT_New_Memory_Face(mTextRenderer->GetFontLibrary(), mFontFileBytes.data(), static_cast<FT_Long>(mFontFileBytes.size()), 0, &mFace);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to create new face!" };
     }
 
-    mErrorResult = FT_Set_Char_Size(mFace, mFontSize << 6, mFontSize << 6, 90, 90);
+    mErrorResult = FT_Set_Char_Size(mFace, fontSize26Dot6, fontSize26Dot6, 90, 90);
     if (mErrorResult)
     {
         throw std::runtime_error{ "Failed to set char size!" };
@@ -154,18 +177,25 @@ std::pair<GlyphMetrics, ImageData> FontResources::CreateGlyphBitmapBy(GlyphIndex
 
     const auto bufferSize = dstW * dstH * 4;
     std::vector<uint8_t> buffer(bufferSize, 0);
-    for (int y = 0; y < srcH; ++y)
+    for (unsigned int y = 0; y < srcH; ++y)
     {
-        for (int x = 0; x < srcW; ++x)
+        for (unsigned int x = 0; x < srcW; ++x)
         {
-            uint8_t coverage =
-                mFace->glyph->bitmap.buffer[y * srcW + x];
+            const size_t srcIndex =
+                static_cast<size_t>(y) * static_cast<size_t>(srcW) +
+                static_cast<size_t>(x);
 
-            int dstX = x + padding;
-            int dstY = y + padding;
+            const uint8_t coverage =
+                mFace->glyph->bitmap.buffer[srcIndex];
 
-            const size_t idx = (static_cast<size_t>(dstY) * static_cast<size_t>(dstW)
-                    + static_cast<size_t>(dstX)) * 4u;
+            const size_t dstX =
+                static_cast<size_t>(x) + static_cast<size_t>(padding);
+
+            const size_t dstY =
+                static_cast<size_t>(y) + static_cast<size_t>(padding);
+
+            const size_t idx =
+                (dstY * static_cast<size_t>(dstW) + dstX) * 4U;
 
             buffer[idx + 0] = coverage;
             buffer[idx + 1] = coverage;

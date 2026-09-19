@@ -37,9 +37,9 @@ bool TextureAtlasMaker::CreateTextureAtlas(std::map<char, std::pair<unsigned int
 
 	auto imageIterator = mImageCollection.begin();
 
-	for( int y = 0; y < numberOfRows; y++ )
+	for(unsigned int y = 0; y < numberOfRows; y++)
 	{
-		for( int x = 0; x < numberOfColumns; x++ )
+		for(unsigned int x = 0; x < numberOfColumns; x++)
 		{
 			if( imageIterator != mImageCollection.end() )
 			{
@@ -82,9 +82,9 @@ ImageData TextureAtlasMaker::CreateTextureAtlas(std::unordered_map<std::uint32_t
 
 	auto imageIterator = ioFontAtlas.begin();
 
-	for (int y = 0; y < numberOfRows; y++)
+	for (unsigned int y = 0; y < numberOfRows; y++)
 	{
-		for (int x = 0; x < numberOfColumns; x++)
+		for (unsigned int x = 0; x < numberOfColumns; x++)
 		{
 			if (imageIterator != ioFontAtlas.end())
 			{
@@ -148,7 +148,7 @@ void TextureAtlasMaker::CalculateGridDimensions(unsigned int& outputNumberOfColu
 	FindCellDimensions(cellWidth, cellHeight);
 
 	unsigned int cellsNum = mImageCollection.size();
-	int totalSquare = cellWidth * cellHeight * cellsNum;
+	unsigned int totalSquare = cellWidth * cellHeight * cellsNum;
 	float rootSq = sqrtf(totalSquare);
 
 	outputNumberOfColumns = std::ceil(rootSq / cellWidth);
@@ -162,7 +162,7 @@ void TextureAtlasMaker::CalculateGridDimensions(unsigned int& outputNumberOfColu
 	FindCellDimensions(cellWidth, cellHeight, fontAtlas);
 
 	unsigned int cellsNum = fontAtlas.size();
-	int totalSquare = cellWidth * cellHeight * cellsNum;
+	unsigned int totalSquare = cellWidth * cellHeight * cellsNum;
 	float rootSq = sqrtf(totalSquare);
 
 	outputNumberOfColumns = std::ceil(rootSq / cellWidth);

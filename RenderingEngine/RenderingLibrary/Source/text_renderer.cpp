@@ -7,49 +7,49 @@ namespace rendering_engine
 {
 std::unordered_map<std::string, std::pair<std::uint32_t, std::uint32_t>> TextRenderer::sScriptRanges{
 	// European
-	{{"Latin"}, {0x0020, 0x007E}},
-	{{"Cyrillic"}, {0x0400, 0x04FF}},
-	{{"Greek"}, {0x0370, 0x03FF}},
+	{{"Latin"}, {0x0020U, 0x007EU}},
+	{{"Cyrillic"}, {0x0400U, 0x04FFU}},
+	{{"Greek"}, {0x0370U, 0x03FFU}},
 
 	// Asian
-	{{"Han"}, {0x4E00, 0x9FFF}},
-	{{"HanExtensionA"}, {0x3400, 0x4DBF}},
+	{{"Han"}, {0x4E00U, 0x9FFFU}},
+	{{"HanExtensionA"}, {0x3400U, 0x4DBFU}},
 
-	{{"Hiragana"}, {0x3040, 0x309F}},
-	{{"Katakana"}, {0x30A0, 0x30FF}},
-	{{"KatakanaPhoneticExtensions"}, {0x31F0, 0x31FF}},
+	{{"Hiragana"}, {0x3040U, 0x309FU}},
+	{{"Katakana"}, {0x30A0U, 0x30FFU}},
+	{{"KatakanaPhoneticExtensions"}, {0x31F0U, 0x31FFU}},
 
-	{{"Hangul"}, {0xAC00, 0xD7AF}},
+	{{"Hangul"}, {0xAC00U, 0xD7AFU}},
 
 	// Requires shaping
 	// East
-	{{"Hebrew"}, {0x0590, 0x05FF}},
-	{{"Arabic"}, {0x0600, 0x06FF}},
-	{{"ArabicSupplement"}, {0x0750, 0x077F}},
-	{{"ArabicExtended-A"}, {0x08A0, 0x08FF}},
-	{{"Aramaic"}, {0x0700, 0x074F}},
-	{{"Thaana"}, {0x0780, 0x07BF}}, 
+	{{"Hebrew"}, {0x0590U, 0x05FFU}},
+	{{"Arabic"}, {0x0600U, 0x06FFU}},
+	{{"ArabicSupplement"}, {0x0750U, 0x077FU}},
+	{{"ArabicExtended-A"}, {0x08A0U, 0x08FFU}},
+	{{"Aramaic"}, {0x0700U, 0x074FU}},
+	{{"Thaana"}, {0x0780U, 0x07BFU}},
 
 	// Indic
-	{{"Devanagari"}, {0x0900, 0x097F}},
-	{{"Bengali"}, {0x0980, 0x09FF}},	
-	{{"Gurmukhi"}, {0x0A00, 0x0A7F}},	
-	{{"Gujarati"}, {0x0A80, 0x0AFF}},	
-	{{"Oriya"}, {0x0B00, 0x0B7F}},		
-	{{"Tamil"}, {0x0B80, 0x0BFF}},		
-	{{"Telugu"}, {0x0C00, 0x0C7F}},		
-	{{"Kannada"}, {0x0C80, 0x0CFF}},	
-	{{"Malayalam"}, {0x0D00, 0x0D7F}},	
-	{{"Sinhala"}, {0x0D80, 0x0DFF}},	
+	{{"Devanagari"}, {0x0900U, 0x097FU}},
+	{{"Bengali"}, {0x0980U, 0x09FFU}},
+	{{"Gurmukhi"}, {0x0A00U, 0x0A7FU}},
+	{{"Gujarati"}, {0x0A80U, 0x0AFFU}},
+	{{"Oriya"}, {0x0B00U, 0x0B7FU}},
+	{{"Tamil"}, {0x0B80U, 0x0BFFU}},
+	{{"Telugu"}, {0x0C00U, 0x0C7FU}},
+	{{"Kannada"}, {0x0C80U, 0x0CFFU}},
+	{{"Malayalam"}, {0x0D00U, 0x0D7FU}},
+	{{"Sinhala"}, {0x0D80U, 0x0DFFU}},
 
 	// Southeast Asian
-	{{"Thai"}, {0x0E00, 0x0E7F}},		
-	{{"Lao"}, {0x0E80, 0x0EFF}},		
-	{{"Myanmar"}, {0x1000, 0x109F}},	
-	{{"Khmer"}, {0x1780, 0x17FF}},		
+	{{"Thai"}, {0x0E00U, 0x0E7FU}},
+	{{"Lao"}, {0x0E80U, 0x0EFFU}},
+	{{"Myanmar"}, {0x1000U, 0x109FU}},
+	{{"Khmer"}, {0x1780U, 0x17FFU}},
 
 	// Tibetan
-	{{"Tibetan"}, {0x0F00, 0x0FFF}}		
+	{{"Tibetan"}, {0x0F00U, 0x0FFFU}}
 };
 std::vector<std::string> TextRenderer::sFontAtlasPreloadableScripts{
 	// European
@@ -156,7 +156,7 @@ const RenderResourceContext& TextRenderer::GetRenderResourceContext() const
 	return mRenderResourceContext;
 }
 
-std::shared_ptr<FontResources> TextRenderer::GetFontResources(const std::string& fontName, int fontSize)
+std::shared_ptr<FontResources> TextRenderer::GetFontResources(const std::string& fontName, unsigned int fontSize)
 {
 	auto key = std::make_pair(fontName, fontSize);
 	if (auto search = mFontResources.find(key); search != mFontResources.end())
@@ -221,7 +221,7 @@ const std::vector<std::string>& TextRenderer::GetScriptsRequiredShaping() const
 
 std::pair<std::uint32_t, std::uint32_t> TextRenderer::GetScriptRange(std::string script)
 {
-	std::pair<std::uint32_t, std::uint32_t> result{0, 0};
+	std::pair<std::uint32_t, std::uint32_t> result{ 0U, 0U };
 
 	auto search = sScriptRanges.find(script);
 	{

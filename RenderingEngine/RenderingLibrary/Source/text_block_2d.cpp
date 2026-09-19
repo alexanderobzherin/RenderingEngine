@@ -50,7 +50,7 @@ TextBlock2D::TextBlock2D(Scene& scene, std::shared_ptr<TextRenderer> textRendere
     mTextAlign(properties.textAlign),
     mDimensions(glm::vec2(0.0f, 0.0f)),
     bIsTextShapeEnabled(properties.textShapeEnabled),
-    mOutlineThicknessPx(properties.outlineThicknessPx > 2 ? 2 : properties.outlineThicknessPx)
+    mOutlineThicknessPx(properties.outlineThicknessPx > 2.0f ? 2.0f : properties.outlineThicknessPx)
 {
     mFontResources = mTextRenderer->GetFontResources(mFontName, mFontSize);
     if (!mFontResources)
@@ -150,45 +150,45 @@ std::vector<std::uint32_t> TextBlock2D::DecodeUtf8(const std::string& text)
         std::uint32_t codePoint = 0;
         unsigned char c = bytes[i];
 
-        if (c <= 0x7F)
+        if (c <= 0x7FU)
         {
             // 1-byte sequence (ASCII)
             codePoint = c;
             i += 1;
         }
-        else if ((c & 0xE0) == 0xC0)
+        else if ((c & 0xE0U) == 0xC0U)
         {
             // 2-byte sequence
             if (i + 1 >= length) break;
 
             codePoint =
-                ((c & 0x1F) << 6) |
-                (bytes[i + 1] & 0x3F);
+                ((c & 0x1FU) << 6) |
+                (bytes[i + 1] & 0x3FU);
 
             i += 2;
         }
-        else if ((c & 0xF0) == 0xE0)
+        else if ((c & 0xF0U) == 0xE0U)
         {
             // 3-byte sequence
             if (i + 2 >= length) break;
 
             codePoint =
-                ((c & 0x0F) << 12) |
-                ((bytes[i + 1] & 0x3F) << 6) |
-                (bytes[i + 2] & 0x3F);
+                ((c & 0x0FU) << 12) |
+                ((bytes[i + 1] & 0x3FU) << 6) |
+                (bytes[i + 2] & 0x3FU);
 
             i += 3;
         }
-        else if ((c & 0xF8) == 0xF0)
+        else if ((c & 0xF8U) == 0xF0U)
         {
             // 4-byte sequence
             if (i + 3 >= length) break;
 
             codePoint =
-                ((c & 0x07) << 18) |
-                ((bytes[i + 1] & 0x3F) << 12) |
-                ((bytes[i + 2] & 0x3F) << 6) |
-                (bytes[i + 3] & 0x3F);
+                ((c & 0x07U) << 18) |
+                ((bytes[i + 1] & 0x3FU) << 12) |
+                ((bytes[i + 2] & 0x3FU) << 6) |
+                (bytes[i + 3] & 0x3FU);
 
             i += 4;
         }
@@ -451,7 +451,7 @@ void TextBlock2D::ShapeTextAndConstructMesh()
     mMaxLineLength = (mMaxLineLength > maximumLineLengh ? mMaxLineLength : maximumLineLengh);
 
     const FontMetrics& fontMetrics = mFontResources->GetFontMetrics();
-    int curLine = 0;
+    std::size_t curLine = 0U;
     for (auto& line : linesOfShapedGlyphs)
     {
         for (const auto& glyph : line)

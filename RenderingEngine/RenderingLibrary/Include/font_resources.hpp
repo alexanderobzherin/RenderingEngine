@@ -51,7 +51,7 @@ struct GlyphMetrics
     int32_t bearingX = 0;
     int32_t bearingY = 0;
     int32_t advanceX = 0;
-    int32_t padding = 0;
+    uint32_t padding = 0;
 };
 
 /**

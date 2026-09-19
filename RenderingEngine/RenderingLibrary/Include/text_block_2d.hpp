@@ -148,7 +148,7 @@ struct GlyphQuad
 	float v1;
 
 	std::string fontAtlasMaterialName;
-	std::uint32_t advanceX;
+	std::int32_t advanceX;
 };
 /**
  * @struct ShapedGlyph

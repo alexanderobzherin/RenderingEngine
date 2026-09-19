@@ -25,6 +25,7 @@
 #pragma once
 
 #include <iostream>
+#include <limits>
 #include <stdio.h>
 #include "jpeglib.h"
 #include <setjmp.h>
@@ -47,7 +48,6 @@ static void SaveTextureFileJpeg(rendering_engine::ImageData const& imageData, ch
 
 	FILE* outfile;                /* target file */
 	JSAMPROW row_pointer[1];      /* pointer to JSAMPLE row[s] */
-	int row_stride;               /* physical row width in image buffer */
 
 	cinfo.err = jpeg_std_error(&jerr);
 	jpeg_create_compress(&cinfo);
@@ -69,7 +69,7 @@ static void SaveTextureFileJpeg(rendering_engine::ImageData const& imageData, ch
 
 	jpeg_start_compress(&cinfo, TRUE);
 
-	row_stride = imageData.GetWidth() * 3; /* JSAMPLEs per row in image_buffer */
+	const size_t rowStride = static_cast<size_t>(imageData.GetWidth()) * 3U; /* JSAMPLEs per row in image_buffer */
 
 	while( cinfo.next_scanline < cinfo.image_height )
 	{
@@ -77,7 +77,7 @@ static void SaveTextureFileJpeg(rendering_engine::ImageData const& imageData, ch
 		 * Here the array is only one element long, but you could pass
 		 * more than one scanline at a time if that's more convenient.
 		 */
-		row_pointer[0] = &imageBuffer[cinfo.next_scanline * row_stride];
+		row_pointer[0] = &imageBuffer[static_cast<size_t>(cinfo.next_scanline) * rowStride];
 		(void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
 	}
 
@@ -161,7 +161,6 @@ DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char const* filename, unsig
 
 	FILE* infile;                 /* source file */
 	JSAMPARRAY buffer;            /* Output row buffer */
-	int row_stride;               /* physical row width in output buffer */
 
 	if( (infile = fopen(filename, "rb")) == NULL )
 	{
@@ -223,7 +222,7 @@ DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char const* filename, unsig
 	  * In this example, we need to make an output work buffer of the right size.
 	  */
 	  /* JSAMPLEs per row in output buffer */
-	row_stride = cinfo->output_width * cinfo->output_components;
+	const JDIMENSION row_stride = cinfo->output_width * cinfo->output_components;
 	/* Make a one-row-high sample array that will go away when done with image */
 	buffer = (*cinfo->mem->alloc_sarray)
 		((j_common_ptr)cinfo, JPOOL_IMAGE, row_stride, 1);
@@ -242,7 +241,7 @@ DoReadJpegFile(struct jpeg_decompress_struct* cinfo, char const* filename, unsig
 		 */
 		(void)jpeg_read_scanlines(cinfo, buffer, 1);
 		/* Assume put_scanline_someplace wants a pointer and sample count. */
-		for( int i = 0; i < row_stride; ++i )
+		for(JDIMENSION i = 0; i < row_stride; ++i)
 		{
 			rgbImageDataVector.push_back(*(buffer[0] + i));
 		}
@@ -331,24 +330,31 @@ static bool ReadJpegFromMemory(
 
 	jpeg_create_decompress(&cinfo);
 
-	jpeg_mem_src(&cinfo, memory, memorySize);
+	if (memorySize > static_cast<size_t>(std::numeric_limits<unsigned long>::max()))
+	{
+		return false;
+	}
+
+	jpeg_mem_src(
+		&cinfo,
+		memory,
+		static_cast<unsigned long>(memorySize));
 
 	jpeg_read_header(&cinfo, TRUE);
 	jpeg_start_decompress(&cinfo);
 
 	width = cinfo.output_width;
 	height = cinfo.output_height;
-	unsigned int components = cinfo.output_components; // should = 3
 
-	size_t row_stride = width * components;
-	rgbImageDataVector.resize(width * height * components);
+	const size_t components = static_cast<size_t>(cinfo.output_components);
+	const size_t rowStride = static_cast<size_t>(width) * components;
+	const size_t imageSize = static_cast<size_t>(width) * static_cast<size_t>(height) *	components;
+
+	rgbImageDataVector.resize(imageSize);
 
 	while (cinfo.output_scanline < cinfo.output_height)
 	{
-		unsigned char* row = (unsigned char*)(
-			rgbImageDataVector.data() +
-			cinfo.output_scanline * row_stride
-			);
+		unsigned char* row = rgbImageDataVector.data() + static_cast<size_t>(cinfo.output_scanline) * rowStride;
 		jpeg_read_scanlines(&cinfo, &row, 1);
 	}
 
