@@ -1750,15 +1750,28 @@ void VulkanRenderer::CreateSwapchainSyncObjects()
     }
 }
 
-VkShaderModule VulkanRenderer::CreateShaderModule(std::vector<char>& code)
+VkShaderModule VulkanRenderer::CreateShaderModule(const std::vector<char>& code)
 {
+    if (code.empty() || code.size() % sizeof(std::uint32_t) != 0U)
+    {
+        throw std::runtime_error("Invalid SPIR-V shader binary size.");
+    }
+
+    std::vector<std::uint32_t> alignedCode(code.size() / sizeof(std::uint32_t));
+
+    std::memcpy(alignedCode.data(), code.data(), code.size());
+
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = code.size();
-    createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+    createInfo.pCode = alignedCode.data();
 
     VkShaderModule shaderModule;
-    if (vkCreateShaderModule(mLogicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
+    if (vkCreateShaderModule(
+            mLogicalDevice,
+            &createInfo,
+            nullptr,
+            &shaderModule) != VK_SUCCESS)
     {
         LOG_ERROR("failed to create shader module!");
         throw std::runtime_error("failed to create shader module!");
