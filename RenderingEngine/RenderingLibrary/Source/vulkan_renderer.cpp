@@ -1718,8 +1718,10 @@ void VulkanRenderer::CreateFrameSyncObjects()
     mImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     mInFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
-    VkSemaphoreCreateInfo semaphoreInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
-    VkFenceCreateInfo fenceInfo{ VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+    VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    VkFenceCreateInfo fenceInfo{};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -1738,7 +1740,8 @@ void VulkanRenderer::CreateSwapchainSyncObjects()
     mRenderFinishedSemaphores.resize(mSwapChainImages.size());
     mImagesInFlight.resize(mSwapChainImages.size(), VK_NULL_HANDLE);
 
-    VkSemaphoreCreateInfo semaphoreInfo{ VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+    VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
     for (size_t i = 0; i < mSwapChainImages.size(); i++)
     {
