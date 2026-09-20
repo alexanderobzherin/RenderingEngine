@@ -52,7 +52,7 @@ public:
 	/**
 	 * @brief Destructor. Cleans up resources and active scenes.
 	 */
-	~SceneManager();
+	virtual ~SceneManager();
 	/**
 	 * @brief Initializes the current scene and related caches.
 	 */
