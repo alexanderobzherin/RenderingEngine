@@ -66,7 +66,8 @@ void Camera2D::Reset()
 	mSceneComponent->SetRotation(startRot);
 	mSceneComponent->SetScale(glm::vec2(startZoom, startZoom));
 
-	SetViewportSize(mApp.GetScreenSettings().width, mApp.GetScreenSettings().height);
+	SetViewportSize(static_cast<float>(mApp.GetScreenSettings().width), 
+					static_cast<float>(mApp.GetScreenSettings().height));
 }
 
 glm::vec2 Camera2D::GetPosition() const

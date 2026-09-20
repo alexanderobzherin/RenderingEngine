@@ -1,4 +1,5 @@
 #include "color_space.hpp"
+#include <cmath>
 
 namespace rendering_engine
 {
@@ -8,7 +9,7 @@ float ColorSpace::SRGBToLinear(float c)
 	if (c <= 0.04045f)
 		return c / 12.92f;
 	else
-		return pow((c + 0.055f) / 1.055f, 2.4f);
+		return std::pow((c + 0.055f) / 1.055f, 2.4f);
 }
 
 glm::vec3 ColorSpace::SRGBToLinear(const glm::vec3& color)
