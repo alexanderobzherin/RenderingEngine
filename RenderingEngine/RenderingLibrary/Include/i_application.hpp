@@ -6,6 +6,7 @@
 #pragma once
 
 #include "i_renderer.hpp"
+#include "rendering_engine_export.hpp"
 #include <string>
 
 namespace rendering_engine
@@ -64,7 +65,7 @@ struct FrameMetrics
  *
  * @see IRenderer
  */
-class IApplication
+class RE_API IApplication
 {
 public:
     /** @brief Initializes the application and its subsystems. */
