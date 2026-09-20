@@ -22,6 +22,7 @@ function(re_enable_project_warnings target_name)
             /w44263 /w44264 /w34265 # Hidden virtual functions and non-virtual destruction.
             /w44296 /w14555         # Constant comparisons and no-effect expressions.
             /w44668 /w15038         # Undefined macros and initialization order.
+            /wd4251                 # Exported engine classes intentionally contain STL implementation types.
             /utf-8
         )
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
