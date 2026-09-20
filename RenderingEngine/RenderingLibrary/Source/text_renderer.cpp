@@ -193,7 +193,6 @@ std::shared_ptr<FontResources> TextRenderer::GetFontResources(const std::string&
 				auto foundInFolder = mAvailableFontsInFolder.find(fontName);
 				if (foundInFolder != mAvailableFontsInFolder.end())
 				{
-					auto key = std::make_pair(fontName, fontSize);
 					mFontResources[key] = std::make_shared<FontResources>(mRenderResourceContext, this, mAvailableFontsInFolder[fontName], fontSize);
 
 					return mFontResources[key];

@@ -15,8 +15,7 @@ namespace rendering_engine
 
 VulkanRenderResources::VulkanRenderResources(VulkanRenderer* renderer)
     :
-    mRenderer(renderer),
-    bHasCustomMaterialVariables(false)
+    mRenderer(renderer)
 {
     mRenderer->RegisterObserver(this);
 }

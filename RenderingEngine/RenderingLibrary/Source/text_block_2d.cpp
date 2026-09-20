@@ -232,8 +232,7 @@ void TextBlock2D::ConstructMeshAutoLinebreak(const std::vector<std::uint32_t>& c
 
             GlyphIndex glyphIndex = mFontResources->GetIndexFromCodePoint(glyph);
             GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX, penY);
-            const std::string meshName = mMaterialMesh[glyphQuad.fontAtlasMaterialName];
-            PushQuad(meshName, meshes, glyphQuad);
+            PushQuad(meshes, glyphQuad);
             penX += static_cast<float>(glyphQuad.advanceX);
         }
     }
@@ -306,8 +305,7 @@ void TextBlock2D::ConstructMeshAutoLinebreak(const std::vector<std::uint32_t>& c
                     {
                         horizontalShift = (mMaxLineLength - lineLength);
                     }
-                    const std::string meshName = mMaterialMesh[quad.fontAtlasMaterialName];
-                    PushQuad(meshName, meshes, quad, horizontalShift);
+                    PushQuad(meshes, quad, horizontalShift);
                 }
                 line.clear();
 
@@ -386,7 +384,6 @@ void TextBlock2D::ConstructMesh()
     {
         for (const auto& glyphQuad : line)
         {
-            const std::string meshName = mMaterialMesh[glyphQuad.fontAtlasMaterialName];
             float horizontalShift = 0.0f;
             if (mTextAlign == TextAlign::Center)
             {
@@ -396,7 +393,7 @@ void TextBlock2D::ConstructMesh()
             {
                 horizontalShift = (mMaxLineLength - lineLengths[curLine]);
             }
-            PushQuad(meshName, meshes, glyphQuad, horizontalShift);
+            PushQuad(meshes, glyphQuad, horizontalShift);
         }
         ++curLine;
     }
@@ -463,7 +460,6 @@ void TextBlock2D::ShapeTextAndConstructMesh()
             glyphIndex.index = glyph.glyphIndex;
 
             GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX + glyph.xOffset, penY + glyph.yOffset);
-            const std::string meshName = mMaterialMesh[glyphQuad.fontAtlasMaterialName];
 
             float horizontalShift = 0.0f;
             if (mTextAlign == TextAlign::Center)
@@ -474,7 +470,7 @@ void TextBlock2D::ShapeTextAndConstructMesh()
             {
                 horizontalShift = (mMaxLineLength - lineLengths[curLine]);
             }
-            PushQuad(meshName, meshes, glyphQuad, horizontalShift);
+            PushQuad(meshes, glyphQuad, horizontalShift);
             penX += glyph.xAdvance;
         }
 
@@ -540,7 +536,7 @@ TextBlock2D::GlyphQuad TextBlock2D::MakeGlyphQuad(GlyphIndex glyphIndex, float p
     return result;
 }
 
-void TextBlock2D::PushQuad(std::string meshName, std::unordered_map<std::string, TextBlock2D::Mesh>& meshes, GlyphQuad glyphQuad, float horizontalShift)
+void TextBlock2D::PushQuad(std::unordered_map<std::string, TextBlock2D::Mesh>& meshes, GlyphQuad glyphQuad, float horizontalShift)
 {
     auto& mesh = meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]);
 

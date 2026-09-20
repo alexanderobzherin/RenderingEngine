@@ -214,10 +214,9 @@ protected:
 	 * @param glyphQuad Glyph quad data.
 	 * @param horizontalShift Alignment offset.
 	 */
-	void PushQuad(std::string meshName,
-		std::unordered_map<std::string, TextBlock2D::Mesh>& meshes,
-		GlyphQuad glyphQuad,
-		float horizontalShift = 0.0f);
+	void PushQuad(std::unordered_map<std::string, TextBlock2D::Mesh>& meshes,
+				  GlyphQuad glyphQuad,
+				  float horizontalShift = 0.0f);
 	/**
 	 * @brief Uploads prepared meshes to GPU resources.
 	 * @param meshes CPU-side mesh data.

@@ -95,8 +95,6 @@ private:
     MeshDataGpu* mMeshData;
     TextureCache* mTextureCache;
 
-    bool bHasCustomMaterialVariables;
-
     VkBuffer mVertexBuffer;
     VkBuffer mIndexBuffer;
 
@@ -111,8 +109,6 @@ private:
 
     VkDescriptorPool mDescriptorPool;
     std::vector<VkDescriptorSet> mDescriptorSets;
-
-
 };
 
 } // namespace rendering_engine

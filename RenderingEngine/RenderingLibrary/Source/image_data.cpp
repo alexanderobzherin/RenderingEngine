@@ -30,8 +30,6 @@ ImageData::ImageData(std::string filepath)
 	auto const pathToTexture = std::filesystem::path(filepath);
 	if(std::filesystem::exists(pathToTexture) && std::filesystem::is_regular_file(pathToTexture) )
 	{
-		std::filesystem::path const pathToTexture = std::filesystem::path(filepath);
-		
 		size_t const dot = pathToTexture.string().find_last_of(".");
 		std::string const fileExtension = pathToTexture.string().substr(dot + 1);
 

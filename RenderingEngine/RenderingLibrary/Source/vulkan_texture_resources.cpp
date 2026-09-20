@@ -150,7 +150,6 @@ void VulkanTextureResources::CreateVulkanImage(uint32_t width, uint32_t height, 
     mGpuMemorySize = allocInfo.allocationSize;
 
     vkBindImageMemory(mRenderer->GetLogicalDevice(), image, imageMemory, 0);
-    allocInfo.allocationSize;
 }
 
 void VulkanTextureResources::CreateTextureImageView()
