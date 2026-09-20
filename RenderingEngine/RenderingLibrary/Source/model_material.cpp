@@ -63,7 +63,7 @@ ModelMaterial::ModelMaterial(Model& model, aiMaterial& material)
 					textures.push_back(path.C_Str());
 				}
 			}
-			mTextures.emplace(textureType, move(textures));
+			mTextures.emplace(textureType, std::move(textures));
 		}
 	}
 }

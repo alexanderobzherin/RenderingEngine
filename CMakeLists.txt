@@ -29,7 +29,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Build flags
 if(UNIX)
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -g0 -s")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -g0")
 else()
     set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
 endif()

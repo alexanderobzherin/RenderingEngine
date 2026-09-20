@@ -245,6 +245,7 @@ endif()
 if(NOT WIN32)
 target_link_options(RenderingEngine PRIVATE
     "-Wl,--exclude-libs,ALL"
+	$<$<CONFIG:Release>:-s>
 )
 endif()
 
