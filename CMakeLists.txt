@@ -255,7 +255,7 @@ endif()
 
 find_package(nlohmann_json CONFIG QUIET)
 
-include(cmake/RenderingEngineWarnings.cmake)
+include(CMake/RenderingEngineWarnings.cmake)
 add_subdirectory(RenderingEngine)
 if(NOT RE_BUILD_ENGINE_ONLY)
 add_subdirectory(ContentExamples)

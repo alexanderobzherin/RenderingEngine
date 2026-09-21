@@ -16,7 +16,7 @@
  * - Steps: setup error handler -> create compressor/decompressor -> set parameters -> read/write scanlines -> clean up.
  *
  * Custom error handling is implemented via `codec_error_mgr` to safely recover
- * from libjpeg�s internal `longjmp` behavior.
+ * from libjpeg's internal `longjmp` behavior.
  *
  * @note This file is an internal backend of the Rendering Engine and is not part of the public API.
  *
@@ -118,6 +118,14 @@ codec_error_exit(j_common_ptr cinfo)
 static bool
 DoReadJpegFile(struct jpeg_decompress_struct* cinfo,
 	char const* filename, unsigned int& width, unsigned int& height, std::vector<std::uint8_t>& rgbImageDataVector);
+
+static bool DoReadJpegFromMemory(
+	struct jpeg_decompress_struct* cinfo,
+	const unsigned char* memory,
+	size_t memorySize,
+	unsigned int& width,
+	unsigned int& height,
+	std::vector<std::uint8_t>& rgbImageDataVector);
 
 /*
  * Sample routine for JPEG decompression.  We assume that the source file name
@@ -318,48 +326,80 @@ static bool ReadJpegFromMemory(
 	std::vector<std::uint8_t>& rgbImageDataVector)
 {
 	struct jpeg_decompress_struct cinfo;
+
+	return DoReadJpegFromMemory(
+		&cinfo,
+		memory,
+		memorySize,
+		width,
+		height,
+		rgbImageDataVector);
+}
+
+static bool DoReadJpegFromMemory(
+	struct jpeg_decompress_struct* cinfo,
+	const unsigned char* memory,
+	size_t memorySize,
+	unsigned int& width,
+	unsigned int& height,
+	std::vector<std::uint8_t>& rgbImageDataVector)
+{
 	struct codec_error_mgr jerr;
 
-	cinfo.err = jpeg_std_error(&jerr.pub);
+	cinfo->err = jpeg_std_error(&jerr.pub);
 	jerr.pub.error_exit = codec_error_exit;
 
-	if (setjmp(jerr.setjmp_buffer)) {
-		jpeg_destroy_decompress(&cinfo);
+	if (setjmp(jerr.setjmp_buffer))
+	{
+		jpeg_destroy_decompress(cinfo);
 		return false;
 	}
 
-	jpeg_create_decompress(&cinfo);
+	jpeg_create_decompress(cinfo);
 
-	if (memorySize > static_cast<size_t>(std::numeric_limits<unsigned long>::max()))
+	if (memorySize >
+		static_cast<size_t>(
+			std::numeric_limits<unsigned long>::max()))
 	{
+		jpeg_destroy_decompress(cinfo);
 		return false;
 	}
 
 	jpeg_mem_src(
-		&cinfo,
+		cinfo,
 		memory,
 		static_cast<unsigned long>(memorySize));
 
-	jpeg_read_header(&cinfo, TRUE);
-	jpeg_start_decompress(&cinfo);
+	jpeg_read_header(cinfo, TRUE);
+	jpeg_start_decompress(cinfo);
 
-	width = cinfo.output_width;
-	height = cinfo.output_height;
+	width = cinfo->output_width;
+	height = cinfo->output_height;
 
-	const size_t components = static_cast<size_t>(cinfo.output_components);
-	const size_t rowStride = static_cast<size_t>(width) * components;
-	const size_t imageSize = static_cast<size_t>(width) * static_cast<size_t>(height) *	components;
+	const size_t components =
+		static_cast<size_t>(cinfo->output_components);
+
+	const size_t rowStride =
+		static_cast<size_t>(width) * components;
+
+	const size_t imageSize =
+		static_cast<size_t>(width) *
+		static_cast<size_t>(height) *
+		components;
 
 	rgbImageDataVector.resize(imageSize);
 
-	while (cinfo.output_scanline < cinfo.output_height)
+	while (cinfo->output_scanline < cinfo->output_height)
 	{
-		unsigned char* row = rgbImageDataVector.data() + static_cast<size_t>(cinfo.output_scanline) * rowStride;
-		jpeg_read_scanlines(&cinfo, &row, 1);
+		unsigned char* row =
+			rgbImageDataVector.data() +
+			static_cast<size_t>(cinfo->output_scanline) * rowStride;
+
+		jpeg_read_scanlines(cinfo, &row, 1);
 	}
 
-	jpeg_finish_decompress(&cinfo);
-	jpeg_destroy_decompress(&cinfo);
+	jpeg_finish_decompress(cinfo);
+	jpeg_destroy_decompress(cinfo);
 
 	return true;
 }
