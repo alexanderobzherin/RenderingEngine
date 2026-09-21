@@ -75,7 +75,7 @@ public:
      * @param fontSize Font size in pixels.
      * @return Shared pointer to font resources, or nullptr if unavailable.
      */
-    std::shared_ptr<FontResources> GetFontResources(const std::string& fontName, int fontSize);
+    std::shared_ptr<FontResources> GetFontResources(const std::string& fontName, unsigned int fontSize);
     /**
      * @brief Enables or disables storing generated font atlases to files.
      * @param in True to store atlases on disk.
@@ -126,8 +126,8 @@ protected:
 private:
     struct PairHash
     {
-        std::size_t operator()(const std::pair<std::string, int>& p) const {
-            return std::hash<std::string>{}(p.first) ^ (std::hash<int>{}(p.second) << 1);
+        std::size_t operator()(const std::pair<std::string, unsigned int>& p) const {
+            return std::hash<std::string>{}(p.first) ^ (std::hash<unsigned int>{}(p.second) << 1);
         }
     };
 
@@ -140,7 +140,7 @@ private:
     std::unordered_map<std::string, std::string> mAvailableFontsInFolder;
     std::unordered_map<std::string, std::string> mAvailableFontsInPackage;
 
-    std::unordered_map<std::pair<std::string, int>, std::shared_ptr<FontResources>, PairHash> mFontResources;
+    std::unordered_map<std::pair<std::string, unsigned int>, std::shared_ptr<FontResources>, PairHash> mFontResources;
 
     bool bStoreFontAtlasesInFiles = false;
 

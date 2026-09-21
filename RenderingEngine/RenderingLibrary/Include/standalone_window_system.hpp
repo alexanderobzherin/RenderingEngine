@@ -6,7 +6,7 @@
 
 #include "i_window_system.hpp"
 
-class GLFWwindow;
+struct GLFWwindow;
 
 namespace rendering_engine
 {

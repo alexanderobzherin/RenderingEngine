@@ -98,8 +98,11 @@ void SceneManager::Update(float deltaTime)
 		using clock = std::chrono::steady_clock;
 		auto start = clock::now();
 
-		std::string oldSceneName = mCurrentScene ? typeid(*mCurrentScene).name() : "None";
-		std::string newSceneName = typeid(*mNextScene).name();
+		const Scene* currentScene = mCurrentScene.get();
+		const Scene* nextScene = mNextScene.get();
+
+		const std::string oldSceneName = currentScene ? typeid(*currentScene).name() : "None";
+		const std::string newSceneName = typeid(*nextScene).name();
 
 		if (mCurrentScene)
 		{

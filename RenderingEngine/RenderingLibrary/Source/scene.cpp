@@ -34,10 +34,10 @@ void Scene::Initialize()
 	if (appConfig.showStatsOverlay)
 	{
 		mStatsOverlay = SpawnActor2D<StatsOverlay>();
-		const float screenWidth = mSceneManager.GetApplication()->GetScreenSettings().width;
-		const float screenHeight = mSceneManager.GetApplication()->GetScreenSettings().height;
-		const float x = screenWidth / 2 - 200.0f;
-		const float y = -screenHeight / 2 + 130.0f;
+		const float screenWidth = static_cast<float>(mSceneManager.GetApplication()->GetScreenSettings().width);
+		const float screenHeight = static_cast<float>(mSceneManager.GetApplication()->GetScreenSettings().height);
+		const float x = screenWidth / 2.0f - 200.0f;
+		const float y = -screenHeight / 2.0f + 130.0f;
 		mStatsOverlay->SetPosition(glm::vec2(x, y));
 	}
 }

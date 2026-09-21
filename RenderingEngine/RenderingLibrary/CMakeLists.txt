@@ -192,19 +192,7 @@ CXX_STANDARD 17
 CXX_STANDARD_REQUIRED ON
 )
 
-if(NOT WIN32)
-	set_target_properties(RenderingEngine PROPERTIES
-		COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
-)
-else(
-	set_target_properties(RenderingEngine PROPERTIES
-		COMPILE_OPTIONS "-Wall;-Wextra"
-		RUNTIME_OUTPUT_DIRECTORY           "${CMAKE_BINARY_DIR}"
-		RUNTIME_OUTPUT_DIRECTORY_DEBUG     "${CMAKE_BINARY_DIR}"
-		RUNTIME_OUTPUT_DIRECTORY_RELEASE   "${CMAKE_BINARY_DIR}"
-	)
-)
-endif()
+re_enable_project_warnings(RenderingEngine)
 
 # Engine public headers (visible to SDK user)
 target_include_directories(RenderingEngine
@@ -257,6 +245,7 @@ endif()
 if(NOT WIN32)
 target_link_options(RenderingEngine PRIVATE
     "-Wl,--exclude-libs,ALL"
+	$<$<CONFIG:Release>:-s>
 )
 endif()
 

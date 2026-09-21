@@ -16,9 +16,7 @@ Mesh::Mesh(Model& model, aiMesh& mesh)
 	mFaceCount(0),
 	mIndices()
 {
-	mMaterial; // = mModel.Materials().at(mesh.mMaterialIndex);
-
-       // Vertices
+    // Vertices
     mVertices.reserve(mesh.mNumVertices);
     for( uint32_t i = 0; i < mesh.mNumVertices; i++ )
     {
@@ -80,7 +78,7 @@ Mesh::Mesh(Model& model, aiMesh& mesh)
             const auto& c = aiVertexColors[j];
             vertexColors.emplace_back(c.r, c.g, c.b, c.a);
         }
-        mVertexColors.push_back(move(vertexColors));
+        mVertexColors.push_back(std::move(vertexColors));
     }
 
     // Faces (note: could pre-reserve if we limit primitive types)

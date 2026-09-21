@@ -42,15 +42,15 @@ TextBlock2D::TextBlock2D(Scene& scene, std::shared_ptr<TextRenderer> textRendere
     :
     Drawable2D(textRenderer->GetRenderResourceContext(), scene),
     mTextRenderer(textRenderer),
-    bIsTextShapeEnabled(properties.textShapeEnabled),
+    mColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
     mFontName(properties.fontName),
     mFontSize(properties.fontSize),
     mLineSpacingScale(properties.lineSpacingScale),
-    mTextAlign(properties.textAlign),
     mMaxLineLength(properties.maxLineLength),
-    mOutlineThicknessPx(properties.outlineThicknessPx > 2 ? 2 : properties.outlineThicknessPx),
-    mColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-    mDimensions(glm::vec2(0.0f, 0.0f))
+    mTextAlign(properties.textAlign),
+    mDimensions(glm::vec2(0.0f, 0.0f)),
+    bIsTextShapeEnabled(properties.textShapeEnabled),
+    mOutlineThicknessPx(properties.outlineThicknessPx > 2.0f ? 2.0f : properties.outlineThicknessPx)
 {
     mFontResources = mTextRenderer->GetFontResources(mFontName, mFontSize);
     if (!mFontResources)
@@ -150,45 +150,45 @@ std::vector<std::uint32_t> TextBlock2D::DecodeUtf8(const std::string& text)
         std::uint32_t codePoint = 0;
         unsigned char c = bytes[i];
 
-        if (c <= 0x7F)
+        if (c <= 0x7FU)
         {
             // 1-byte sequence (ASCII)
             codePoint = c;
             i += 1;
         }
-        else if ((c & 0xE0) == 0xC0)
+        else if ((c & 0xE0U) == 0xC0U)
         {
             // 2-byte sequence
             if (i + 1 >= length) break;
 
             codePoint =
-                ((c & 0x1F) << 6) |
-                (bytes[i + 1] & 0x3F);
+                ((c & 0x1FU) << 6) |
+                (bytes[i + 1] & 0x3FU);
 
             i += 2;
         }
-        else if ((c & 0xF0) == 0xE0)
+        else if ((c & 0xF0U) == 0xE0U)
         {
             // 3-byte sequence
             if (i + 2 >= length) break;
 
             codePoint =
-                ((c & 0x0F) << 12) |
-                ((bytes[i + 1] & 0x3F) << 6) |
-                (bytes[i + 2] & 0x3F);
+                ((c & 0x0FU) << 12) |
+                ((bytes[i + 1] & 0x3FU) << 6) |
+                (bytes[i + 2] & 0x3FU);
 
             i += 3;
         }
-        else if ((c & 0xF8) == 0xF0)
+        else if ((c & 0xF8U) == 0xF0U)
         {
             // 4-byte sequence
             if (i + 3 >= length) break;
 
             codePoint =
-                ((c & 0x07) << 18) |
-                ((bytes[i + 1] & 0x3F) << 12) |
-                ((bytes[i + 2] & 0x3F) << 6) |
-                (bytes[i + 3] & 0x3F);
+                ((c & 0x07U) << 18) |
+                ((bytes[i + 1] & 0x3FU) << 12) |
+                ((bytes[i + 2] & 0x3FU) << 6) |
+                (bytes[i + 3] & 0x3FU);
 
             i += 4;
         }
@@ -210,6 +210,7 @@ void TextBlock2D::ConstructMeshAutoLinebreak(const std::vector<std::uint32_t>& c
     auto meshes = PrepareMeshSlots(codePoints);
 
     const FontMetrics& fontMetrics = mFontResources->GetFontMetrics();
+    const float lineHeight = static_cast<float>(fontMetrics.lineHeight);
     // Pen position (baseline)
     float penX = 0.0f;
     float penY = 0.0f;
@@ -225,15 +226,14 @@ void TextBlock2D::ConstructMeshAutoLinebreak(const std::vector<std::uint32_t>& c
             if (glyph == newLine)
             {
                 penX = 0.0f;
-                penY += fontMetrics.lineHeight;
+                penY += lineHeight;
                 continue;
             }
 
             GlyphIndex glyphIndex = mFontResources->GetIndexFromCodePoint(glyph);
             GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX, penY);
-            const std::string meshName = mMaterialMesh[glyphQuad.fontAtlasMaterialName];
-            PushQuad(meshName, meshes, glyphQuad);
-            penX += glyphQuad.advanceX;
+            PushQuad(meshes, glyphQuad);
+            penX += static_cast<float>(glyphQuad.advanceX);
         }
     }
     else
@@ -262,7 +262,7 @@ void TextBlock2D::ConstructMeshAutoLinebreak(const std::vector<std::uint32_t>& c
                 stringProcessed.append(curGlyph);
                 GlyphIndex glyphIndex = mFontResources->GetIndexFromCodePoint(codePoints[nextGlyphIndex]);
                 GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX, penY);
-                penX += glyphQuad.advanceX;
+                penX += static_cast<float>(glyphQuad.advanceX);
                 nextWord.push_back(glyphQuad);
                 ++nextGlyphIndex;
                 isLastGlyphProcessed = nextGlyphIndex >= codePoints.size();
@@ -278,7 +278,7 @@ void TextBlock2D::ConstructMeshAutoLinebreak(const std::vector<std::uint32_t>& c
                     GlyphIndex glyphIndex = mFontResources->GetIndexFromCodePoint(space);
                     GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX, penY);
                     stringProcessed.append(" ");
-                    penX += glyphQuad.advanceX;
+                    penX += static_cast<float>(glyphQuad.advanceX);
                     nextWord.push_back(glyphQuad);
                     ++nextGlyphIndex;
                 }
@@ -305,13 +305,12 @@ void TextBlock2D::ConstructMeshAutoLinebreak(const std::vector<std::uint32_t>& c
                     {
                         horizontalShift = (mMaxLineLength - lineLength);
                     }
-                    const std::string meshName = mMaterialMesh[quad.fontAtlasMaterialName];
-                    PushQuad(meshName, meshes, quad, horizontalShift);
+                    PushQuad(meshes, quad, horizontalShift);
                 }
                 line.clear();
 
                 penX = 0.0f;
-                penY += fontMetrics.lineHeight;
+                penY += lineHeight;
                 nextGlyphIndex = currentIndex;
             }
         }
@@ -347,6 +346,7 @@ void TextBlock2D::ConstructMesh()
     std::vector<std::vector<GlyphQuad>> linesOfGlyphQuads;
 
     const FontMetrics& fontMetrics = mFontResources->GetFontMetrics();
+    const float lineHeight = static_cast<float>(fontMetrics.lineHeight);
 
     float penX = 0.0f;
     float penY = 0.0f;
@@ -360,7 +360,7 @@ void TextBlock2D::ConstructMesh()
             GlyphIndex glyphIndex = mFontResources->GetIndexFromCodePoint(glyph);
             GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX, penY);
 
-            penX += glyphQuad.advanceX;
+            penX += static_cast<float>(glyphQuad.advanceX);
             lineOfGlyphQuads.push_back(glyphQuad);
         }
 
@@ -368,7 +368,7 @@ void TextBlock2D::ConstructMesh()
         linesOfGlyphQuads.push_back(lineOfGlyphQuads);
         const float lineLength = penX;
 
-        penY += (fontMetrics.lineHeight * mLineSpacingScale);
+        penY += (lineHeight * mLineSpacingScale);
 
         if (lineLength > maximumLineLengh)
         {
@@ -384,7 +384,6 @@ void TextBlock2D::ConstructMesh()
     {
         for (const auto& glyphQuad : line)
         {
-            const std::string meshName = mMaterialMesh[glyphQuad.fontAtlasMaterialName];
             float horizontalShift = 0.0f;
             if (mTextAlign == TextAlign::Center)
             {
@@ -394,7 +393,7 @@ void TextBlock2D::ConstructMesh()
             {
                 horizontalShift = (mMaxLineLength - lineLengths[curLine]);
             }
-            PushQuad(meshName, meshes, glyphQuad, horizontalShift);
+            PushQuad(meshes, glyphQuad, horizontalShift);
         }
         ++curLine;
     }
@@ -451,7 +450,8 @@ void TextBlock2D::ShapeTextAndConstructMesh()
     mMaxLineLength = (mMaxLineLength > maximumLineLengh ? mMaxLineLength : maximumLineLengh);
 
     const FontMetrics& fontMetrics = mFontResources->GetFontMetrics();
-    int curLine = 0;
+    const float lineHeight = static_cast<float>(fontMetrics.lineHeight);
+    std::size_t curLine = 0U;
     for (auto& line : linesOfShapedGlyphs)
     {
         for (const auto& glyph : line)
@@ -460,7 +460,6 @@ void TextBlock2D::ShapeTextAndConstructMesh()
             glyphIndex.index = glyph.glyphIndex;
 
             GlyphQuad glyphQuad = MakeGlyphQuad(glyphIndex, penX + glyph.xOffset, penY + glyph.yOffset);
-            const std::string meshName = mMaterialMesh[glyphQuad.fontAtlasMaterialName];
 
             float horizontalShift = 0.0f;
             if (mTextAlign == TextAlign::Center)
@@ -471,16 +470,19 @@ void TextBlock2D::ShapeTextAndConstructMesh()
             {
                 horizontalShift = (mMaxLineLength - lineLengths[curLine]);
             }
-            PushQuad(meshName, meshes, glyphQuad, horizontalShift);
+            PushQuad(meshes, glyphQuad, horizontalShift);
             penX += glyph.xAdvance;
         }
 
         penX = 0.0f;
-        penY += (fontMetrics.lineHeight * mLineSpacingScale);
+        penY += (lineHeight * mLineSpacingScale);
         ++curLine;
     }
 
-    mDimensions = glm::vec2(mMaxLineLength, linesOfShapedGlyphs.size() * fontMetrics.lineHeight * mLineSpacingScale);
+    const float lineCount =
+    static_cast<float>(linesOfShapedGlyphs.size());
+
+    mDimensions = glm::vec2(mMaxLineLength, lineCount * lineHeight * mLineSpacingScale);
 
     UploadMeshes(meshes);
 
@@ -499,11 +501,16 @@ TextBlock2D::GlyphQuad TextBlock2D::MakeGlyphQuad(GlyphIndex glyphIndex, float p
 
     result.fontAtlasMaterialName = fontAtlasMaterialName;
     
+    const float bearingX = static_cast<float>(glyphMetrics.bearingX);
+    const float bearingY = static_cast<float>(glyphMetrics.bearingY);
+    const float glyphWidth = static_cast<float>(glyphMetrics.width);
+    const float glyphHeight = static_cast<float>(glyphMetrics.height);
+
     // Positions
-    const float x0 = penX + glyphMetrics.bearingX;
-    const float y0 = penY - glyphMetrics.bearingY; // y0 - top
-    const float y1 = y0 + glyphMetrics.height; // y1 - bottom
-    const float x1 = x0 + glyphMetrics.width;
+    const float x0 = penX + bearingX;
+    const float y0 = penY - bearingY; // y0 - top
+    const float y1 = y0 + glyphHeight; // y1 - bottom
+    const float x1 = x0 + glyphWidth;
 
     result.x0 = x0 - mOutlineThicknessPx * 2;
     result.y0 = y0 - mOutlineThicknessPx * 2;
@@ -511,27 +518,35 @@ TextBlock2D::GlyphQuad TextBlock2D::MakeGlyphQuad(GlyphIndex glyphIndex, float p
     result.y1 = y1 + mOutlineThicknessPx * 2;
 
     // UVs
-    const auto atlasWidth = static_cast<float>(fontAtlas->GetCpuImageData().GetWidth());
-    const auto atlasHeight = static_cast<float>(fontAtlas->GetCpuImageData().GetHeight());
+    const float atlasWidth =
+        static_cast<float>(fontAtlas->GetCpuImageData().GetWidth());
+    const float atlasHeight =
+        static_cast<float>(fontAtlas->GetCpuImageData().GetHeight());
 
-    const float u0 = static_cast<float>(glyphMetrics.atlasX - mOutlineThicknessPx * 2) / atlasWidth;
-    const float v0 = static_cast<float>(glyphMetrics.atlasY - mOutlineThicknessPx * 2) / atlasHeight;
-    const float u1 = static_cast<float>(glyphMetrics.atlasX + glyphMetrics.width + mOutlineThicknessPx * 2) / atlasWidth;
-    const float v1 = static_cast<float>(glyphMetrics.atlasY + glyphMetrics.height + mOutlineThicknessPx * 2) / atlasHeight;
+    const float atlasX = static_cast<float>(glyphMetrics.atlasX);
+    const float atlasY = static_cast<float>(glyphMetrics.atlasY);
 
-    result.u0 = u0;
-    result.v0 = v0;
-    result.u1 = u1;
-    result.v1 = v1;
+    result.u0 = (atlasX - mOutlineThicknessPx * 2) / atlasWidth;
+    result.v0 = (atlasY - mOutlineThicknessPx * 2) / atlasHeight;
+    result.u1 = (atlasX + glyphWidth + mOutlineThicknessPx * 2) / atlasWidth;
+    result.v1 = (atlasY + glyphHeight + mOutlineThicknessPx * 2) / atlasHeight;
 
     result.advanceX = glyphMetrics.advanceX;
 
     return result;
 }
 
-void TextBlock2D::PushQuad(std::string meshName, std::unordered_map<std::string, TextBlock2D::Mesh>& meshes, GlyphQuad glyphQuad, float horizontalShift)
+void TextBlock2D::PushQuad(std::unordered_map<std::string, TextBlock2D::Mesh>& meshes, GlyphQuad glyphQuad, float horizontalShift)
 {
-    const uint32_t vertexBase = meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.size();
+    auto& mesh = meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]);
+
+    if (mesh.positions2D.size() >
+        static_cast<std::size_t>(std::numeric_limits<std::uint32_t>::max()) - 3U)
+    {
+        throw std::overflow_error("TextBlock2D mesh exceeds 32-bit index range.");
+    }
+
+    const std::uint32_t vertexBase = static_cast<std::uint32_t>(mesh.positions2D.size());
 
     const glm::vec2 shift(horizontalShift, 0.0f);
 
@@ -540,31 +555,31 @@ void TextBlock2D::PushQuad(std::string meshName, std::unordered_map<std::string,
     const glm::vec2 vert_2 = glm::vec2(glyphQuad.x1, glyphQuad.y1) + shift;
     const glm::vec2 vert_3 = glm::vec2(glyphQuad.x0, glyphQuad.y1) + shift;
 
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_0);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_1);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_2);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).positions2D.push_back(vert_3);
+    mesh.positions2D.push_back(vert_0);
+    mesh.positions2D.push_back(vert_1);
+    mesh.positions2D.push_back(vert_2);
+    mesh.positions2D.push_back(vert_3);
 
     // UVs
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v0));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u1, glyphQuad.v0));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u1, glyphQuad.v1));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v1));
+    mesh.texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v0));
+    mesh.texCoords.push_back(glm::vec2(glyphQuad.u1, glyphQuad.v0));
+    mesh.texCoords.push_back(glm::vec2(glyphQuad.u1, glyphQuad.v1));
+    mesh.texCoords.push_back(glm::vec2(glyphQuad.u0, glyphQuad.v1));
 
     // Colors
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.colors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     // Indices
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 0);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 1);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 2);
+    mesh.indices.push_back(vertexBase + 0U);
+    mesh.indices.push_back(vertexBase + 1U);
+    mesh.indices.push_back(vertexBase + 2U);
 
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 2);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 3);
-    meshes.at(mMaterialMesh[glyphQuad.fontAtlasMaterialName]).indices.push_back(vertexBase + 0);
+    mesh.indices.push_back(vertexBase + 2U);
+    mesh.indices.push_back(vertexBase + 3U);
+    mesh.indices.push_back(vertexBase + 0U);
 }
 
 void TextBlock2D::UploadMeshes(const std::unordered_map<std::string, TextBlock2D::Mesh>& meshes)
@@ -675,10 +690,10 @@ std::vector<TextBlock2D::ShapedGlyph> TextBlock2D::ShapeText(const std::string& 
     {
         ShapedGlyph shapedGlyph;
         shapedGlyph.glyphIndex = glyph_info[i].codepoint;
-        shapedGlyph.xOffset = glyph_pos[i].x_offset / 64.0f;
-        shapedGlyph.yOffset = glyph_pos[i].y_offset / 64.0f;
-        shapedGlyph.xAdvance = glyph_pos[i].x_advance / 64.0f;
-        shapedGlyph.yAdvance = glyph_pos[i].y_advance / 64.0f;
+        shapedGlyph.xOffset = static_cast<float>(glyph_pos[i].x_offset) / 64.0f;
+        shapedGlyph.yOffset = static_cast<float>(glyph_pos[i].y_offset) / 64.0f;
+        shapedGlyph.xAdvance =static_cast<float>(glyph_pos[i].x_advance) / 64.0f;
+        shapedGlyph.yAdvance = static_cast<float>(glyph_pos[i].y_advance) / 64.0f;
         shapedGlyph.cluster = glyph_info[i].cluster;
         result.push_back(shapedGlyph);
     }

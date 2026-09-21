@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "2")
-set(VERSION_PATCH "14")
+set(VERSION_PATCH "15")
 
 #set the project name
 project(RenderingEngineProject VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
@@ -29,7 +29,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Build flags
 if(UNIX)
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -g0 -s")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -g0")
 else()
     set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
 endif()
@@ -255,6 +255,7 @@ endif()
 
 find_package(nlohmann_json CONFIG QUIET)
 
+include(CMake/RenderingEngineWarnings.cmake)
 add_subdirectory(RenderingEngine)
 if(NOT RE_BUILD_ENGINE_ONLY)
 add_subdirectory(ContentExamples)

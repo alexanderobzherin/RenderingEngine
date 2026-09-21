@@ -7,8 +7,8 @@ namespace rendering_engine
 {
 Actor2D::Actor2D(Scene& scene)
 	:
-	mScene(scene),
-	bUpdateOnTick(true)
+	bUpdateOnTick(true),
+	mScene(scene)
 {
 	mRenderContext = mScene.GetSceneManager().GetRenderResourceContext();
 }
@@ -61,7 +61,7 @@ const SceneComponent2D& Actor2D::GetTransform() const
 	return mRootComponent;
 }
 
-void Actor2D::Update(float deltaTime)
+void Actor2D::Update(float)
 {
 	if (!bUpdateOnTick)
 		return;

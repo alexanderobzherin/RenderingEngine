@@ -61,7 +61,7 @@ struct Properties
 	/// Font family name.
 	std::string fontName;
 	/// Font size in pixels.
-	float fontSize = 10;
+	unsigned int fontSize = 10U;
 	/// Horizontal text alignment.
 	TextAlign textAlign = TextAlign::Left;
 	/// Maximum line length for layout; zero disables wrapping.
@@ -148,7 +148,7 @@ struct GlyphQuad
 	float v1;
 
 	std::string fontAtlasMaterialName;
-	std::uint32_t advanceX;
+	std::int32_t advanceX;
 };
 /**
  * @struct ShapedGlyph
@@ -214,10 +214,9 @@ protected:
 	 * @param glyphQuad Glyph quad data.
 	 * @param horizontalShift Alignment offset.
 	 */
-	void PushQuad(std::string meshName,
-		std::unordered_map<std::string, TextBlock2D::Mesh>& meshes,
-		GlyphQuad glyphQuad,
-		float horizontalShift = 0.0f);
+	void PushQuad(std::unordered_map<std::string, TextBlock2D::Mesh>& meshes,
+				  GlyphQuad glyphQuad,
+				  float horizontalShift = 0.0f);
 	/**
 	 * @brief Uploads prepared meshes to GPU resources.
 	 * @param meshes CPU-side mesh data.

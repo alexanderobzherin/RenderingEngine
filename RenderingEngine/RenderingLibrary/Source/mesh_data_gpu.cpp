@@ -8,19 +8,19 @@ namespace rendering_engine
 MeshDataGpu::MeshDataGpu(IRenderer* renderer)
 	:
 	mRenderer(renderer),
-	mGpuHandle(nullptr),
+	mMeshType(MeshType::None),
 	mSizeOfVerticesBytes(0),
 	mSizeOfIndicesBytes(0),
-	mMeshType(MeshType::None)
+	mGpuHandle(nullptr)
 {
 }
 	MeshDataGpu::MeshDataGpu(const std::string& filename, IRenderer* renderer)
 	:
 	mRenderer(renderer),
-	mGpuHandle(nullptr),
+	mMeshType(MeshType::None),
 	mSizeOfVerticesBytes(0),
 	mSizeOfIndicesBytes(0),
-	mMeshType(MeshType::None)
+	mGpuHandle(nullptr)
 {
 	LoadModel(filename);
 }
@@ -28,10 +28,10 @@ MeshDataGpu::MeshDataGpu(IRenderer* renderer)
 MeshDataGpu::MeshDataGpu(std::vector<uint8_t> const& fileBytes, IRenderer* renderer)
 	:
 	mRenderer(renderer),
-	mGpuHandle(nullptr),
+	mMeshType(MeshType::None),
 	mSizeOfVerticesBytes(0),
 	mSizeOfIndicesBytes(0),
-	mMeshType(MeshType::None)
+	mGpuHandle(nullptr)
 {
 	LoadModel(fileBytes);
 }

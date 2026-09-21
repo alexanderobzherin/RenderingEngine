@@ -305,7 +305,7 @@ private:
     void CreateFrameSyncObjects();
     void CreateSwapchainSyncObjects();
 
-    VkShaderModule CreateShaderModule(std::vector<char>& code);
+    VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
     void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 

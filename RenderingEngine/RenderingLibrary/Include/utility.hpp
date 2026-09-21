@@ -37,7 +37,7 @@ struct AppConfig
 	/** @brief Unicode scripts to preload for text rendering. */
 	std::vector<std::string> textScripts{"Latin"};
 	/** @brief Font sizes to preload at startup. */
-	std::vector<int> fontSizePreload{10};
+	std::vector<unsigned int> fontSizePreload{10U};
 	/** @brief Logging verbosity level ("Error", "Warning", "Info", "Debug"). */
 	std::string logLevel{"Info"};
 	/** @brief Enable FPS smoothing and frame pacing behavior. */

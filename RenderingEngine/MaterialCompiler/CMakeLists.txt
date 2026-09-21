@@ -29,19 +29,13 @@ add_executable(MaterialCompiler ${HEADER_FILES} ${SRC_FILES})
 #	CXX_STANDARD 17
 #	CXX_STANDARD_REQUIRED ON
 #)
+
+re_enable_project_warnings(MaterialCompiler)
+
 if(NOT WIN32)
-target_compile_options(MaterialCompiler PRIVATE
-	-Wpedantic
-	-Wall
-	-Wextra
-)
-else(
-	set_target_properties(MaterialCompiler PROPERTIES
-	COMPILE_OPTIONS "-Wall;-Wextra"
-	#RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-	#set_target_properties( VulkanProject PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}" )
-	)
-)
+    target_link_options(MaterialCompiler PRIVATE
+        $<$<CONFIG:Release>:-s>
+    )
 endif()
 
 target_link_libraries(MaterialCompiler PRIVATE

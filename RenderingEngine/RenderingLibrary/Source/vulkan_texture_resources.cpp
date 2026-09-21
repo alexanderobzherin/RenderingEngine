@@ -1,6 +1,9 @@
 #include "vulkan_texture_resources.hpp"
 #include "vulkan_renderer.hpp"
 
+#include <limits>
+#include <stdexcept>
+
 namespace rendering_engine
 {
 
@@ -54,10 +57,19 @@ void VulkanTextureResources::CreateTextureImage()
     unsigned int const width = mImageData->GetWidth();
     unsigned int const height = mImageData->GetHeight();
 
+    if (width > static_cast<unsigned int>(std::numeric_limits<int32_t>::max()) ||
+        height > static_cast<unsigned int>(std::numeric_limits<int32_t>::max()))
+    {
+        throw std::out_of_range("Texture dimensions exceed supported mipmap range.");
+    }
+
     mMipmapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(width, height)))) + 1;
     auto const pixelVector = mImageData->GetImageDataRGBA();
 
-    VkDeviceSize imageSize = width * height * 4;
+    const VkDeviceSize imageSize =
+        static_cast<VkDeviceSize>(width) *
+        static_cast<VkDeviceSize>(height) *
+        4;
 
     if (pixelVector.size() == 0)
     {
@@ -69,7 +81,7 @@ void VulkanTextureResources::CreateTextureImage()
 
     mRenderer->CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
-    unsigned char* pixels = new unsigned char[width * height * 4];
+    unsigned char* pixels = new unsigned char[static_cast<size_t>(imageSize)];
     std::copy(pixelVector.begin(), pixelVector.end(), pixels);
     void* data;
     vkMapMemory(mRenderer->GetLogicalDevice(), stagingBufferMemory, 0, imageSize, 0, &data);
@@ -77,7 +89,7 @@ void VulkanTextureResources::CreateTextureImage()
     vkUnmapMemory(mRenderer->GetLogicalDevice(), stagingBufferMemory);
     delete[] pixels;
 
-    CreateVulkanImage(width, height, mMipmapLevels, VK_SAMPLE_COUNT_1_BIT, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+    CreateVulkanImage(static_cast<uint32_t>(width), static_cast<uint32_t>(height), mMipmapLevels, VK_SAMPLE_COUNT_1_BIT, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, mTextureImage, mTextureImageMemory);
 
     mRenderer->TransitionImageLayout(mTextureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mMipmapLevels);
@@ -86,7 +98,12 @@ void VulkanTextureResources::CreateTextureImage()
     vkDestroyBuffer(mRenderer->GetLogicalDevice(), stagingBuffer, nullptr);
     vkFreeMemory(mRenderer->GetLogicalDevice(), stagingBufferMemory, nullptr);
 
-    mRenderer->GenerateMipmaps(mTextureImage, VK_FORMAT_R8G8B8A8_SRGB, width, height, mMipmapLevels);
+    mRenderer->GenerateMipmaps(
+        mTextureImage, 
+        VK_FORMAT_R8G8B8A8_SRGB, 
+        static_cast<int32_t>(width), 
+        static_cast<int32_t>(height), 
+        mMipmapLevels);
 }
 
 void VulkanTextureResources::CreateVulkanImage(uint32_t width, uint32_t height, std::uint32_t mipmapLevels, VkSampleCountFlagBits numSamples, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory)
@@ -94,8 +111,8 @@ void VulkanTextureResources::CreateVulkanImage(uint32_t width, uint32_t height, 
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.extent.width = static_cast<uint32_t>(width);
-    imageInfo.extent.height = static_cast<uint32_t>(height);
+    imageInfo.extent.width = width;
+    imageInfo.extent.height = height;
     imageInfo.extent.depth = 1;
     imageInfo.mipLevels = mipmapLevels;
     imageInfo.arrayLayers = 1;
@@ -133,7 +150,6 @@ void VulkanTextureResources::CreateVulkanImage(uint32_t width, uint32_t height, 
     mGpuMemorySize = allocInfo.allocationSize;
 
     vkBindImageMemory(mRenderer->GetLogicalDevice(), image, imageMemory, 0);
-    allocInfo.allocationSize;
 }
 
 void VulkanTextureResources::CreateTextureImageView()

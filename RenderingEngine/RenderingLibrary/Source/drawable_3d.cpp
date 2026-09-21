@@ -13,7 +13,7 @@ void Drawable3D::Initialize()
 	DrawableComponent::Initialize();
 }
 
-void Drawable3D::Update(float deltaTime)
+void Drawable3D::Update(float)
 {
 	if (bUpdateOnTick)
 	{
