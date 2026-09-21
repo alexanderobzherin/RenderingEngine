@@ -55,7 +55,7 @@ public:
 	/**
 	 * @brief Virtual destructor for safe polymorphic destruction.
 	 */
-	~Scene() = default;
+	virtual ~Scene() = default;
 	/**
 	 * @brief Initializes scene resources and drawables.
 	 *

@@ -44,11 +44,11 @@ public:
 	/// Returns total accumulated application time since start.
 	const std::chrono::milliseconds& TotalAppTime() const;
 	/// Returns total accumulated time in milliseconds (float).
-	const float TotalAppTimeMilliseconds() const;
+	float TotalAppTimeMilliseconds() const;
 	/// Sets total accumulated application time.
 	void SetTotalAppTime(const std::chrono::milliseconds& totalAppTime);
 	/// Returns elapsed time since the last frame in milliseconds (float).
-	const float ElapsedAppTimeSeconds() const;
+	float ElapsedAppTimeSeconds() const;
 	/// Returns elapsed time since the last frame.
 	const std::chrono::milliseconds& ElapsedAppTime() const;
 	/// Sets elapsed time since the last frame.

@@ -8,8 +8,8 @@ namespace rendering_engine
 
 Actor::Actor(Scene& scene)
 	:
-	mScene(scene),
-	bUpdateOnTick(true)
+	bUpdateOnTick(true),
+	mScene(scene)
 {
 	mRenderContext = mScene.GetSceneManager().GetRenderResourceContext();
 }
@@ -63,7 +63,7 @@ const SceneComponent& Actor::GetTransform() const
 	return mRootComponent;
 }
 
-void Actor::Update(float deltaTime)
+void Actor::Update(float)
 {
 	if (!bUpdateOnTick)
 		return;

@@ -15,8 +15,7 @@ namespace rendering_engine
 
 VulkanRenderResources::VulkanRenderResources(VulkanRenderer* renderer)
     :
-    mRenderer(renderer),
-    bHasCustomMaterialVariables(false)
+    mRenderer(renderer)
 {
     mRenderer->RegisterObserver(this);
 }
@@ -146,14 +145,20 @@ void VulkanRenderResources::AcquireResources()
 
 void VulkanRenderResources::CreateUniformBuffers()
 {
-    VkDeviceSize transformationBufferSize;
-    if (mMaterial->GetMaterialSettings().materialDomain == MaterialDomain::Sprite2D)
+    VkDeviceSize transformationBufferSize = 0;
+
+    switch (mMaterial->GetMaterialSettings().materialDomain)
     {
-        transformationBufferSize = sizeof(Transformations2D);
-    }
-    if (mMaterial->GetMaterialSettings().materialDomain == MaterialDomain::Surface3D)
-    {
-        transformationBufferSize = sizeof(Transformations3D);
+        case MaterialDomain::Sprite2D:
+            transformationBufferSize = sizeof(Transformations2D);
+            break;
+
+        case MaterialDomain::Surface3D:
+            transformationBufferSize = sizeof(Transformations3D);
+            break;
+
+        default:
+            throw std::runtime_error("Unsupported material domain.");
     }
 
     mTransformationBuffers.resize(MAX_FRAMES_IN_FLIGHT);

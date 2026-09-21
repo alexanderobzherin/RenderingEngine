@@ -37,9 +37,9 @@ bool TextureAtlasMaker::CreateTextureAtlas(std::map<char, std::pair<unsigned int
 
 	auto imageIterator = mImageCollection.begin();
 
-	for( int y = 0; y < numberOfRows; y++ )
+	for(unsigned int y = 0; y < numberOfRows; y++)
 	{
-		for( int x = 0; x < numberOfColumns; x++ )
+		for(unsigned int x = 0; x < numberOfColumns; x++)
 		{
 			if( imageIterator != mImageCollection.end() )
 			{
@@ -82,9 +82,9 @@ ImageData TextureAtlasMaker::CreateTextureAtlas(std::unordered_map<std::uint32_t
 
 	auto imageIterator = ioFontAtlas.begin();
 
-	for (int y = 0; y < numberOfRows; y++)
+	for (unsigned int y = 0; y < numberOfRows; y++)
 	{
-		for (int x = 0; x < numberOfColumns; x++)
+		for (unsigned int x = 0; x < numberOfColumns; x++)
 		{
 			if (imageIterator != ioFontAtlas.end())
 			{
@@ -147,12 +147,21 @@ void TextureAtlasMaker::CalculateGridDimensions(unsigned int& outputNumberOfColu
 	unsigned int cellHeight;
 	FindCellDimensions(cellWidth, cellHeight);
 
-	unsigned int cellsNum = mImageCollection.size();
-	int totalSquare = cellWidth * cellHeight * cellsNum;
-	float rootSq = sqrtf(totalSquare);
+	const std::size_t cellsNum = mImageCollection.size();
+	const double totalSquare =
+		static_cast<double>(cellWidth) *
+		static_cast<double>(cellHeight) *
+		static_cast<double>(cellsNum);
 
-	outputNumberOfColumns = std::ceil(rootSq / cellWidth);
-	outputNumberOfRows = std::ceil((float)(cellsNum) / (float)(outputNumberOfColumns));
+	const double rootSq = std::sqrt(totalSquare);
+
+	outputNumberOfColumns = static_cast<unsigned int>(
+		std::ceil(rootSq / static_cast<double>(cellWidth)));
+
+	outputNumberOfRows = static_cast<unsigned int>(
+		std::ceil(
+			static_cast<double>(cellsNum) /
+			static_cast<double>(outputNumberOfColumns)));
 }
 
 void TextureAtlasMaker::CalculateGridDimensions(unsigned int& outputNumberOfColumns, unsigned int& outputNumberOfRows, std::unordered_map<std::uint32_t, std::pair<GlyphMetrics, ImageData>>& fontAtlas)
@@ -161,12 +170,22 @@ void TextureAtlasMaker::CalculateGridDimensions(unsigned int& outputNumberOfColu
 	unsigned int cellHeight;
 	FindCellDimensions(cellWidth, cellHeight, fontAtlas);
 
-	unsigned int cellsNum = fontAtlas.size();
-	int totalSquare = cellWidth * cellHeight * cellsNum;
-	float rootSq = sqrtf(totalSquare);
+	const std::size_t cellsNum = fontAtlas.size();
 
-	outputNumberOfColumns = std::ceil(rootSq / cellWidth);
-	outputNumberOfRows = std::ceil((float)(cellsNum) / (float)(outputNumberOfColumns));
+	const double totalSquare =
+		static_cast<double>(cellWidth) *
+		static_cast<double>(cellHeight) *
+		static_cast<double>(cellsNum);
+
+	const double rootSq = std::sqrt(totalSquare);
+
+	outputNumberOfColumns = static_cast<unsigned int>(
+		std::ceil(rootSq / static_cast<double>(cellWidth)));
+
+	outputNumberOfRows = static_cast<unsigned int>(
+		std::ceil(
+			static_cast<double>(cellsNum) /
+			static_cast<double>(outputNumberOfColumns)));
 }
 
 }// rendering_engine

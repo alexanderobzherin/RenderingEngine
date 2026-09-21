@@ -53,7 +53,7 @@ void StatsOverlay::Initialize()
 	const float column_0 = -middleX + pad;
 	const float column_1 = column_0 + middleX + pad;
 
-	const float row_0 = -middleY + tbProp.fontSize + pad;
+	const float row_0 = -middleY + static_cast<float>(tbProp.fontSize) + pad;
 	const float row_1 = row_0 + vertDelta;
 	const float row_2 = row_1 + vertDelta;
 	const float row_3 = row_2 + vertDelta;

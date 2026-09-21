@@ -1,5 +1,6 @@
 #include "utility.hpp"
 #include <nlohmann/json.hpp>
+#include <limits>
 
 namespace rendering_engine
 {
@@ -25,6 +26,8 @@ path const Utility::sContentPackEntriesFilePath = path{} / "Content" / "Pack.jso
 
 void Utility::InitializePaths(int argc, char* argv[])
 {
+	static_cast<void>(argc);
+
 	sApplicationPath = std::filesystem::path(argv[0]);
 
 	sBuildPath = FindPath( "Build" );
@@ -83,7 +86,7 @@ AppConfig Utility::ReadConfigFile()
 					auto found = std::find(cfg.fontSizePreload.begin(), cfg.fontSizePreload.end(), fontSize);
 					if (found == cfg.fontSizePreload.end())
 					{
-						cfg.fontSizePreload.push_back(fontSize.get<int>());
+						cfg.fontSizePreload.push_back(fontSize.get<unsigned int>());
 					}
 				}
 			}
@@ -102,7 +105,7 @@ AppConfig Utility::ReadConfigFile()
 			cfg.showStatsOverlay = appConfigData["showStatsOverlay"].get<bool>();
 		
 	}
-	catch (const std::exception& e)
+	catch (const std::exception&)
 	{
 		return cfg;
 	}
@@ -119,11 +122,16 @@ std::vector<char> Utility::ReadShaderBinaryFile( std::string const & filename )
         throw std::runtime_error("failed to open shader binary file!");
     }
 
-    size_t fileSize = (size_t) file.tellg();
-    std::vector<char> buffer(fileSize);
+	const auto fileSize = file.tellg();
+	if (fileSize < 0)
+	{
+		throw std::runtime_error("failed to determine shader binary file size!");
+	}
 
-    file.seekg(0);
-    file.read(buffer.data(), fileSize);
+	std::vector<char> buffer(static_cast<size_t>(fileSize));
+
+	file.seekg(0);
+	file.read(buffer.data(), static_cast<std::streamsize>(fileSize));
 
     file.close();
 
@@ -311,8 +319,8 @@ const PackEntries& Utility::GetPackEntries()
 	for (auto it = j.begin(); it != j.end(); ++it)
 	{
 		PackEntry entry;
-		entry.offset = it.value().value("offset", 0);
-		entry.size = it.value().value("size", 0);
+		entry.offset = it.value().value("offset", std::size_t{ 0 });
+		entry.size = it.value().value("size", std::size_t{ 0 });
 		sPackEntries[it.key()] = entry;
 	}
 
@@ -361,7 +369,15 @@ std::vector<uint8_t> Utility::ReadPackedFile(const std::string& entryPath)
 
 	data.resize(entry.size);
 
-	bin.seekg(entry.offset, std::ios::beg);
+	if (entry.offset > static_cast<std::size_t>(std::numeric_limits<std::streamoff>::max()))
+	{
+		std::cerr << "[Utility::ReadPackedFile] Entry offset exceeds supported file range: "
+			<< entryPath << std::endl;
+		return {};
+	}
+
+	bin.seekg(static_cast<std::streamoff>(entry.offset), std::ios::beg);
+
 	if (!bin.good())
 	{
 		std::cerr << "[Utility::ReadPackedFile] Seek error for entry: "
@@ -369,7 +385,18 @@ std::vector<uint8_t> Utility::ReadPackedFile(const std::string& entryPath)
 		return {};
 	}
 
-	bin.read(reinterpret_cast<char*>(data.data()), entry.size);
+	if (entry.size >
+		static_cast<std::size_t>(std::numeric_limits<std::streamsize>::max()))
+	{
+		std::cerr << "[Utility::ReadPackedFile] Entry size exceeds supported read range: "
+			<< entryPath << std::endl;
+		return {};
+	}
+
+	bin.read(
+		reinterpret_cast<char*>(data.data()),
+		static_cast<std::streamsize>(entry.size));
+
 	if (!bin.good())
 	{
 		std::cerr << "[Utility::ReadPackedFile] Read error for entry: "
@@ -379,6 +406,5 @@ std::vector<uint8_t> Utility::ReadPackedFile(const std::string& entryPath)
 
 	return data;
 }
-
 
 }

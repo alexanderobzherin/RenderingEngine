@@ -63,6 +63,21 @@ For platform-specific setup instructions, see
 
 ---
 
+## Code Quality
+
+Rendering Engine maintains a cross-platform compiler warning policy for
+project-owned C++ code. The engine is validated with MSVC, GCC, and Clang
+using a curated set of strict compiler diagnostics.
+
+Compiler warnings are treated as code-review signals: suspicious diagnostics
+are investigated and corrected at their source rather than mechanically
+suppressed. Warning policy is target-local and does not propagate to
+applications consuming the Rendering Engine SDK.
+
+For details, see the [Code Quality Policy](Doc/code_quality.md).
+
+---
+
 ## Portability notes
 This engine builds and runs successfully on:
 - Windows 10

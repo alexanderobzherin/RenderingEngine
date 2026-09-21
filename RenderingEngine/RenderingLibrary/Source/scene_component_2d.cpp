@@ -1,6 +1,7 @@
 #include "scene_component_2d.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
+#include <cmath>
 
 namespace rendering_engine
 {
@@ -10,8 +11,8 @@ SceneComponent2D::SceneComponent2D()
     mPosition{ 0.0f, 0.0f },
     mRotation{ 0.0f },
     mScale{ 1.0f, 1.0f },
-    mWorldMatrix{ 1.0f },
     mLocalMatrix{ 1.0f },
+    mWorldMatrix{ 1.0f },
     mParent(nullptr),
     bIsDirty(true)
 {
@@ -45,7 +46,7 @@ float SceneComponent2D::GetWorldRotation() const
 {
     const glm::mat4& world = const_cast<SceneComponent2D*>(this)->GetWorldMatrix();
 
-    float angle = atan2(world[1][0], world[0][0]);
+    const float angle = std::atan2(world[1][0], world[0][0]);
     return glm::degrees(angle);
 }
 

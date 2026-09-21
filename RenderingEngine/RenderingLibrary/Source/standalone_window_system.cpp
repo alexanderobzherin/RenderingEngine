@@ -1,6 +1,7 @@
 #include "standalone_window_system.hpp"
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <limits>
+#include <stdexcept>
 #include "i_application.hpp"
 
 namespace rendering_engine
@@ -22,19 +23,27 @@ void StandaloneDesktopWindow::CreateAppWindow(unsigned int width, unsigned int h
     if (mApp.GetScreenSettings().isFullScreen)
     {
         const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        mFullScreenRes.width = mode->width;
-        mFullScreenRes.height = mode->height;
+        mFullScreenRes.width = static_cast<unsigned int>(mode->width);
+        mFullScreenRes.height = static_cast<unsigned int>(mode->height);
         mWindow = glfwCreateWindow(mode->width,
                                    mode->height,
-                                   mApp.GetScreenSettings().name.c_str(), 
+                                   title.c_str(),
                                    glfwGetPrimaryMonitor(), nullptr);
     }
     else
     {
-        mWindow = glfwCreateWindow(mApp.GetScreenSettings().width,
-                                   mApp.GetScreenSettings().height,
-                                   mApp.GetScreenSettings().name.c_str(),
-                                   nullptr, nullptr);
+        if (width > static_cast<unsigned int>(std::numeric_limits<int>::max()) ||
+            height > static_cast<unsigned int>(std::numeric_limits<int>::max()))
+        {
+            throw std::out_of_range("Window dimensions exceed GLFW supported range.");
+        }
+
+        mWindow = glfwCreateWindow(
+            static_cast<int>(width),
+            static_cast<int>(height),
+            title.c_str(),
+            nullptr,
+            nullptr);
     }
 
     glfwSetWindowUserPointer(mWindow, this);
@@ -69,6 +78,9 @@ const IApplication& StandaloneDesktopWindow::GetApplication()
 
 void StandaloneDesktopWindow::FramebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
+    static_cast<void>(width);
+    static_cast<void>(height);
+
     auto app = reinterpret_cast<StandaloneDesktopWindow*>(glfwGetWindowUserPointer(window));
     app->mFramebufferResized = true;
 }

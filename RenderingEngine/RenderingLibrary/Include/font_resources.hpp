@@ -51,7 +51,7 @@ struct GlyphMetrics
     int32_t bearingX = 0;
     int32_t bearingY = 0;
     int32_t advanceX = 0;
-    int32_t padding = 0;
+    uint32_t padding = 0;
 };
 
 /**
@@ -203,9 +203,11 @@ protected:
      * @return True if the glyph exists.
      */
     bool HasGlyph(uint32_t codePoint) const;
-
+    
 private:
-	FontResources(FontResources const&);
+    static std::int32_t FreeType26Dot6ToPixelInt(FT_Pos value);
+	
+    FontResources(FontResources const&);
 	FontResources operator=(FontResources const&);
 
 protected:
