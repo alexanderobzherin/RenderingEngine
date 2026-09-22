@@ -2,21 +2,12 @@
 # Author: Alexander Obzherin <alexanderobzherin@gmail.com>
 # Copyright (c) 2026 Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
-#set the project name
-project(RenderingEngine_gtests)
+project(RenderingEngine_gtests LANGUAGES CXX)
 
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(GTest REQUIRED)
 
-find_package(Threads REQUIRED)
-
-include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/RenderingLibrary/Include/)
-
-include_directories(${GTEST_INCLUDE_DIRS}
-)
-#set source files
 set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/main.cpp
     ${PROJECT_SOURCE_DIR}/image_data_tests.cpp
@@ -26,25 +17,24 @@ set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/app_clock_tests.cpp
 )
 
-#add the executable
-add_executable(RenderingEngine_gtests  ${SRC_FILES})
+add_executable(RenderingEngine_gtests ${SRC_FILES})
 
-target_link_libraries(RenderingEngine_gtests 
-    PUBLIC
-        RenderingEngine
+target_link_libraries(RenderingEngine_gtests
     PRIVATE
-        ${Vulkan_LIBRARY}
-        ${GTEST_LIBRARIES}
-        ${RE_GLFW_LINK_TARGET}
-        glm::glm
-        Threads::Threads
-        ${JPEG_LIBRARIES}
-        PNG::PNG
-        assimp::assimp
-        freetype
-        #GTest::gmock 
-        #GTest::gtest 
-        #GTest::gmock_main 
-        #GTest::gtest_main
+        RenderingEngine
+        GTest::gtest
 )
 
+if(WIN32)
+    add_custom_command(
+        TARGET RenderingEngine_gtests
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:RenderingEngine>
+            $<TARGET_FILE_DIR:RenderingEngine_gtests>
+        COMMENT "Copying RenderingEngine runtime library for unit tests"
+    )
+endif()
+
+include(GoogleTest)
+gtest_discover_tests(RenderingEngine_gtests)

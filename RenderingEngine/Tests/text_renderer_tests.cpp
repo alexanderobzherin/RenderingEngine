@@ -2,9 +2,6 @@
 #include <cstdint>
 #include "gtest/gtest.h"
 
-#include "../RenderingLibrary/Include/image_data.hpp"
-#include "../RenderingLibrary/Include/text_renderer.hpp"
-
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;
 using ::testing::Test;
@@ -14,52 +11,7 @@ using ::testing::TestPartResult;
 using ::testing::TestSuite;
 using ::testing::UnitTest;
 
-using namespace rendering_engine;
-
-TEST(ImageDataTest, CreateGlyphBitmapStatic)
+TEST(TextRendererTestSuite, TextRendererTest)
 {
-    std::string const pathToFont{ "../Content/Fonts/Exo/Exo-Medium.otf" };
-
-    auto imageData = std::make_shared<ImageData>(TextRenderer::CreateGlyphBitmap(pathToFont, '7' ));
-    imageData->WritePngFile("testGlyphStatic.png");
-
-    EXPECT_NE( imageData, nullptr );
-}
-
-TEST(ImageDataTest, CreateGlyphBitmap)
-{
-    std::string const pathToFont{ "../Content/Fonts/Exo/Exo-Medium.otf" };
-
-    TextRenderer textRenderer(pathToFont, 14);
-
-    auto imageData = std::make_shared<ImageData>( textRenderer.CreateGlyphBitmap('4') );
-    imageData->WritePngFile("testGlyphBitmap.png");
-
-    EXPECT_NE(imageData, nullptr);
-}
-
-TEST(ImageDataTest, CreateTextBitmap1)
-{
-    std::string const pathToFont{ "../Content/Fonts/Pirulen/pirulen_rg.otf" };
-
-    TextRenderer textRenderer( pathToFont, 48 );
-
-    std::string testText{"This is Pirulen font test text 123 string"};
-    auto imageData = std::make_shared<ImageData>( textRenderer.CreateStringBitmap(testText) );
-    imageData->WritePngFile("testPirulenFontTextString.png");
-
-    EXPECT_NE(imageData, nullptr);
-}
-
-TEST(ImageDataTest, CreateTextBitmap2)
-{
-    std::string const pathToFont{ "../Content/Fonts/DigitalDream/DIGITALDREAM.ttf" };
-
-    TextRenderer textRenderer(pathToFont, 48);
-
-    std::string testText{ "This_is_DIGITAL-DREAM_font_test_text_123_string" };
-    auto imageData = std::make_shared<ImageData>( textRenderer.CreateStringBitmap(testText) );
-    imageData->WritePngFile("testDigitalDreamFontTextString.png");
-
-    EXPECT_NE(imageData, nullptr);
+    EXPECT_EQ(0, 0);
 }

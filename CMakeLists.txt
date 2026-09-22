@@ -12,6 +12,9 @@ set(VERSION_PATCH "15")
 #set the project name
 project(RenderingEngineProject VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
 
+# Enable test registration for the root build tree.
+enable_testing()
+
 # Get date in YYYY-MM-DD format
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
 
@@ -71,8 +74,6 @@ endif()
 find_package(glfw3 CONFIG REQUIRED)
 
 find_package(glm CONFIG REQUIRED)
-
-find_package(GTest REQUIRED)
 
 set(JPEG_STATIC ON)
 find_package(JPEG REQUIRED)
