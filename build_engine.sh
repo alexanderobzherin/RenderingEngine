@@ -15,6 +15,7 @@ SOURCE_DIR="$(pwd)"
 BUILD_DIR="${SOURCE_DIR}/Build"
 DOCS_ONLY=false
 BUILD_SDK=false
+BUILD_UNIT_TESTS=false
 
 # Check for --docs-only argument
 BuildDocumentation()
@@ -45,11 +46,14 @@ for arg in "$@"; do
     --build-sdk)
       BUILD_SDK=true
       ;;
+    --build-unit-tests)
+      BUILD_UNIT_TESTS=true
+      ;;
     --docs-only)
       DOCS_ONLY=true
       ;;
     --help|-h)
-      echo "Usage: $0 [--debug|--release] [--engine-only] [--build-sdk] [--docs-only]"
+      echo "Usage: $0 [--debug|--release] [--engine-only] [--build-sdk] [--build-unit-tests] [--docs-only]"
       exit 0
       ;;
     *)
@@ -74,8 +78,8 @@ mkdir Build
 cd Build
 PATH_TO_BUILD=$(pwd)
 
-if [ "$BUILD_SDK" = true ]; then
-    BUILD_ENGINE_ONLY=true
+if [ "$BUILD_SDK" = true ] || [ "$BUILD_UNIT_TESTS" = true ]; then
+    BUILD_ENGINE_ONLY="ON"
 fi
 
 if [ "$BUILD_SDK" = true ] && [ "$BUILD_TYPE_EXPLICIT" = false ]; then
@@ -93,4 +97,14 @@ cmake --install . --prefix "${BUILD_DIR}/Installed"
 
 if [ "$BUILD_SDK" = true ]; then
     python3 ../RenderingEngine/Scripts/package_sdk.py
+fi
+
+if [ "$BUILD_UNIT_TESTS" = true ]; then
+    cd "${PROJECT_ROOT_PATH}/RenderingEngine/Tests"
+
+    if [ "$BUILD_TYPE" = "Release" ]; then
+        ./build_tests.sh --release
+    else
+        ./build_tests.sh --debug
+    fi
 fi
