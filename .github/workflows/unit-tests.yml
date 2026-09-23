@@ -1,0 +1,147 @@
+name: Unit Tests
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - devel
+
+jobs:
+  unit-tests-linux:
+    name: Unit Tests Linux
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install build tools and system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            git \
+            cmake \
+            meson \
+            ninja-build \
+            nasm \
+            pkg-config \
+            libvulkan-dev \
+            vulkan-tools \
+            vulkan-validationlayers \
+            libglm-dev \
+            libgtest-dev \
+            nlohmann-json3-dev \
+            zlib1g-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libwayland-dev \
+            wayland-protocols \
+            libxkbcommon-dev \
+            curl \
+            ca-certificates
+
+      - name: Build static implementation dependencies
+        run: |
+          chmod +x RenderingEngine/Scripts/build_static_dependencies_unix.sh
+          STATIC_DEPS_WORK_DIR="${RUNNER_TEMP}/RenderingEngineThirdPartySources" \
+            RenderingEngine/Scripts/build_static_dependencies_unix.sh
+
+      - name: Verify static implementation dependencies
+        run: |
+          test -f /usr/local/lib/libjpeg.a
+          test -f /usr/local/lib/libpng16.a
+          test -f /usr/local/lib/libfreetype.a
+          test -f /usr/local/lib/libharfbuzz.a
+          test -f /usr/local/lib/libassimp.a
+          test -f /usr/local/lib/libglfw3.a
+
+      - name: Build unit tests
+        run: |
+          chmod +x build_engine.sh
+          chmod +x RenderingEngine/Tests/build_tests.sh
+          ./build_engine.sh --build-unit-tests
+
+      - name: Run unit tests
+        run: |
+          ctest --test-dir Build/Tests --output-on-failure
+
+  unit-tests-windows:
+    name: Unit Tests Windows
+    runs-on: [self-hosted, Windows, X64, sdk-windows]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify toolchain
+        shell: powershell
+        run: |
+          where.exe cl
+          where.exe cmake
+          where.exe ctest
+
+      - name: Build unit tests
+        shell: cmd
+        run: build_engine.bat --build-unit-tests
+
+      - name: Run unit tests
+        shell: cmd
+        run: ctest --test-dir Build -C Debug --output-on-failure
+
+  unit-tests-freebsd:
+    name: Unit Tests FreeBSD
+    runs-on: [self-hosted, Linux, X64, sdk-freebsd]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify toolchain
+        run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
+          uname -a
+          which cmake
+          which ctest
+          which meson
+          which ninja
+          which nasm
+          which pkg-config
+          which git
+
+      - name: Build static implementation dependencies
+        run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
+          chmod +x RenderingEngine/Scripts/build_static_dependencies_unix.sh
+          chmod +x RenderingEngine/Tests/build_tests.sh
+
+          STATIC_DEPS_WORK_DIR="${RUNNER_TEMP:-/tmp}/RenderingEngineThirdPartySources" \
+            RenderingEngine/Scripts/build_static_dependencies_unix.sh
+
+      - name: Verify static implementation dependencies
+        run: |
+          test -f /usr/local/lib/libjpeg.a
+          test -f /usr/local/lib/libpng16.a
+          test -f /usr/local/lib/libfreetype.a
+          test -f /usr/local/lib/libharfbuzz.a
+          test -f /usr/local/lib/libassimp.a
+          test -f /usr/local/lib/libglfw3.a
+
+      - name: Build unit tests
+        run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
+          chmod +x build_engine.sh
+          ./build_engine.sh --build-unit-tests
+
+      - name: Run unit tests
+        run: |
+          export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
+          ctest --test-dir Build/Tests --output-on-failure
