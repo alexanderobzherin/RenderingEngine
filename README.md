@@ -4,6 +4,8 @@
 
 [![Publish SDK Release](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/release-sdk.yml/badge.svg)](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/release-sdk.yml)
 
+[![Unit Tests](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/unit-tests.yml/badge.svg?branch=devel)](https://github.com/alexanderobzherin/RenderingEngine/actions/workflows/unit-tests.yml)
+
 [![Latest Release](https://img.shields.io/github/v/release/alexanderobzherin/RenderingEngine?label=Latest%20Release)](https://github.com/alexanderobzherin/RenderingEngine/releases/latest)
 
 <p align="center">
