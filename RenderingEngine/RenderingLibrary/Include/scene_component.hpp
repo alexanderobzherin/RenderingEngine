@@ -27,12 +27,12 @@ namespace rendering_engine
  * @brief Represents a 3D transformable scene component with position, rotation, and scale.
  *
  * SceneComponent holds the core kinematic properties required for positioning and orienting objects in a 3D scene.
- * It provides methods to set and get position, rotation (as both quaternion and Euler angles, in radians), and scale.
+ * It provides methods to set and get position, rotation (as both quaternion and Euler angles, with Euler angles in degrees), and scale.
  * The world transformation matrix is updated automatically when any of these properties change.
  * Axis direction vectors (forward, right, up) are derived from the current rotation.
  *
  * @note
- * - Euler angles are expected in radians, using the convention (pitch, yaw, roll).
+ * - Euler angles are expressed in degrees using the convention (pitch, yaw, roll).
  * The rendering engine uses a **left-handed** coordinate system:
  *   - **X+** : Forward (world forward direction)
  *   - **Y+** : Right
@@ -108,7 +108,7 @@ public:
 	const glm::quat& GetRotationQuat() const { return mRotation; }
 
 	/**
-	 * @brief Gets the current rotation as Euler angles (in radians).
+	 * @brief Gets the current rotation as Euler angles (in degrees).
 	 * @return Euler angles (pitch, yaw, roll), where:
 	 *   - pitch: rotation around the Right (Y) axis
 	 *   - yaw:   rotation around the Up (Z) axis
