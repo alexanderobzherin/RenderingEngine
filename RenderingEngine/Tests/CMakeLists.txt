@@ -24,7 +24,7 @@ endif()
 set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/main.cpp
     ${PROJECT_SOURCE_DIR}/image_data_tests.cpp
-    #${PROJECT_SOURCE_DIR}/texture_atlas_maker_tests.cpp
+    ${PROJECT_SOURCE_DIR}/texture_atlas_maker_tests.cpp
     #${PROJECT_SOURCE_DIR}/scene_component_tests.cpp
     #${PROJECT_SOURCE_DIR}/scene_component_2d_tests.cpp
     ${PROJECT_SOURCE_DIR}/color_space_tests.cpp
