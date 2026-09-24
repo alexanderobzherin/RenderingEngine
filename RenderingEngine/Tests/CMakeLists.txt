@@ -29,7 +29,7 @@ set(SRC_FILES
     #${PROJECT_SOURCE_DIR}/scene_component_2d_tests.cpp
     ${PROJECT_SOURCE_DIR}/color_space_tests.cpp
     ${PROJECT_SOURCE_DIR}/material_types_tests.cpp
-    #${PROJECT_SOURCE_DIR}/model_material_tests.cpp
+    ${PROJECT_SOURCE_DIR}/model_material_tests.cpp
 )
 
 add_executable(RenderingEngine_gtests ${SRC_FILES})
