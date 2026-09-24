@@ -78,6 +78,13 @@ applications consuming the Rendering Engine SDK.
 
 For details, see the [Code Quality Policy](Doc/code_quality.md).
 
+Rendering Engine also maintains a cross-platform automated unit-test suite for
+deterministic engine-owned logic. Tests are built with GoogleTest, registered
+through CTest, and validated in CI on Windows, Linux, and FreeBSD.
+
+For test development and execution instructions, see the
+[Unit Testing Guide](Doc/unit_testing.md).
+
 ---
 
 ## Portability notes
