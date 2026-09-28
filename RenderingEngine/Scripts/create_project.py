@@ -7,12 +7,15 @@
 # @file create_project.py
 # @brief Rendering Engine demo/test application generator.
 #
-# This script creates a new project inside TestApplications/ by copying the
-# template folder structure, exposing template variables, and registering
-# the project in TestApplications/CMakeLists.txt.
+# This script creates a new Rendering Engine user application by copying the
+# template folder structure and exposing template variables.
+#
+# By default, the project is created inside UserApplications/ and registered
+# in UserApplications/CMakeLists.txt. An optional destination path can be
+# provided to create and register an external UserApplication.
 #
 # Usage:
-#   python3 create_project.py <ProjectName>
+#   python3 create_project.py <ProjectName> [DestinationPath]
 #
 # Platform notes:
 #   - On Unix systems, .sh files copied from the template are given +x permission.
@@ -25,6 +28,8 @@
 import os
 import sys
 import shutil
+
+from register_project import register_project
 
 TEMPLATE_ROOT = os.path.join("RenderingEngine", "Scripts", "Templates")
 DEST_ROOT = os.path.join("UserApplications")
@@ -57,30 +62,47 @@ def copy_template(src_dir, dst_dir, project_name):
                 os.chmod(dst_file, st.st_mode | stat.S_IEXEC)
 ## @endcond
 
-def create_project(name):
+def create_project(name, destination=DEST_ROOT):
     """
-    @brief Create a new Rendering Engine test/demo project.
-    
-    Generates the folder structure, copies template files, and appends
-    'add_subdirectory()' to TestApplications/CMakeLists.txt.
-    
-    @param name  Name of the project to create.
+    @brief Create a new Rendering Engine user application.
+
+    Generates the project folder structure and copies template files.
+    Projects created in the default UserApplications directory are
+    automatically registered in UserApplications/CMakeLists.txt.
+
+    @param name         Name of the project to create.
+    @param destination  Directory in which the project will be created.
     """
-    project_dir = os.path.join(DEST_ROOT, name)
+    destination = os.path.abspath(destination)
+    default_destination = os.path.abspath(DEST_ROOT)
+    project_dir = os.path.join(destination, name)
+
     if os.path.exists(project_dir):
-        print(f"Error: Project '{name}' already exists.")
+        print(f"Error: Project '{name}' already exists at '{project_dir}'.")
         return
 
     os.makedirs(project_dir)
     copy_template(TEMPLATE_ROOT, project_dir, name)
-    FILE_PATH = os.path.join(DEST_ROOT, "CMakeLists.txt")
-    CMAKE_ADD_PROJECT = "\n" + "add_subdirectory(" + name + ")"
-    with open(FILE_PATH, "a") as cmake_file:
-        cmake_file.write(CMAKE_ADD_PROJECT)
+
+    if destination == default_destination:
+        file_path = os.path.join(default_destination, "CMakeLists.txt")
+        cmake_add_project = "\n" + "add_subdirectory(" + name + ")"
+
+        with open(file_path, "a") as cmake_file:
+            cmake_file.write(cmake_add_project)
+    else:
+        if not register_project(project_dir):
+            print(
+                f"Warning: Project '{name}' was created successfully, "
+                "but could not be registered."
+            )
+            return
+
     print(f"Created new project at {project_dir}")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: create_project.py <ProjectName>")
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print("Usage: create_project.py <ProjectName> [DestinationPath]")
         sys.exit(1)
-    create_project(sys.argv[1])
+    destination = sys.argv[2] if len(sys.argv) == 3 else DEST_ROOT
+    create_project(sys.argv[1], destination)

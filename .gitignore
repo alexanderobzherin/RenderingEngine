@@ -1,1 +1,6 @@
 Build
+Local
+
+# Python cache
+__pycache__/
+*.py[cod]
