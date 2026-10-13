@@ -19,8 +19,9 @@ Responsibilities:
   - Copy the installed RenderingEngine library, headers, and CMake config
     into a distributable SDK layout.
   - Copy vendored headers (glm, nlohmann_json, Vulkan headers if used).
-  - Copy project templates and the create_project.py helper.
-  - Copy and patch ContentExamples into SDK-user mode (RE_DEV_MODE=OFF).
+  - Copy project templates and project management scripts.
+  - Copy ContentExamples without modifying their build configuration.
+  - Preserve automatic source/SDK environment detection.
   - Emit documentation files and a human-readable Manifest.txt.
   - Create a compressed archive suitable for CI/CD artifacts.
 """
@@ -132,27 +133,7 @@ def write_manifest(path, version, platform):
         f.write("- Doc/                             : documentation\n")
     logging.info(f"Manifest written: {path}")
 
-def patch_build_script_for_sdk(build_script_path):
-    """Force RE_DEV_MODE=OFF inside build_project.sh"""
-    if not os.path.isfile(build_script_path):
-        return
 
-    with open(build_script_path, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    # Patch the cmake configuration line:
-    # cmake -S "$PROJECT_SOURCE_DIR" -B "$PROJECT_BUILD_DIR" -DCMAKE_BUILD_TYPE=...
-    content = re.sub(
-        r'cmake\s+-S\s+"\$PROJECT_SOURCE_DIR"\s+-B\s+"\$PROJECT_BUILD_DIR"\s+-DCMAKE_BUILD_TYPE=\$BUILD_MODE',
-        r'cmake -S "$PROJECT_SOURCE_DIR" -B "$PROJECT_BUILD_DIR" -DCMAKE_BUILD_TYPE=$BUILD_MODE -DRE_DEV_MODE=OFF',
-        content
-    )
-
-    with open(build_script_path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-    logging.info(f"Patched build_project.sh for SDK: {build_script_path}")
-    
 # --------------------------------------------------------------------
 # Main Packaging Logic
 # --------------------------------------------------------------------
@@ -198,6 +179,14 @@ def main():
         # RenderingLibrary
         installed_render_lib = os.path.join(installed_engine_root, "RenderingLibrary")
 
+        for required_dir in ("Include", "Library"):
+            required_path = os.path.join(installed_render_lib, required_dir)
+
+            if not os.path.isdir(required_path):
+                raise FileNotFoundError(
+                    f"Required SDK component not found: {required_path}"
+                )
+
         copy_tree(
             os.path.join(installed_render_lib, "Include"),
             os.path.join(sdk_render_lib_root, "Include"),
@@ -221,48 +210,37 @@ def main():
         copy_tree(installed_external_root, os.path.join(sdk_rendering_engine_root, "External"))
 
         # --------------------------------------------------------------
-        # 4. Scripts (Templates)
+        # 4. Project management scripts and templates
         # --------------------------------------------------------------
+
         copy_tree(
             os.path.join(REPO_ROOT, "RenderingEngine", "Scripts", "Templates"),
             os.path.join(sdk_scripts_root, "Templates"),
         )
 
-        # --------------------------------------------------------------
-        # 4. Modify CMakeLists.txt.in inside SDK to set RE_DEV_MODE OFF
-        # --------------------------------------------------------------
-        cmake_template_path = os.path.join(sdk_scripts_root, "Templates", "CMakeLists.txt.in")
+        project_scripts = [
+            "create_project.py",
+            "register_project.py",
+        ]
 
-        # Always copy the Templates directory
-        copy_tree(
-            os.path.join(REPO_ROOT, "RenderingEngine", "Scripts", "Templates"),
-            os.path.join(sdk_scripts_root, "Templates"),
-        )
+        for script_name in project_scripts:
+            script_src = os.path.join(
+                REPO_ROOT,
+                "RenderingEngine",
+                "Scripts",
+                script_name,
+            )
 
-        # Always copy create_project.py
-        create_project_src = os.path.join(REPO_ROOT, "RenderingEngine", "Scripts", "create_project.py")
-        if os.path.isfile(create_project_src):
-            shutil.copy2(create_project_src, os.path.join(sdk_scripts_root, "create_project.py"))
-            logging.info("Copied script: create_project.py")
-        else:
-            logging.warning(f"create_project.py not found at {create_project_src}")
-
-        # Modify RE_DEV_MODE default in CMakeLists template
-        cmake_template_path = os.path.join(sdk_scripts_root, "Templates", "CMakeLists.txt.in")
-
-        with open(cmake_template_path, "r", encoding="utf-8") as f:
-            text = f.read()
-
-        text = re.sub(
-            r'option\(RE_DEV_MODE\s+"[^"]+"\s+ON\)',
-            'option(RE_DEV_MODE "Build using RenderingEngine directly from source tree (Windows only)" OFF)',
-            text
-        )
-
-        with open(cmake_template_path, "w", encoding="utf-8") as f:
-            f.write(text)
-
-        logging.info("Updated CMakeLists.txt.in to set RE_DEV_MODE=OFF")
+            if os.path.isfile(script_src):
+                shutil.copy2(
+                    script_src,
+                    os.path.join(sdk_scripts_root, script_name),
+                )
+                logging.info(f"Copied script: {script_name}")
+            else:
+                raise FileNotFoundError(
+                    f"Required SDK script not found: {script_src}"
+                )
 
 
         # --------------------------------------------------------------
@@ -286,22 +264,19 @@ def main():
         def ignore_example(dirpath, names):
             ignore = []
             for n in names:
-                if n in ("Build", "Intermediate", ".vs", ".vscode", "x64"):
+                if n in ("Build", "Intermediate", "Local", ".vs", ".vscode", "x64"):
                     ignore.append(n)
                 elif n.endswith(".user") or n.endswith(".vcxproj") or n.endswith(".vcxproj.filters"):
                     ignore.append(n)
             return ignore
 
         if os.path.isdir(examples_src_root):
-            copy_tree(examples_src_root, examples_dst_root, ignore=ignore_example)
+            copy_tree(
+                examples_src_root,
+                examples_dst_root,
+                ignore=ignore_example,
+            )
             logging.info("Copied ContentExamples folder.")
-
-            # Patch build_project.sh in each example
-            for proj in os.listdir(examples_dst_root):
-                proj_path = os.path.join(examples_dst_root, proj)
-                if os.path.isdir(proj_path):
-                    build_script = os.path.join(proj_path, "build_project.sh")
-                    patch_build_script_for_sdk(build_script)
         else:
             logging.warning("No ContentExamples folder found.")
 
@@ -327,13 +302,19 @@ def main():
             if os.path.exists(old):
                 os.remove(old)
 
-        shutil.make_archive(archive_path, "gztar", root_dir=SDK_TEMP_ROOT)
+        shutil.make_archive(
+                            archive_path,
+                            "gztar",
+                            root_dir=SDK_TEMP_ROOT,
+                            base_dir=sdk_name,
+                        )
         logging.info(f"Archive created: {archive_path}.tar.gz")
         logging.info("=== SDK Packaging Complete ===")
 
     except Exception as e:
         logging.error(f"SDK packaging failed: {e}", exc_info=True)
         print(f"SDK packaging failed: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

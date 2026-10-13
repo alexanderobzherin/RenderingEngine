@@ -44,11 +44,22 @@ exit /b 1
 
 :args_done
 
-::Clean previously created binaries
-rmdir /s /q Build
-::Create new build directory and step into it
+:: Clean previously created binaries
+if exist Build (
+    rmdir /s /q Build
+    if errorlevel 1 (
+        echo ERROR: Failed to remove Build directory.
+        echo Close Visual Studio and any processes using Build, then retry.
+        exit /b 1
+    )
+)
+
+:: Create build directory
 mkdir Build
-cd Build
+if errorlevel 1 exit /b 1
+
+cd /d Build
+if errorlevel 1 exit /b 1
 ::Run root cmake file
 set TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake
 cmake .. -DCMAKE_TOOLCHAIN_FILE=%TOOLCHAIN_FILE% -DVCPKG_TARGET_TRIPLET=x64-windows-static-md -A x64 -DRE_BUILD_ENGINE_ONLY=%BUILD_ENGINE_ONLY%

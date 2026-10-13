@@ -21,16 +21,54 @@ include_directories(${PROJECT_SOURCE_DIR}/Include/)
 include_directories(${PROJECT_SOURCE_DIR}/Assets/Shaders/)
 include_directories(${PROJECT_SOURCE_DIR}/Config/)
 
-option(RE_DEV_MODE "Build using RenderingEngine directly from source tree (Windows only)" ON)
+set(RE_DEV_MODE OFF)
 
-set(RENDERING_ENGINE_SDK_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine")
+# Resolve the Rendering Engine installation.
+set(RENDERING_ENGINE_CONFIG
+    "${CMAKE_CURRENT_LIST_DIR}/Local/rendering_engine.cmake"
+)
+
+if(EXISTS "${RENDERING_ENGINE_CONFIG}")
+    include("${RENDERING_ENGINE_CONFIG}")
+    message(STATUS "RenderingEngine: using registered engine at ${RENDERING_ENGINE_ROOT}")
+else()
+    get_filename_component(
+        RENDERING_ENGINE_ROOT
+        "${CMAKE_CURRENT_LIST_DIR}/../.."
+        ABSOLUTE
+    )
+
+    message(STATUS "RenderingEngine: using conventional engine location at ${RENDERING_ENGINE_ROOT}")
+endif()
+
+# Validate the resolved engine location.
+if(NOT EXISTS "${RENDERING_ENGINE_ROOT}/RenderingEngine/RenderingLibrary")
+    message(FATAL_ERROR
+        "Invalid Rendering Engine root: '${RENDERING_ENGINE_ROOT}'. "
+        "Register this application with a Rendering Engine source tree or SDK "
+        "using register_project.py."
+    )
+endif()
+
+# Detect the source development environment.
+set(RENDERING_ENGINE_DEV_CONFIG
+    "${RENDERING_ENGINE_ROOT}/CMake/development.cmake"
+)
+
+if(EXISTS "${RENDERING_ENGINE_DEV_CONFIG}")
+    include("${RENDERING_ENGINE_DEV_CONFIG}")
+endif()
+
+message(STATUS "RenderingEngine: RE_DEV_MODE=${RE_DEV_MODE}")
+
+set(RENDERING_ENGINE_SDK_ROOT "${RENDERING_ENGINE_ROOT}/RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine")
 if(WIN32)
 	if(RE_DEV_MODE)
 		message(STATUS "RenderingEngine: Developer Mode (Windows)")
 
 		# Engine headers in source tree
 		include_directories(
-			${CMAKE_CURRENT_LIST_DIR}/../../RenderingEngine/RenderingLibrary/Include
+			${RENDERING_ENGINE_ROOT}/RenderingEngine/RenderingLibrary/Include
 		)
 
 		# Vulkan SDK
@@ -47,25 +85,20 @@ if(WIN32)
 		endif()
 	else()
 		message(STATUS "RenderingEngine: SDK-user Mode (Windows)")
-		set(RENDERING_ENGINE_ROOT
-		"${RENDERING_ENGINE_SDK_ROOT}"
-		CACHE PATH "Path to installed RenderingEngine SDK")
-		list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_ROOT}")
+		list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_SDK_ROOT}")
 		find_package(RenderingEngine REQUIRED)
 	endif()
 elseif(UNIX)
 	if(RE_DEV_MODE)
 		message(STATUS "RenderingEngine: Developer Mode (Unix)")
-		set(RENDERING_ENGINE_ROOT
-			"${CMAKE_CURRENT_LIST_DIR}/../../Build/Installed/RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine"
-			CACHE PATH "Path to installed RenderingEngine SDK")
+		set(RENDERING_ENGINE_PACKAGE_ROOT
+			"${RENDERING_ENGINE_ROOT}/Build/Installed/RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine"
+		)
 	else()
 		message(STATUS "RenderingEngine: SDK-user Mode (Unix)")
-		set(RENDERING_ENGINE_ROOT
-		"${RENDERING_ENGINE_SDK_ROOT}"
-		CACHE PATH "Path to installed RenderingEngine SDK")
+		set(RENDERING_ENGINE_PACKAGE_ROOT "${RENDERING_ENGINE_SDK_ROOT}")
 	endif()
-	list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_ROOT}")
+	list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_PACKAGE_ROOT}")
 	find_package(RenderingEngine REQUIRED)
 endif()
 
