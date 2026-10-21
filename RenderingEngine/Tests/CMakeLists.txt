@@ -2,49 +2,54 @@
 # Author: Alexander Obzherin <alexanderobzherin@gmail.com>
 # Copyright (c) 2026 Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
-#set the project name
-project(RenderingEngine_gtests)
+project(RenderingEngine_gtests LANGUAGES CXX)
 
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    enable_testing()
+endif()
 
-find_package(Threads REQUIRED)
+find_package(GTest REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR}/RenderingEngine/RenderingLibrary/Include/)
+# Use the in-tree engine target when tests are part of the main build.
+# Otherwise consume the installed Rendering Engine package.
+if(TARGET RenderingEngine)
+    set(RE_TEST_ENGINE_TARGET RenderingEngine)
+else()
+    find_package(RenderingEngine CONFIG REQUIRED)
+    set(RE_TEST_ENGINE_TARGET RenderingEngine::RenderingEngine)
+endif()
 
-include_directories(${GTEST_INCLUDE_DIRS}
-)
-#set source files
 set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/main.cpp
     ${PROJECT_SOURCE_DIR}/image_data_tests.cpp
-    ${PROJECT_SOURCE_DIR}/model_tests.cpp
-    ${PROJECT_SOURCE_DIR}/text_renderer_tests.cpp
     ${PROJECT_SOURCE_DIR}/texture_atlas_maker_tests.cpp
-    ${PROJECT_SOURCE_DIR}/app_clock_tests.cpp
+    ${PROJECT_SOURCE_DIR}/scene_component_tests.cpp
+    ${PROJECT_SOURCE_DIR}/scene_component_2d_tests.cpp
+    ${PROJECT_SOURCE_DIR}/color_space_tests.cpp
+    ${PROJECT_SOURCE_DIR}/material_types_tests.cpp
+    ${PROJECT_SOURCE_DIR}/model_material_tests.cpp
 )
 
-#add the executable
-add_executable(RenderingEngine_gtests  ${SRC_FILES})
+add_executable(RenderingEngine_gtests ${SRC_FILES})
 
-target_link_libraries(RenderingEngine_gtests 
-    PUBLIC
-        RenderingEngine
+target_link_libraries(RenderingEngine_gtests
     PRIVATE
-        ${Vulkan_LIBRARY}
-        ${GTEST_LIBRARIES}
-        ${RE_GLFW_LINK_TARGET}
-        glm::glm
-        Threads::Threads
-        ${JPEG_LIBRARIES}
-        PNG::PNG
-        assimp::assimp
-        freetype
-        #GTest::gmock 
-        #GTest::gtest 
-        #GTest::gmock_main 
-        #GTest::gtest_main
+        ${RE_TEST_ENGINE_TARGET}
+        GTest::gtest
 )
 
+if(WIN32)
+    add_custom_command(
+        TARGET RenderingEngine_gtests
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:RenderingEngine>
+            $<TARGET_FILE_DIR:RenderingEngine_gtests>
+        COMMENT "Copying RenderingEngine runtime library for unit tests"
+    )
+endif()
+
+include(GoogleTest)
+gtest_discover_tests(RenderingEngine_gtests)

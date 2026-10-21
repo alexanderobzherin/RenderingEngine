@@ -1,89 +1,136 @@
+
+#!/bin/sh
+
 # This file is part of the Rendering Engine project.
 # Author: Alexander Obzherin <alexanderobzherin@gmail.com>
 # Copyright (c) 2026 Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
 
+set -eu
+
+PROJECT_NAME="DrawTextBlocks"
 BUILD_MODE="Debug"
-if [ "$1" = "--debug" ];then
-  BUILD_MODE="Debug"
-elif [ "$1" = "--release" ];then
-  BUILD_MODE="Release"
-fi
-echo "Build mode: "
-echo "$BUILD_MODE"
 
-PROJECT_SOURCE_DIR=$(pwd)
-echo "Project source dir: "
-echo $PROJECT_SOURCE_DIR
-
-ENGINE_ROOT_FOLDER="$PROJECT_SOURCE_DIR"
-
-# Search for RenderingEngine directory
-while true; do
-    if [ -d "RenderingEngine" ]; then
-        ENGINE_ROOT_FOLDER=$(pwd)
-        break
-    fi    
-    # If we're at root directory, stop searching
-    if [ "$(pwd)" = "/" ]; then
-        echo "RenderingEngine not found in parent directories"
+case "${1:-}" in
+    --debug|"")
+        BUILD_MODE="Debug"
+        ;;
+    --release)
+        BUILD_MODE="Release"
+        ;;
+    *)
+        echo "Usage: $0 [--debug|--release]" >&2
         exit 1
-    fi    
-    cd ..
-done
+        ;;
+esac
 
-echo "Engine source dir: "
-echo "$ENGINE_ROOT_FOLDER"
+# Resolve project root independently of the caller's current directory.
+PROJECT_SOURCE_DIR=$(
+    CDPATH= cd -- "$(dirname -- "$0")" && pwd -P
+)
 
-cd $ENGINE_ROOT_FOLDER
-cd ..
-PROJECT_BUILD_DIR=$ENGINE_ROOT_FOLDER/Build/UserApplications/DrawTextBlocks
-echo "Project build dir: "
-echo $PROJECT_BUILD_DIR
+PROJECT_LOCAL_CONFIG="${PROJECT_SOURCE_DIR}/Local/rendering_engine.cmake"
 
-PATH_SHADERS_SOURCE=$PROJECT_BUILD_DIR/Content/Shaders
-echo "Shader source dir: "
-echo $PATH_SHADERS_SOURCE
-PATH_SHADERS_BIN=$PATH_SHADERS_SOURCE
+# An explicitly registered project has a standalone build directory.
+if [ -f "$PROJECT_LOCAL_CONFIG" ]; then
+    PROJECT_BUILD_DIR="${PROJECT_SOURCE_DIR}/Build"
+    echo "Registered project configuration found."
+else
+    # Preserve legacy engine-workspace layout for in-tree applications.
+    SEARCH_DIR="$PROJECT_SOURCE_DIR"
+    ENGINE_ROOT_FOLDER=""
 
-rm -rf $PROJECT_BUILD_DIR
-mkdir -p $PROJECT_BUILD_DIR
-cd $PROJECT_BUILD_DIR
+    while :; do
+        if [ -d "${SEARCH_DIR}/RenderingEngine" ] &&
+           [ -d "${SEARCH_DIR}/UserApplications" ]; then
+            ENGINE_ROOT_FOLDER="$SEARCH_DIR"
+            break
+        fi
 
-mkdir -p $BUILD_MODE
-#Run root cmake file
-cmake -S "$PROJECT_SOURCE_DIR" -B "$PROJECT_BUILD_DIR" -DCMAKE_BUILD_TYPE=$BUILD_MODE
-#Run make file
-make
+        PARENT_DIR=$(dirname "$SEARCH_DIR")
 
-#Shader compilation
-CompileShaders()
+        if [ "$PARENT_DIR" = "$SEARCH_DIR" ]; then
+            break
+        fi
+
+        SEARCH_DIR="$PARENT_DIR"
+    done
+
+    if [ -n "$ENGINE_ROOT_FOLDER" ]; then
+        PROJECT_BUILD_DIR="${ENGINE_ROOT_FOLDER}/Build/UserApplications/${PROJECT_NAME}"
+        echo "Rendering Engine workspace found at: $ENGINE_ROOT_FOLDER"
+    else
+        PROJECT_BUILD_DIR="${PROJECT_SOURCE_DIR}/Build"
+        echo "Rendering Engine workspace not found in parent directories."
+        echo "Using project-local Build directory."
+    fi
+fi
+
+echo "Build mode: $BUILD_MODE"
+echo "Project source directory: $PROJECT_SOURCE_DIR"
+echo "Project build directory: $PROJECT_BUILD_DIR"
+
+# Reconfigure from scratch.
+if [ -d "$PROJECT_BUILD_DIR" ]; then
+    rm -rf -- "$PROJECT_BUILD_DIR"
+fi
+
+# Locate shader compiler through PATH.
+if ! command -v glslc >/dev/null 2>&1; then
+    echo "ERROR: glslc shader compiler not found in PATH." >&2
+    exit 1
+fi
+
+SHADER_COMPILER=$(command -v glslc)
+echo "Shader compiler: $SHADER_COMPILER"
+
+# Configure project.
+cmake -S "$PROJECT_SOURCE_DIR" \
+      -B "$PROJECT_BUILD_DIR" \
+      -DCMAKE_BUILD_TYPE="$BUILD_MODE"
+
+# Build project.
+cmake --build "$PROJECT_BUILD_DIR" --parallel
+
+# Compile built-in shaders.
+SHADER_DIR="${PROJECT_BUILD_DIR}/Content/Shaders"
+
+compile_shader()
 {
-  # Compile buildin shaders
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/BasicTexture3D/BasicTexture3D.vert -o $PATH_SHADERS_BIN/BasicTexture3D/BasicTexture3D_vert.spv
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/BasicTexture3D/BasicTexture3D.frag -o $PATH_SHADERS_BIN/BasicTexture3D/BasicTexture3D_frag.spv
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/FlatColorFiltering/FlatColorFiltering.vert -o $PATH_SHADERS_BIN/FlatColorFiltering/FlatColorFiltering_vert.spv
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/FlatColorFiltering/FlatColorFiltering.frag -o $PATH_SHADERS_BIN/FlatColorFiltering/FlatColorFiltering_frag.spv
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Quad2D/Quad2D.vert -o $PATH_SHADERS_BIN/Quad2D/Quad2D_vert.spv
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Quad2D/Quad2D.frag -o $PATH_SHADERS_BIN/Quad2D/Quad2D_frag.spv
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Font2D/Font2D.vert -o $PATH_SHADERS_BIN/Font2D/Font2D_vert.spv
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Font2D/Font2D.frag -o $PATH_SHADERS_BIN/Font2D/Font2D_frag.spv
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Rectangle2D/Rectangle2D.vert -o $PATH_SHADERS_BIN/Rectangle2D/Rectangle2D_vert.spv
-  $PATH_TO_SHADER_COMPILER $PATH_SHADERS_SOURCE/Rectangle2D/Rectangle2D.frag -o $PATH_SHADERS_BIN/Rectangle2D/Rectangle2D_frag.spv
-  
-  # Compile custom user shader from json files via calling MaterialCompiler
-  # TO DO
+    source_file="$1"
+    output_file="$2"
+
+    if [ ! -f "$source_file" ]; then
+        echo "ERROR: Missing shader: $source_file" >&2
+        exit 1
+    fi
+
+    "$SHADER_COMPILER" "$source_file" -o "$output_file"
 }
 
-echo "Finding shader compiler..."
+compile_shader "$SHADER_DIR/BasicTexture3D/BasicTexture3D.vert" \
+               "$SHADER_DIR/BasicTexture3D/BasicTexture3D_vert.spv"
+compile_shader "$SHADER_DIR/BasicTexture3D/BasicTexture3D.frag" \
+               "$SHADER_DIR/BasicTexture3D/BasicTexture3D_frag.spv"
 
-find / -name glslc 2>/dev/null |
-while read -r PATH_TO_SHADER_COMPILER
-do
-if test -f $PATH_TO_SHADER_COMPILER; then
-    echo "Shader compiler found $PATH_TO_SHADER_COMPILER"
-    CompileShaders
-    break
-fi
-done
+compile_shader "$SHADER_DIR/FlatColorFiltering/FlatColorFiltering.vert" \
+               "$SHADER_DIR/FlatColorFiltering/FlatColorFiltering_vert.spv"
+compile_shader "$SHADER_DIR/FlatColorFiltering/FlatColorFiltering.frag" \
+               "$SHADER_DIR/FlatColorFiltering/FlatColorFiltering_frag.spv"
 
+compile_shader "$SHADER_DIR/Quad2D/Quad2D.vert" \
+               "$SHADER_DIR/Quad2D/Quad2D_vert.spv"
+compile_shader "$SHADER_DIR/Quad2D/Quad2D.frag" \
+               "$SHADER_DIR/Quad2D/Quad2D_frag.spv"
+
+compile_shader "$SHADER_DIR/Font2D/Font2D.vert" \
+               "$SHADER_DIR/Font2D/Font2D_vert.spv"
+compile_shader "$SHADER_DIR/Font2D/Font2D.frag" \
+               "$SHADER_DIR/Font2D/Font2D_frag.spv"
+
+compile_shader "$SHADER_DIR/Rectangle2D/Rectangle2D.vert" \
+               "$SHADER_DIR/Rectangle2D/Rectangle2D_vert.spv"
+compile_shader "$SHADER_DIR/Rectangle2D/Rectangle2D.frag" \
+               "$SHADER_DIR/Rectangle2D/Rectangle2D_frag.spv"
+
+echo "Project build completed successfully."

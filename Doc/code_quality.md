@@ -19,7 +19,7 @@ supported SDK builds:
 - Clang on FreeBSD
 
 The warning configuration is defined in
-`CMake/RenderingEngineWarnings.cmake`.
+`CMake/rendering_engine_warnings.cmake`.
 
 ## Warning Policy
 

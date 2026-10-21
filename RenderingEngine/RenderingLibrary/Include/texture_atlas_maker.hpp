@@ -12,6 +12,7 @@
 #include <sstream>
 #include <filesystem>
 #include "image_data.hpp"
+#include "rendering_engine_export.hpp"
 
 namespace rendering_engine
 {
@@ -25,7 +26,7 @@ struct GlyphMetrics;
  * Arranges input images into a grid-based atlas, aiming for a compact,
  * near-square layout. Supports generic image atlases and font glyph atlases.
  */
-class TextureAtlasMaker
+class RE_API TextureAtlasMaker
 {
 public:
 	/**

@@ -7,10 +7,13 @@ cmake_minimum_required(VERSION 3.16)
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "2")
-set(VERSION_PATCH "15")
+set(VERSION_PATCH "17")
 
 #set the project name
 project(RenderingEngineProject VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH} LANGUAGES CXX)
+
+# Enable test registration for the root build tree.
+enable_testing()
 
 # Get date in YYYY-MM-DD format
 string(TIMESTAMP BUILD_DATE "%Y-%m-%d")
@@ -71,8 +74,6 @@ endif()
 find_package(glfw3 CONFIG REQUIRED)
 
 find_package(glm CONFIG REQUIRED)
-
-find_package(GTest REQUIRED)
 
 set(JPEG_STATIC ON)
 find_package(JPEG REQUIRED)
@@ -255,7 +256,7 @@ endif()
 
 find_package(nlohmann_json CONFIG QUIET)
 
-include(CMake/RenderingEngineWarnings.cmake)
+include(CMake/rendering_engine_warnings.cmake)
 add_subdirectory(RenderingEngine)
 if(NOT RE_BUILD_ENGINE_ONLY)
 add_subdirectory(ContentExamples)
