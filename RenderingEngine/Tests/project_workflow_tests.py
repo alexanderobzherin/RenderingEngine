@@ -2,7 +2,13 @@
 # This file is part of the Rendering Engine project.
 # Author: Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
-"""Unix developer-mode and packaged-SDK project workflow smoke tests."""
+"""Validate project creation and registration workflows on Linux and FreeBSD.
+
+Creates temporary internal and external applications, builds and launches
+them against the source engine or packaged SDK, and cleans up test artifacts.
+Requires an installed engine, a graphical environment, and an SDK archive
+for SDK workflow tests.
+"""
 
 import argparse
 from contextlib import contextmanager

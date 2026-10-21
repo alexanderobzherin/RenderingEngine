@@ -2,7 +2,12 @@
 # This file is part of the Rendering Engine project.
 # Author: Alexander Obzherin
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
-"""Unix smoke tests for in-tree Rendering Engine applications."""
+"""Build and launch existing Rendering Engine example/test applications.
+
+Runs on Linux and FreeBSD. Verifies successful compilation and that
+applications remain running during a short observation period.
+Requires a graphical environment; not intended for headless CI.
+"""
 
 import argparse
 import os
