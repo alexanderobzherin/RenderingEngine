@@ -6,6 +6,7 @@
 #include "scene_manager.hpp"
 #include "utility.hpp"
 #include "logger.hpp"
+#include "input_controller.hpp"
 
 #include <exception>
 #include <thread>
@@ -113,6 +114,9 @@ void CoreApplication::Initialize()
         LOG_INFO("Fullscreen mode enabled. Resolution set to: "
             + std::to_string(mWidth) + "x" + std::to_string(mHeight));
     }
+
+    mInputController = std::make_unique<InputController>(mWindowSystem->GetNativeHandle());
+
     LOG_INFO("Initializing renderer...");
     mRenderer->InitializeRenderer();
 
@@ -141,6 +145,7 @@ void CoreApplication::Run()
         const auto frameStart = std::chrono::steady_clock::now();
 
         appClock.UpdateAppTime(*mAppTime);
+        mInputController->BeginFrame();
         mWindowSystem->PollEvents();
 
         const auto updateStart = std::chrono::steady_clock::now();
@@ -233,6 +238,8 @@ void CoreApplication::Shutdown()
     mSceneManager->Shutdown();
     LOG_DEBUG("Shutting down Renderer...");
     mRenderer->ShutdownRenderer();
+    LOG_DEBUG("Shutting down Input Controller...");
+    mInputController.reset();
     LOG_DEBUG("Shutting down WindowSystem...");
     mWindowSystem->Shutdown();
     LOG_INFO("CoreApplication shutdown complete.");
@@ -253,6 +260,11 @@ ScreenSettings CoreApplication::GetScreenSettings() const
 FrameMetrics CoreApplication::GetFrameMetrics() const
 {
     return mFrameMetrics;
+}
+
+InputController* CoreApplication::GetInputController()
+{
+    return mInputController.get();
 }
 
 } // rendering_engine

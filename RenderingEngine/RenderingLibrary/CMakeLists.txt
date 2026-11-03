@@ -97,6 +97,13 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/stats_overlay.hpp
 
 	${PROJECT_SOURCE_DIR}/Include/color_space.hpp
+
+	# Input Controllers
+	${PROJECT_SOURCE_DIR}/Include/input_key.hpp
+	${PROJECT_SOURCE_DIR}/Include/input_event.hpp
+	${PROJECT_SOURCE_DIR}/Include/input_controller.hpp
+
+	${PROJECT_SOURCE_DIR}/Include/input_key_glfw.hpp
 )
 
 set(RenderingLibrary_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/Include/")
@@ -172,6 +179,9 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/stats_overlay.cpp
 
 	${PROJECT_SOURCE_DIR}/Source/color_space.cpp
+
+	# Input Controllers
+	${PROJECT_SOURCE_DIR}/Source/input_controller.cpp
 )
 
 

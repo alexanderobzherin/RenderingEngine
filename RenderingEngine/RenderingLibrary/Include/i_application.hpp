@@ -11,6 +11,7 @@
 
 namespace rendering_engine
 {
+class InputController;
 
 /**
  * @struct ScreenSettings
@@ -94,5 +95,7 @@ public:
      * @return FrameMetrics structure containing timing and FPS data.
      */
     virtual FrameMetrics GetFrameMetrics() const = 0;
+
+    virtual InputController* GetInputController() = 0;
 };
 } //rendering_engine

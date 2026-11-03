@@ -1,0 +1,21 @@
+{
+  "appName": "InputKeyboardMouse",
+  "isFullScreen": false,
+  "screenWidth": 1920,
+  "screenHeight": 1080,
+
+  "text": {
+    "scripts": [
+      "Latin"
+    ],
+    "fontSizePreload": [
+      10
+    ]
+  },
+
+  "logLevel": "Info",
+
+  "useSmoothedFPS": true,
+  "targetFPS": 60,
+  "showStatsOverlay": true
+}

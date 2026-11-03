@@ -22,6 +22,7 @@ class Drawable2D;
 class Actor;
 class Actor2D;
 class StatsOverlay;
+class InputController;
 
 /**
  * @class Scene
@@ -89,6 +90,9 @@ public:
 	 * @return Reference to the owning SceneManager.
 	 */
 	SceneManager& GetSceneManager();
+
+	InputController* GetInputController();
+
 	/**
 	 * @brief Requests to load another scene.
 	 * @param newSceneName The name of the registered scene to load next.
@@ -220,6 +224,8 @@ protected:
 	 * @param color Linear-space RGB color.
 	 */
 	void SetBackgroundColor(glm::vec3 color);
+
+
 
 private:
 	/**

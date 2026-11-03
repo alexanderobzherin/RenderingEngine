@@ -14,7 +14,7 @@
 namespace rendering_engine
 {
 template <>
-Rectangle2D* Actor2D::CreateSubobject<Rectangle2D>(Rectangle2D::Properties prop)
+inline Rectangle2D* Actor2D::CreateSubobject<Rectangle2D>(Rectangle2D::Properties prop)
 {
 	auto rectangle2D = mScene.Spawn<Rectangle2D>(prop);
 	mWards.push_back(rectangle2D);
@@ -24,7 +24,7 @@ Rectangle2D* Actor2D::CreateSubobject<Rectangle2D>(Rectangle2D::Properties prop)
 }
 	
 template <>
-TextBlock2D* Actor2D::CreateSubobject<TextBlock2D>(TextBlock2D::Properties prop)
+inline TextBlock2D* Actor2D::CreateSubobject<TextBlock2D>(TextBlock2D::Properties prop)
 {
 	auto textBlock2D = mScene.Spawn<TextBlock2D>(prop);
 	mWards.push_back(textBlock2D);

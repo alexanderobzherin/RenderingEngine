@@ -17,6 +17,7 @@ namespace rendering_engine
 {
 class AppTime;
 class SceneManager;
+class InputController;
 
 /**
  * @class CoreApplication
@@ -93,6 +94,8 @@ public:
 	/** @copydoc IApplication::GetFrameMetrics */
 	FrameMetrics GetFrameMetrics() const override;
 
+	InputController* GetInputController() override;
+
 protected:
 	bool bIsFullScreen;
 	unsigned int mWidth;
@@ -107,5 +110,7 @@ protected:
 	std::shared_ptr<IRenderer> mRenderer;
 
 	std::shared_ptr<SceneManager> mSceneManager;
+
+	std::unique_ptr<InputController> mInputController;
 };
 }

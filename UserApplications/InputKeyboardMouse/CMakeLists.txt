@@ -1,0 +1,273 @@
+# This file is part of the Rendering Engine project.
+# Author: Alexander Obzherin <alexanderobzherin@gmail.com>
+# Copyright (c) 2026 Alexander Obzherin
+# Distributed under the terms of the zlib License. See LICENSE.md for details.
+cmake_minimum_required(VERSION 3.16)
+
+#set the project name
+project(InputKeyboardMouse VERSION 0.1.0 LANGUAGES CXX)
+
+#set header files
+file(GLOB_RECURSE HEADER_FILES
+    "${PROJECT_SOURCE_DIR}/Include/*.hpp"
+)
+
+#set source files
+file(GLOB_RECURSE SRC_FILES
+    "${PROJECT_SOURCE_DIR}/Source/*.cpp"
+)
+
+include_directories(${PROJECT_SOURCE_DIR}/Include/)
+include_directories(${PROJECT_SOURCE_DIR}/Assets/Shaders/)
+include_directories(${PROJECT_SOURCE_DIR}/Config/)
+
+set(RE_DEV_MODE OFF)
+
+# Resolve the Rendering Engine installation.
+set(RENDERING_ENGINE_CONFIG
+    "${CMAKE_CURRENT_LIST_DIR}/Local/rendering_engine.cmake"
+)
+
+if(EXISTS "${RENDERING_ENGINE_CONFIG}")
+    include("${RENDERING_ENGINE_CONFIG}")
+    message(STATUS "RenderingEngine: using registered engine at ${RENDERING_ENGINE_ROOT}")
+else()
+    get_filename_component(
+        RENDERING_ENGINE_ROOT
+        "${CMAKE_CURRENT_LIST_DIR}/../.."
+        ABSOLUTE
+    )
+
+    message(STATUS "RenderingEngine: using conventional engine location at ${RENDERING_ENGINE_ROOT}")
+endif()
+
+# Validate the resolved engine location.
+if(NOT EXISTS "${RENDERING_ENGINE_ROOT}/RenderingEngine/RenderingLibrary")
+    message(FATAL_ERROR
+        "Invalid Rendering Engine root: '${RENDERING_ENGINE_ROOT}'. "
+        "Register this application with a Rendering Engine source tree or SDK "
+        "using register_project.py."
+    )
+endif()
+
+# Detect the source development environment.
+set(RENDERING_ENGINE_DEV_CONFIG
+    "${RENDERING_ENGINE_ROOT}/CMake/development.cmake"
+)
+
+if(EXISTS "${RENDERING_ENGINE_DEV_CONFIG}")
+    include("${RENDERING_ENGINE_DEV_CONFIG}")
+endif()
+
+message(STATUS "RenderingEngine: RE_DEV_MODE=${RE_DEV_MODE}")
+
+set(RENDERING_ENGINE_SDK_ROOT "${RENDERING_ENGINE_ROOT}/RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine")
+if(WIN32)
+	if(RE_DEV_MODE)
+		message(STATUS "RenderingEngine: Developer Mode (Windows)")
+
+		# Engine headers in source tree
+		include_directories(
+			${RENDERING_ENGINE_ROOT}/RenderingEngine/RenderingLibrary/Include
+		)
+
+		# Vulkan SDK
+		if(DEFINED ENV{VULKAN_SDK})
+			include_directories("$ENV{VULKAN_SDK}/Include")
+			message(STATUS "DevMode: Vulkan headers from $ENV{VULKAN_SDK}/Include")
+		else()
+			message(FATAL_ERROR "VULKAN_SDK environment variable is not set!")
+		endif()
+
+		# vcpkg for glfw, freetype, etc.
+		if(DEFINED ENV{VCPKG_ROOT})
+			include_directories("$ENV{VCPKG_ROOT}/installed/x64-windows-static-md/include")
+		endif()
+	else()
+		message(STATUS "RenderingEngine: SDK-user Mode (Windows)")
+		list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_SDK_ROOT}")
+		find_package(RenderingEngine REQUIRED)
+	endif()
+elseif(UNIX)
+	if(RE_DEV_MODE)
+		message(STATUS "RenderingEngine: Developer Mode (Unix)")
+		set(RENDERING_ENGINE_PACKAGE_ROOT
+			"${RENDERING_ENGINE_ROOT}/Build/Installed/RenderingEngine/RenderingLibrary/Library/cmake/RenderingEngine"
+		)
+	else()
+		message(STATUS "RenderingEngine: SDK-user Mode (Unix)")
+		set(RENDERING_ENGINE_PACKAGE_ROOT "${RENDERING_ENGINE_SDK_ROOT}")
+	endif()
+	list(APPEND CMAKE_PREFIX_PATH "${RENDERING_ENGINE_PACKAGE_ROOT}")
+	find_package(RenderingEngine REQUIRED)
+endif()
+
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
+
+#add the executable
+add_executable(InputKeyboardMouse ${HEADER_FILES} ${SRC_FILES})
+
+if(WIN32 AND NOT RE_DEV_MODE)
+    # The precompiled Windows SDK contains a Release Rendering Engine DLL.
+    # Keep Debug consumer builds ABI-compatible with that binary while
+    # preserving application debug symbols and breakpoints.
+    set_property(
+        TARGET InputKeyboardMouse
+        PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
+    )
+
+    target_compile_definitions(
+        InputKeyboardMouse
+        PRIVATE
+            _ITERATOR_DEBUG_LEVEL=0
+    )
+endif()
+
+target_include_directories(InputKeyboardMouse PUBLIC
+${PROJECT_SOURCE_DIR}/Assets/Shaders/
+)
+
+if(UNIX)
+	set_target_properties(InputKeyboardMouse 
+	PROPERTIES
+		CXX_STANDARD 17
+		CXX_STANDARD_REQUIRED ON
+		COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra;-finput-charset=UTF-8"
+		RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${PROJECT_BINARY_DIR}/Debug"
+		RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Release"
+	)
+	if(CMAKE_BUILD_TYPE STREQUAL "Release")
+		add_custom_command(
+			TARGET InputKeyboardMouse
+			POST_BUILD
+			COMMAND ${CMAKE_STRIP} $<TARGET_FILE:InputKeyboardMouse>
+			COMMENT "Stripping Release executable"
+		)
+	endif()
+elseif(WIN32)
+	set_target_properties(InputKeyboardMouse PROPERTIES
+		CXX_STANDARD 17
+		CXX_STANDARD_REQUIRED ON
+		COMPILE_OPTIONS "/utf-8"
+)
+endif()
+
+if(WIN32 AND RE_DEV_MODE)
+	target_link_libraries(InputKeyboardMouse 
+		PRIVATE
+		RenderingEngine
+	)
+else()	
+	target_link_libraries(InputKeyboardMouse 
+		PRIVATE
+			RenderingEngine::RenderingEngine 
+	)
+endif()
+
+set(PATH_TO_COMPILED_SHADER_PATH "${PROJECT_BINARY_DIR}/Content/Shaders")
+set(SHADER_COMPILER $ENV{glslc})
+
+# Shader compilation
+set(BUILDIN_SOURCE_SHADER_PATH "${PROJECT_SOURCE_DIR}/Assets/Shaders")
+set(PATH_TO_SOURCE_TEXTURES "${PROJECT_SOURCE_DIR}/Assets/Textures")
+set(PATH_TO_SOURCE_MODELS "${PROJECT_SOURCE_DIR}/Assets/Models")
+set(PATH_TO_SOURCE_FONTS "${PROJECT_SOURCE_DIR}/Assets/Fonts")
+set(PATH_TO_APP_CONFIG "${PROJECT_SOURCE_DIR}/Config")
+file(MAKE_DIRECTORY
+    "${PATH_TO_SOURCE_TEXTURES}"
+    "${PATH_TO_SOURCE_MODELS}"
+)
+file(COPY ${PATH_TO_SOURCE_TEXTURES} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${PATH_TO_SOURCE_MODELS} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${PATH_TO_SOURCE_FONTS} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${BUILDIN_SOURCE_SHADER_PATH} DESTINATION "${PROJECT_BINARY_DIR}/Content")
+file(COPY ${PATH_TO_APP_CONFIG} DESTINATION "${PROJECT_BINARY_DIR}")
+set(PATH_TO_SOURCE_SHADER "${PROJECT_BINARY_DIR}/Content/Shaders")
+
+#Set paths to buildin shaders
+set(basic_texture_3d_vert_source "${PATH_TO_SOURCE_SHADER}/BasicTexture3D/BasicTexture3D.vert")
+set(basic_texture_3d_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/BasicTexture3D/BasicTexture3D_vert.spv")
+set(basic_texture_3d_frag_source "${PATH_TO_SOURCE_SHADER}/BasicTexture3D/BasicTexture3D.frag")
+set(basic_texture_3d_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/BasicTexture3D/BasicTexture3D_frag.spv")
+
+set(flat_color_filtering_vert_source "${PATH_TO_SOURCE_SHADER}/FlatColorFiltering/FlatColorFiltering.vert")
+set(flat_color_filtering_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/FlatColorFiltering/FlatColorFiltering_vert.spv")
+set(flat_color_filtering_frag_source "${PATH_TO_SOURCE_SHADER}/FlatColorFiltering/FlatColorFiltering.frag")
+set(flat_color_filtering_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/FlatColorFiltering/FlatColorFiltering_frag.spv")
+
+set(test_triangle_vert_source "${PATH_TO_SOURCE_SHADER}/TestTriangle/TestTriangle.vert")
+set(test_triangle_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestTriangle/TestTriangle_vert.spv")
+set(test_triangle_frag_source "${PATH_TO_SOURCE_SHADER}/TestTriangle/TestTriangle.frag")
+set(test_triangle_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/TestTriangle/TestTriangle_frag.spv")
+
+set(quad2D_vert_source "${PATH_TO_SOURCE_SHADER}/Quad2D/Quad2D.vert")
+set(quad2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_vert.spv")
+set(quad2D_frag_source "${PATH_TO_SOURCE_SHADER}/Quad2D/Quad2D.frag")
+set(quad2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Quad2D/Quad2D_frag.spv")
+
+set(font2D_vert_source "${PATH_TO_SOURCE_SHADER}/Font2D/Font2D.vert")
+set(font2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Font2D/Font2D_vert.spv")
+set(font2D_frag_source "${PATH_TO_SOURCE_SHADER}/Font2D/Font2D.frag")
+set(font2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Font2D/Font2D_frag.spv")
+
+set(rectangle2D_vert_source "${PATH_TO_SOURCE_SHADER}/Rectangle2D/Rectangle2D.vert")
+set(rectangle2D_vert_spv "${PATH_TO_COMPILED_SHADER_PATH}/Rectangle2D/Rectangle2D_vert.spv")
+set(rectangle2D_frag_source "${PATH_TO_SOURCE_SHADER}/Rectangle2D/Rectangle2D.frag")
+set(rectangle2D_frag_spv "${PATH_TO_COMPILED_SHADER_PATH}/Rectangle2D/Rectangle2D_frag.spv")
+
+if(WIN32)
+add_custom_command(
+	TARGET InputKeyboardMouse  
+	PRE_BUILD
+
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_SOURCE_TEXTURES}
+            ${PROJECT_BINARY_DIR}/Content/Textures
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_SOURCE_MODELS}
+            ${PROJECT_BINARY_DIR}/Content/Models
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_SOURCE_FONTS}
+            ${PROJECT_BINARY_DIR}/Content/Fonts
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${BUILDIN_SOURCE_SHADER_PATH}
+            ${PROJECT_BINARY_DIR}/Content/Shaders
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${PATH_TO_APP_CONFIG}
+            ${PROJECT_BINARY_DIR}/Config
+
+	# Compile buildin shaders
+	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_vert_source} -o ${basic_texture_3d_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${basic_texture_3d_frag_source} -o ${basic_texture_3d_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${flat_color_filtering_vert_source} -o ${flat_color_filtering_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${flat_color_filtering_frag_source} -o ${flat_color_filtering_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${test_triangle_vert_source} -o ${test_triangle_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${test_triangle_frag_source} -o ${test_triangle_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_vert_source} -o ${quad2D_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${quad2D_frag_source} -o ${quad2D_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${font2D_vert_source} -o ${font2D_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${font2D_frag_source} -o ${font2D_frag_spv}
+
+	COMMAND cmd /c ${SHADER_COMPILER} ${rectangle2D_vert_source} -o ${rectangle2D_vert_spv}
+	COMMAND cmd /c ${SHADER_COMPILER} ${rectangle2D_frag_source} -o ${rectangle2D_frag_spv}
+
+	# Compile custom user shader from json files via calling MaterialCompiler
+	# TO DO
+
+	TARGET InputKeyboardMouse POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:InputKeyboardMouse>
+            $<TARGET_FILE_DIR:InputKeyboardMouse>
+    COMMAND_EXPAND_LISTS
+)
+endif()

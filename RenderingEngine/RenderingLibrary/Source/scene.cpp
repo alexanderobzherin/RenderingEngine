@@ -131,6 +131,11 @@ SceneManager& Scene::GetSceneManager()
 	return mSceneManager;
 }
 
+InputController* Scene::GetInputController()
+{
+	return GetSceneManager().GetApplication()->GetInputController();
+}
+
 void Scene::LoadScene(std::string newSceneName)
 {
 	mSceneManager.LoadScene(newSceneName);
