@@ -53,6 +53,16 @@ public:
 	 */
 	void SetSpriteScale(float scale);
 
+	/**
+	 * @brief Sets the sprite color multiplier.
+	 *
+	 * The supplied RGBA color is multiplied by the
+	 * sampled texture color.
+	 *
+	 * White (1, 1, 1, 1) preserves the original texture.
+	 */
+	void SetColor(glm::vec4 color);
+
 	Sprite2D(const Sprite2D& rhs) = delete;
 	Sprite2D& operator=(const Sprite2D& rhs) = delete;
 

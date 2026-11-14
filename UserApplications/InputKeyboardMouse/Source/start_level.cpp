@@ -8,6 +8,7 @@
 #include "color_space.hpp"
 #include "input_event.hpp"
 #include "pckeyboard_actor.hpp"
+#include "pcmouse_actor.hpp"
 #include "i_application.hpp"
 
 using namespace rendering_engine;
@@ -26,7 +27,7 @@ void StartLevel::Initialize()
 	Scene::Initialize();
 
 	SetBackgroundColor(ColorSpace::SRGBToLinear(glm::vec3(0.008f, 0.231f, 0.357f)));
-
+	
 	mKeyboard = SpawnActor2D<PCKeyboardActor>();
 
 	const auto& screenSettings = GetSceneManager().GetApplication()->GetScreenSettings();
@@ -37,7 +38,12 @@ void StartLevel::Initialize()
 
 	constexpr float scale = 1.0f;
 	mKeyboard->SetScale({ scale, scale });
-	mKeyboard->SetPosition(-keyboardCenter * scale);
+	const auto centeredKeyboard = -keyboardCenter * scale;
+	mKeyboard->SetPosition(centeredKeyboard - glm::vec2{150.0f, 0.0f});
+	
+	mMouse = SpawnActor2D<PCMouseActor>();
+	mMouse->SetScale({1.0f, 1.0f});
+	mMouse->SetPosition({ 700.0f, 0.0f });
 }
 void StartLevel::Update(float deltaTime)
 {

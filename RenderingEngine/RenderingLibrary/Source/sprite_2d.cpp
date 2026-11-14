@@ -37,7 +37,8 @@ void Sprite2D::Initialize()
         materialSettings.materialName = materialName;
         materialSettings.materialDomain = MaterialDomain::Sprite2D;
         materialSettings.shadingModel = ShadingModel::Unlit;
-        materialSettings.blendMode = BlendMode::Opaque;
+        materialSettings.blendMode = BlendMode::Translucent;
+        materialSettings.parameterLayout = &Rectangle2DLayout;
 
         materialCache->AddMaterial(materialSettings);
 
@@ -49,6 +50,8 @@ void Sprite2D::Initialize()
     AddRenderBatch("Quad2D", materialName);
 
     Drawable2D::Initialize();
+
+    SetColor(glm::vec4(1.0f));
 
     mTextureRespectiveScale = glm::vec2(width, height);
     Drawable2D::SetScale(mTextureRespectiveScale);
@@ -75,6 +78,14 @@ void Sprite2D::Draw(const Camera2D& camera)
 void Sprite2D::SetSpriteScale(float scale)
 {
 	Drawable2D::SetScale(glm::vec2(mTextureRespectiveScale.x * scale, mTextureRespectiveScale.y * scale));
+}
+
+void Sprite2D::SetColor(glm::vec4 color)
+{
+    for (auto& renderBatch : mRenderBatches)
+    {
+        renderBatch.materialParameters.SetMaterialVec4("Color", color);
+    }
 }
 
 } // namespace rendering_engine

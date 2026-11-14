@@ -7,6 +7,8 @@
 
 #include "input_key.hpp"
 
+#include <variant>
+
 namespace rendering_engine
 {
 
@@ -41,5 +43,18 @@ struct MouseMoveEvent
     double x;
     double y;
 };
+
+struct MouseScrollEvent
+{
+    double xOffset;
+    double yOffset;
+};
+
+using InputEvent = std::variant<
+    KeyEvent,
+    MouseButtonEvent,
+    MouseMoveEvent,
+    MouseScrollEvent
+>;
 
 } // namespace rendering_engine

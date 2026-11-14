@@ -20,6 +20,7 @@ namespace application
 {
 class PCKeyboardKeyActor;
 class PCKeyboardActor;
+class PCMouseActor;
 
 class StartLevel : public Scene
 {
@@ -31,6 +32,7 @@ public:
 
 private:
 	PCKeyboardActor* mKeyboard;
+	PCMouseActor* mMouse;
 };
 
 } //application

@@ -12,12 +12,6 @@ struct GLFWwindow;
 namespace rendering_engine
 {
 
-using InputEvent = std::variant<
-    KeyEvent,
-    MouseButtonEvent,
-    MouseMoveEvent
->;
-
 class RE_API InputController
 {
 public:
@@ -42,6 +36,14 @@ public:
 
     bool IsMouseButtonDown(MouseButton button) const;
 
+    void OnMouseScrollEvent(const MouseScrollEvent& event);
+
+    bool IsMouseButtonPressed(MouseButton button) const;
+    bool IsMouseButtonReleased(MouseButton button) const;
+
+    double GetMouseScrollX() const;
+    double GetMouseScrollY() const;
+
     double GetMouseX() const;
     double GetMouseY() const;
 
@@ -54,6 +56,22 @@ private:
         int scancode,
         int action,
         int mods);
+
+    static void MouseButtonCallback(
+        GLFWwindow* window,
+        int button,
+        int action,
+        int mods);
+
+    static void CursorPositionCallback(
+        GLFWwindow* window,
+        double x,
+        double y);
+
+    static void ScrollCallback(
+        GLFWwindow* window,
+        double xOffset,
+        double yOffset);
 
 private:
     // Persistent state
@@ -71,6 +89,12 @@ private:
     std::vector<InputEvent> mEvents;
 
     GLFWwindow* mWindow = nullptr;
+
+    std::unordered_set<MouseButton> mJustPressedMouseButtons;
+    std::unordered_set<MouseButton> mJustReleasedMouseButtons;
+
+    double mMouseScrollX = 0.0;
+    double mMouseScrollY = 0.0;
 };
 
 } // namespace rendering_engine
