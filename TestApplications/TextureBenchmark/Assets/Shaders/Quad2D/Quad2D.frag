@@ -7,19 +7,21 @@
 layout(location = 0) in vec4 fragColor;
 layout(location = 1) in vec2 fragUV;
 
+
+layout(location = 0) out vec4 outColor;
+
+layout(std140, binding = 1) uniform PackedParametersUBO
+{
+    vec4 color;
+} packedParamsUbo;
+
+layout(binding = 2) uniform sampler2D texSampler;
+
 // -------------
 // Outputs
 // -------------
 
-layout(location = 0) out vec4 outColor;
-
-// -------------
-// Optional texture sampler (uncomment if using textures)
-// -------------
-layout(binding = 1) uniform sampler2D texSampler;
-
 void main()
 {
     outColor = texture(texSampler, fragUV) * fragColor;
-    // outColor = fragColor;
 }

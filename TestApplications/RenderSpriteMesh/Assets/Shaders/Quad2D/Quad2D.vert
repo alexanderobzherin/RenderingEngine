@@ -11,6 +11,11 @@ layout(std140, binding = 0) uniform TransformationsUBO
     mat4 proj;
 } ubo;
 
+layout(std140, binding = 1) uniform PackedParametersUBO
+{
+    vec4 color;
+} packedParamsUbo;
+
 // -------------
 // Vertex inputs
 // -------------
@@ -39,6 +44,6 @@ void main()
     gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPos, 0.0, 1.0);
 
     // Pass interpolated data
-    fragColor = inColor;
+    fragColor = packedParamsUbo.color;
     fragUV = inTexCoord;
 }
