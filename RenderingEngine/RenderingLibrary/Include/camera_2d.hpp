@@ -23,9 +23,9 @@ class SceneComponent2D;
  * Camera2D defines the view in a 2D scene, using a SceneComponent2D for transform (position, rotation, zoom).
  * The camera provides basic pan, rotation, and uniform zoom features.
  *
- * The engine uses a left-handed coordinate system:
+ * The engine's current 2D rendering convention:
  * - X+ : Right
- * - Y+ : Up
+ * - Y+ : Down on screen
  * Rotation is counterclockwise, in degrees, around the Z axis (out of the screen).
  *
  * By default, the camera is at the origin, with zero rotation and unit zoom.
@@ -43,7 +43,7 @@ public:
 	/**
 	 * @brief Virtual destructor.
 	 */
-	virtual ~Camera2D() = default;
+	virtual ~Camera2D();
 
 	/**
 	 * @brief Initializes the camera (calls Reset()).
@@ -76,6 +76,26 @@ public:
 	 * @return 4�4 orthographic projection matrix.
 	 */
 	glm::mat4 GetProjectionMatrix() const;
+
+	/**
+	 * @brief Converts a viewport-local screen position into 2D world coordinates.
+	 *
+	 * Screen coordinates:
+	 * - Origin is at the top-left corner of the viewport.
+	 * - X increases to the right.
+	 * - Y increases downward.
+	 *
+	 * The conversion accounts for the camera's projection and view
+	 * transformations, matching the current Vulkan viewport convention
+	 * (positive viewport height).
+	 *
+	 * @param screenPosition Cursor position in viewport-local coordinates.
+	 * @return Corresponding position in 2D world coordinates.
+	 *
+	 * @note Requires positive viewport dimensions and an invertible
+	 * camera transformation.
+	 */
+	glm::vec2 ScreenToWorld(const glm::vec2& screenPosition) const;
 
 	/**
 	 * @brief Sets the camera position.
