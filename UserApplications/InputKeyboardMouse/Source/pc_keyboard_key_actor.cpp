@@ -9,7 +9,6 @@
 #include "input_controller.hpp"
 #include "input_event.hpp"
 #include "color_space.hpp"
-#include "input_event.hpp"
 
 using namespace rendering_engine;
 
