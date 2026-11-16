@@ -11,6 +11,7 @@
 
 #include "rendering_engine_export.hpp"
 #include "drawable_component.hpp"
+#include "collision_world_2d.hpp"
 
 namespace rendering_engine
 {
@@ -112,6 +113,16 @@ public:
 	 * @return Active 2D camera.
 	 */
 	std::shared_ptr<Camera2D> GetActiveCamera2D();
+
+	/**
+	 * @brief Accesses the scene's 2D collision registry.
+	 */
+	CollisionWorld2D& GetCollisionWorld2D();
+	const CollisionWorld2D& GetCollisionWorld2D() const;
+	/**
+	 * @brief Queries physical geometry containing a world-space point.
+	 */
+	std::vector<PointHitResult2D> QueryPoint2D(const glm::vec2& worldPoint) const;
 
 	/**
 	 * @brief Spawns and registers a drawable of type T.
@@ -225,8 +236,6 @@ protected:
 	 */
 	void SetBackgroundColor(glm::vec3 color);
 
-
-
 private:
 	/**
 	 * @brief Processes all pending destruction queues.
@@ -262,6 +271,8 @@ private:
 	std::vector<Actor2D*> mPendingDestroyActors2D;
 
 	StatsOverlay* mStatsOverlay;
+
+	CollisionWorld2D mCollisionWorld2D;
 };	
 
 template <typename T>

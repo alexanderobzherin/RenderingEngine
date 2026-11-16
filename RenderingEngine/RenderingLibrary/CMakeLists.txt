@@ -110,6 +110,7 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/physical_geometry_2d.hpp
 	${PROJECT_SOURCE_DIR}/Include/rectangle_physical_geometry_2d.hpp
 	${PROJECT_SOURCE_DIR}/Include/physical_geometry_factory_2d.hpp
+	${PROJECT_SOURCE_DIR}/Include/collision_world_2d.hpp
 )
 
 set(RenderingLibrary_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/Include/")
@@ -193,6 +194,7 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/physical_geometry_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/rectangle_physical_geometry_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/physical_geometry_factory_2d.cpp
+	${PROJECT_SOURCE_DIR}/Source/collision_world_2d.cpp
 )
 
 

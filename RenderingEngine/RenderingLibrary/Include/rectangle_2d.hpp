@@ -7,6 +7,7 @@
 
 #include "rendering_engine_export.hpp"
 #include "drawable_2d.hpp"
+#include "physical_geometry_definitions.hpp"
 
 namespace rendering_engine
 {
@@ -25,6 +26,8 @@ struct Properties
 {
 	glm::vec2 size = {50.0f, 50.0f};
 	glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+
+	PhysicalProperties2D physical;
 };
 public:
 	/**
@@ -55,6 +58,8 @@ public:
 	* @param color RGBA [0.0f - 1.0f].
 	*/
 	void SetColor(glm::vec4 color);
+
+	void InitializePhysicalGeometry();
 
 	Rectangle2D(const Rectangle2D& rhs) = delete;
 	Rectangle2D& operator=(const Rectangle2D& rhs) = delete;

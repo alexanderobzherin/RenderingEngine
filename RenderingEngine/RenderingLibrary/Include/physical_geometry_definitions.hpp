@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <glm/glm.hpp>
+
 namespace rendering_engine
 {
 
@@ -26,6 +28,14 @@ struct PhysicalProperties2D
     bool collisionEnabled = false;
     PhysicalGeometryType geometryType = PhysicalGeometryType::Rectangle;
     Mobility mobility = Mobility::Static;
+};
+
+class PhysicalGeometry2D;
+
+struct PointHitResult2D
+{
+    PhysicalGeometry2D* geometry = nullptr;
+    glm::vec2 worldPoint{0.0f};
 };
 
 } // namespace rendering_engine

@@ -8,10 +8,14 @@
 #include "rendering_engine_export.hpp"
 #include "drawable_component.hpp"
 #include "scene_component_2d.hpp"
+#include "physical_geometry_2d.hpp"
+
+#include <memory>
 
 namespace rendering_engine
 {
-class RE_API Camera2D;
+
+class Camera2D;
 
 /**
  * @class Drawable2D
@@ -32,6 +36,9 @@ public:
 	 */
 	Drawable2D(RenderResourceContext renderContext, Scene& scene);
 
+	~Drawable2D() override;
+
+
 	/**
 	 * @brief Initializes render resources.
 	 */
@@ -47,6 +54,12 @@ public:
 	 * @brief Submits this quad to the renderer for drawing.
 	 */
 	virtual void Draw(const Camera2D& camera) = 0;
+
+	/**
+	 * @brief Unregisters and releases physical geometry, then
+	 * performs normal drawable resource shutdown.
+	 */
+	void Shutdown() override;
 
 	/**
 	 * @brief Sets the quad position in 2D space.
@@ -93,8 +106,28 @@ public:
 	 */
 	void Destroy() override;
 
+	/**
+	 * @brief Attaches or replaces optional physical geometry.
+	 *
+	 * The drawable takes ownership of the geometry and registers
+	 * it with its owning Scene.
+	 *
+	 * Passing nullptr removes the current geometry.
+	 *
+	 * @note The supplied geometry must reference this drawable's
+	 * SceneComponent2D and must not be registered elsewhere.
+	 */
+	void SetPhysicalGeometry(std::unique_ptr<PhysicalGeometry2D> geometry);
+
+	/**
+	 * @brief Returns the attached physical geometry, if any.
+	 */
+	PhysicalGeometry2D* GetPhysicalGeometry();
+	const PhysicalGeometry2D* GetPhysicalGeometry() const;
+
 protected:
 	SceneComponent2D mSceneComponent;
+	std::unique_ptr<PhysicalGeometry2D> mPhysicalGeometry;
 };
 
 } // namespace rendering_engine

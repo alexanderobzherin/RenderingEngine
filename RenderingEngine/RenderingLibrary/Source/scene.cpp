@@ -124,6 +124,8 @@ void Scene::Shutdown()
     mPendingDestroy3D.clear();
     mPendingDestroyActors.clear();
 	mPendingDestroyActors2D.clear();
+
+	mCollisionWorld2D.Clear();
 }
 
 SceneManager& Scene::GetSceneManager()
@@ -225,6 +227,22 @@ void Scene::FlushDestroyed()
 void Scene::SetBackgroundColor(glm::vec3 color)
 {
 	mSceneManager.GetRenderResourceContext().renderer->SetDefaultColor(color.r, color.g, color.b);
+}
+
+CollisionWorld2D& Scene::GetCollisionWorld2D()
+{
+	return mCollisionWorld2D;
+}
+
+const CollisionWorld2D& Scene::GetCollisionWorld2D() const
+{
+	return mCollisionWorld2D;
+}
+
+std::vector<PointHitResult2D> Scene::QueryPoint2D(
+	const glm::vec2& worldPoint) const
+{
+	return mCollisionWorld2D.QueryPoint(worldPoint);
 }
 
 } // namespace rendering_engine
