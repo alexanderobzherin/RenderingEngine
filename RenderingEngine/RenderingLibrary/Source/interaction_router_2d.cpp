@@ -216,10 +216,12 @@ void InteractionRouter2D::Clear()
 
 void InteractionRouter2D::ProcessPointerEvent(const PointerEvent2D& event)
 {
+    static_cast<void>(event);
 }
 
 void InteractionRouter2D::CancelPointerInteraction(std::uint64_t pointerId)
 {
+    static_cast<void>(pointerId);
 }
 
 } // namespace rendering_engine
