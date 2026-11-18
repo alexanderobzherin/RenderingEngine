@@ -66,11 +66,6 @@ public:
      */
     void UnregisterTarget(PhysicalGeometry2D* geometry);
 
-    /**
-     * @brief Processes a device-independent pointer event.
-     * @param event Pointer action and screen-space position.
-     */
-    void ProcessPointerEvent(const PointerEvent2D& event);
 
     /**
      * @brief Processes a mouse button event.
@@ -79,6 +74,25 @@ public:
      */
     void ProcessMouseButtonEvent(const MouseButtonEvent& event);
 
+
+    /**
+     * @brief Cancels all active pointer interactions.
+     * @note Invokes onCancelled callbacks for captured targets.
+     */
+    void CancelAllInteractions();
+
+    /**
+     * @brief Removes all registered targets and clears pointer capture.
+     * @note Active interactions are cancelled before clearing.
+     */
+    void Clear();
+private:
+    // Will be public API once fully implemented
+    /**
+     * @brief Processes a device-independent pointer event.
+     * @param event Pointer action and screen-space position.
+     */
+    void ProcessPointerEvent(const PointerEvent2D& event);
     /**
      * @brief Cancels the active interaction for a specific pointer.
      * @param pointerId Identifier of the pointer to cancel.
@@ -86,18 +100,6 @@ public:
      *       currently holds a captured target.
      */
     void CancelPointerInteraction(std::uint64_t pointerId);
-
-    /**
-     * @brief Cancels all active pointer interactions.
-     * @note Invokes onCancelled callbacks for captured targets.
-     */
-    void CancelActiveInteractions();
-
-    /**
-     * @brief Removes all registered targets and clears pointer capture.
-     * @note Active interactions are cancelled before clearing.
-     */
-    void Clear();
 
 private:
     struct Target

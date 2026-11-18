@@ -9,6 +9,7 @@
 #include "input_controller.hpp"
 #include "input_event.hpp"
 #include "color_space.hpp"
+#include "interaction_router_2d.hpp"
 
 using namespace rendering_engine;
 
@@ -88,11 +89,27 @@ void PCKeyboardKeyActor::SetButtonShape()
 	Rectangle2D::Properties rectangleProp;
 	rectangleProp.size = sBaseButtonSize;
 	rectangleProp.color = { sRectInactiveColor, 1.0f };
+	rectangleProp.physical.collisionEnabled = true;
+	rectangleProp.physical.geometryType = PhysicalGeometryType::Rectangle;
+	rectangleProp.physical.mobility = Mobility::Static;
 
 	mRectangle2D = CreateSubobject<Rectangle2D>(rectangleProp);
 	mRectangle2D->GetTransform().AttachTo(&mRootComponent);
 
 	mRectangle2D->SetScale(sBaseButtonSize * mKeyDefinition.scale);
+
+	auto* geometry = mRectangle2D->GetPhysicalGeometry();
+
+	// Bind button interaction with mouse
+	// on pressed action
+	auto onButtonPressed = [this]() {OnKeyPressed();};
+	// on released action
+	auto onButtonReleased = [this](bool releaseInside) {OnKeyReleased();};
+	// on cancelled action
+	auto onCancelled = [this]() {OnKeyReleased();};
+	GetScene().GetInteractionRouter2D().RegisterTarget(
+		geometry, { onButtonPressed, onButtonReleased, onCancelled }
+	);
 }
 
 void PCKeyboardKeyActor::SetButtonLabel()

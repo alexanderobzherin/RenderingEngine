@@ -54,7 +54,7 @@ void InteractionRouter2D::UnregisterTarget(PhysicalGeometry2D* geometry)
 
     if (mCapturedGeometry == geometry)
     {
-        CancelActiveInteractions();
+        CancelAllInteractions();
     }
 
     auto found = mTargets.find(geometry);
@@ -121,7 +121,7 @@ void InteractionRouter2D::ProcessMouseButtonEvent(const MouseButtonEvent& event)
 
     if (!camera)
     {
-        CancelActiveInteractions();
+        CancelAllInteractions();
         return;
     }
 
@@ -187,7 +187,7 @@ void InteractionRouter2D::ProcessMouseButtonEvent(const MouseButtonEvent& event)
     }
 }
 
-void InteractionRouter2D::CancelActiveInteractions()
+void InteractionRouter2D::CancelAllInteractions()
 {
     PhysicalGeometry2D* captured = mCapturedGeometry;
     mCapturedGeometry = nullptr;
@@ -210,8 +210,16 @@ void InteractionRouter2D::CancelActiveInteractions()
 
 void InteractionRouter2D::Clear()
 {
-    CancelActiveInteractions();
+    CancelAllInteractions();
     mTargets.clear();
+}
+
+void InteractionRouter2D::ProcessPointerEvent(const PointerEvent2D& event)
+{
+}
+
+void InteractionRouter2D::CancelPointerInteraction(std::uint64_t pointerId)
+{
 }
 
 } // namespace rendering_engine

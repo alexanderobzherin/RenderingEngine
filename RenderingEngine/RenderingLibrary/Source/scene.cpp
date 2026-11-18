@@ -117,10 +117,9 @@ void Scene::Draw()
 
 void Scene::Shutdown()
 {
+	mInteractionRouter2D.Clear();
     // Finish any queued destroys first (so we don't double-delete later)
     FlushDestroyed();
-
-	mInteractionRouter2D.Clear();
 
 	// Destroy drawables FIRST (they may reference actor transforms as parents)
     for (auto* d : mDrawables2D) { if (d) { d->Shutdown(); delete d; } }
