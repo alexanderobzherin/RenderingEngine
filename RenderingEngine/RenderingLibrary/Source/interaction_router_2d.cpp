@@ -130,8 +130,7 @@ void InteractionRouter2D::ProcessMouseButtonEvent(const MouseButtonEvent& event)
         static_cast<float>(event.y)
     };
 
-    const glm::vec2 worldPosition =
-        camera->ScreenToWorld(screenPosition);
+    const glm::vec2 worldPosition = camera->ScreenToWorld(screenPosition);
 
     if (event.action == InputAction::Press)
     {

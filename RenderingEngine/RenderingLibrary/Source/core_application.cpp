@@ -251,9 +251,19 @@ ScreenSettings CoreApplication::GetScreenSettings() const
     ScreenSettings ss;
     ss.name = mAppName;
     ss.isFullScreen = bIsFullScreen;
-    ss.height = mHeight;
     ss.width = mWidth;
-    
+    ss.height = mHeight;
+
+    // Use the actual window dimensions once the window exists.
+    // GLFW mouse coordinates are expressed in window coordinates,
+    // which may differ from framebuffer pixels on high-DPI displays.
+    if (mWindowSystem && mWindowSystem->GetNativeHandle())
+    {
+        const auto resolution = mWindowSystem->GetWindowResolution();
+        ss.width = resolution.width;
+        ss.height = resolution.height;
+    }
+
     return ss;
 }
 

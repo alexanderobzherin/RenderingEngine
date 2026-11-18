@@ -40,6 +40,10 @@ public:
     bool ShouldClose() const override;
     /** @copydoc IWindowSystem::GetNativeHandle */
     void* GetNativeHandle() const override;
+    /** @copydoc IWindowSystem::GetWindowResolution */
+    WindowResolution GetWindowResolution() const override;
+    /** @copydoc IWindowSystem::GetFramebufferResolution */
+    WindowResolution GetFramebufferResolution() const override;
     /** @copydoc IWindowSystem::Shutdown */
     void Shutdown() override;
     /** @copydoc IWindowSystem::GetApplication */

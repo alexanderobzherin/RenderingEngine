@@ -46,9 +46,19 @@ void Scene::Initialize()
 
 void Scene::Update(float deltaTime)
 {
-	// Update cameras
+	// Synchronize the camera with the actual window dimensions.
+	// This runs after GLFW event polling and before mouse hit testing.
 	if (mActiveCamera2D)
 	{
+		const auto screenSettings = mSceneManager.GetApplication()->GetScreenSettings();
+
+		if (screenSettings.width > 0 && screenSettings.height > 0)
+		{
+			mActiveCamera2D->SetViewportSize(
+				static_cast<float>(screenSettings.width),
+				static_cast<float>(screenSettings.height));
+		}
+
 		mActiveCamera2D->Update(deltaTime);
 	}
 	if (mActiveCamera3D)

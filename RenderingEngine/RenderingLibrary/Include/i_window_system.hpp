@@ -50,6 +50,25 @@ public:
      * @return Platform-specific native handle (e.g., HWND, GLFWwindow*, X11 Window).
      */
     virtual void* GetNativeHandle() const = 0;
+    /**
+     * @brief Returns the current window dimensions in screen-coordinate units.
+     *
+     * These dimensions correspond to the coordinate system used by
+     * mouse cursor positions. They may differ from framebuffer dimensions
+     * on high-DPI displays.
+     *
+     * @return Current window width and height.
+     */
+    virtual WindowResolution GetWindowResolution() const = 0;
+    /**
+     * @brief Returns the current framebuffer dimensions in pixels.
+     *
+     * These dimensions are used by the rendering backend to determine
+     * the actual drawable surface size.
+     *
+     * @return Current framebuffer width and height in pixels.
+     */
+    virtual WindowResolution GetFramebufferResolution() const = 0;
     /** @brief Checks if the framebuffer has been resized since the last frame. */
     virtual bool IsFramebufferResized() const = 0;
     /** @brief Resets the framebuffer resized flag after handling a resize event. */

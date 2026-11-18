@@ -39,11 +39,11 @@ void StartLevel::Initialize()
 	constexpr float scale = 1.0f;
 	mKeyboard->SetScale({ scale, scale });
 	const auto centeredKeyboard = -keyboardCenter * scale;
-	mKeyboard->SetPosition(centeredKeyboard - glm::vec2{150.0f, 0.0f});
+	mKeyboard->SetPosition(centeredKeyboard - glm::vec2{120.0f, 0.0f});
 	
 	mMouse = SpawnActor2D<PCMouseActor>();
 	mMouse->SetScale({1.0f, 1.0f});
-	mMouse->SetPosition({ 700.0f, 0.0f });
+	mMouse->SetPosition({ 670.0f, 0.0f });
 }
 void StartLevel::Update(float deltaTime)
 {
