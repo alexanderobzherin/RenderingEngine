@@ -102,8 +102,8 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/input_key.hpp
 	${PROJECT_SOURCE_DIR}/Include/input_event.hpp
 	${PROJECT_SOURCE_DIR}/Include/input_controller.hpp
-
 	${PROJECT_SOURCE_DIR}/Include/input_key_glfw.hpp
+	${PROJECT_SOURCE_DIR}/Include/interaction_router_2d.hpp
 
 	# Physics
 	${PROJECT_SOURCE_DIR}/Include/physical_geometry_definitions.hpp
@@ -189,6 +189,7 @@ set(SRC_FILES
 
 	# Input Controllers
 	${PROJECT_SOURCE_DIR}/Source/input_controller.cpp
+	${PROJECT_SOURCE_DIR}/Source/interaction_router_2d.cpp
 
 	# Physics
 	${PROJECT_SOURCE_DIR}/Source/physical_geometry_2d.cpp

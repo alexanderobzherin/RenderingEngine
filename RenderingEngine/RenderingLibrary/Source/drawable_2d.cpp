@@ -104,7 +104,10 @@ void Drawable2D::SetPhysicalGeometry(std::unique_ptr<PhysicalGeometry2D> geometr
 
 	if (mPhysicalGeometry)
 	{
-		collisionWorld.Unregister(mPhysicalGeometry.get());
+		auto* oldGeometry = mPhysicalGeometry.get();
+
+		mScene.GetInteractionRouter2D().UnregisterTarget(oldGeometry);
+		collisionWorld.Unregister(oldGeometry);
 	}
 
 	// Destroys the previous geometry, if present.

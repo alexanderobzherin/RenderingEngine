@@ -11,6 +11,7 @@
 #include "utility.hpp"
 #include "stats_overlay.hpp"
 #include "i_application.hpp"
+#include "input_controller.hpp"
 
 namespace rendering_engine
 {
@@ -19,7 +20,8 @@ namespace rendering_engine
 Scene::Scene(SceneManager& sceneManager)
 	:
 	mSceneManager(sceneManager),
-	mStatsOverlay(nullptr)
+	mStatsOverlay(nullptr),
+	mInteractionRouter2D(*this)
 {}
 
 void Scene::Initialize()
@@ -53,6 +55,18 @@ void Scene::Update(float deltaTime)
 	{
 		// TO DO - uncomment
 		//mActiveCamera3D->Update(deltaTime);
+	}
+
+	if (auto* input = GetInputController())
+	{
+		for (const auto& event : input->GetEvents())
+		{
+			if (const auto* mouseEvent = std::get_if<MouseButtonEvent>(&event))
+			{
+				mInteractionRouter2D.ProcessMouseButtonEvent(
+					*mouseEvent);
+			}
+		}
 	}
 
 	for (auto& actor : mActors)
@@ -106,7 +120,9 @@ void Scene::Shutdown()
     // Finish any queued destroys first (so we don't double-delete later)
     FlushDestroyed();
 
-    // Destroy drawables FIRST (they may reference actor transforms as parents)
+	mInteractionRouter2D.Clear();
+
+	// Destroy drawables FIRST (they may reference actor transforms as parents)
     for (auto* d : mDrawables2D) { if (d) { d->Shutdown(); delete d; } }
     mDrawables2D.clear();
 
@@ -136,6 +152,11 @@ SceneManager& Scene::GetSceneManager()
 InputController* Scene::GetInputController()
 {
 	return GetSceneManager().GetApplication()->GetInputController();
+}
+
+InteractionRouter2D& Scene::GetInteractionRouter2D()
+{
+	return mInteractionRouter2D;
 }
 
 void Scene::LoadScene(std::string newSceneName)

@@ -8,6 +8,8 @@
 #include "input_key.hpp"
 
 #include <variant>
+#include <glm/glm.hpp>
+#include <cstdint>
 
 namespace rendering_engine
 {
@@ -36,6 +38,9 @@ struct MouseButtonEvent
 {
     MouseButton button;
     InputAction action;
+
+    double x = 0.0;
+    double y = 0.0;
 };
 
 struct MouseMoveEvent
@@ -56,5 +61,39 @@ using InputEvent = std::variant<
     MouseMoveEvent,
     MouseScrollEvent
 >;
+
+/**
+ * @brief Identifies the source of a pointer interaction.
+ */
+enum class PointerType
+{
+    Mouse,
+    Touch
+};
+
+/**
+ * @brief Describes the phase of a pointer interaction.
+ */
+enum class PointerAction
+{
+    Press,
+    Move,
+    Release,
+    Cancel
+};
+
+/**
+ * @brief Device-independent pointer event.
+ *
+ * Coordinates are expressed in screen space.
+ * The pointer ID identifies an individual mouse or touch contact.
+ */
+struct PointerEvent2D
+{
+    PointerType type;
+    std::uint64_t pointerId;
+    PointerAction action;
+    glm::vec2 screenPosition;
+};
 
 } // namespace rendering_engine

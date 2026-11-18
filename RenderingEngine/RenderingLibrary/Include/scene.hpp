@@ -12,6 +12,7 @@
 #include "rendering_engine_export.hpp"
 #include "drawable_component.hpp"
 #include "collision_world_2d.hpp"
+#include "interaction_router_2d.hpp"
 
 namespace rendering_engine
 {
@@ -93,6 +94,8 @@ public:
 	SceneManager& GetSceneManager();
 
 	InputController* GetInputController();
+
+	InteractionRouter2D& GetInteractionRouter2D();
 
 	/**
 	 * @brief Requests to load another scene.
@@ -273,6 +276,7 @@ private:
 	StatsOverlay* mStatsOverlay;
 
 	CollisionWorld2D mCollisionWorld2D;
+	InteractionRouter2D mInteractionRouter2D;
 };	
 
 template <typename T>

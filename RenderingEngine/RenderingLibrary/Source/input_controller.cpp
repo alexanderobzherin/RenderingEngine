@@ -270,9 +270,16 @@ void InputController::MouseButtonCallback(GLFWwindow* window, int button, int ac
         return;
     }
 
+    double x = 0.0;
+    double y = 0.0;
+
+    glfwGetCursorPos(window, &x, &y);
+
     it->second->OnMouseButtonEvent({
         mouseButton,
-        TranslateAction(action)
+        TranslateAction(action),
+        x,
+        y
         });
 }
 
