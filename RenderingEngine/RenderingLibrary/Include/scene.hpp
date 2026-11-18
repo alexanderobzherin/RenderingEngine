@@ -117,6 +117,8 @@ public:
 	 */
 	std::shared_ptr<Camera2D> GetActiveCamera2D();
 
+	void SetActiveCamera2D(std::shared_ptr<Camera2D> camera);
+
 	/**
 	 * @brief Accesses the scene's 2D collision registry.
 	 */

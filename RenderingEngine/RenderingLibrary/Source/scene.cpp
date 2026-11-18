@@ -150,7 +150,8 @@ SceneManager& Scene::GetSceneManager()
 
 InputController* Scene::GetInputController()
 {
-	return GetSceneManager().GetApplication()->GetInputController();
+	auto* application = mSceneManager.GetApplication();
+	return application ? application->GetInputController() : nullptr;
 }
 
 InteractionRouter2D& Scene::GetInteractionRouter2D()
@@ -171,6 +172,11 @@ std::shared_ptr<Camera> Scene::GetActiveCamera3D()
 std::shared_ptr<Camera2D> Scene::GetActiveCamera2D()
 {
 	return mActiveCamera2D;
+}
+
+void Scene::SetActiveCamera2D(std::shared_ptr<Camera2D> camera)
+{
+	mActiveCamera2D = std::move(camera);
 }
 
 void Scene::DestroyDrawable3D(Drawable3D* drawable3D)
