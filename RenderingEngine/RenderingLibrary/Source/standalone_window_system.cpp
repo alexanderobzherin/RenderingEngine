@@ -65,6 +65,32 @@ void* StandaloneDesktopWindow::GetNativeHandle() const
     return static_cast<void*>(mWindow);
 }
 
+WindowResolution StandaloneDesktopWindow::GetWindowResolution() const
+{
+    int width = 0;
+    int height = 0;
+
+    glfwGetWindowSize(mWindow, &width, &height);
+
+    return {
+        static_cast<unsigned int>(width),
+        static_cast<unsigned int>(height)
+    };
+}
+
+WindowResolution StandaloneDesktopWindow::GetFramebufferResolution() const
+{
+    int width = 0;
+    int height = 0;
+
+    glfwGetFramebufferSize(mWindow, &width, &height);
+
+    return {
+        static_cast<unsigned int>(width),
+        static_cast<unsigned int>(height)
+    };
+}
+
 void StandaloneDesktopWindow::Shutdown()
 {
     glfwDestroyWindow(mWindow);

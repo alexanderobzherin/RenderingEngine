@@ -64,7 +64,8 @@ void MaterialCache::CreateBuildInMaterials()
 	setTestSprite2d.materialName = std::string{ "Quad2D" };
 	setTestSprite2d.materialDomain = MaterialDomain::Sprite2D;
 	setTestSprite2d.shadingModel = ShadingModel::Unlit;
-	setTestSprite2d.blendMode = BlendMode::Opaque;
+	setTestSprite2d.blendMode = BlendMode::Translucent;
+	setTestSprite2d.parameterLayout = &Rectangle2DLayout;
 
 	AddMaterial(setTestSprite2d);
 	Material* testSprite2dMat = GetMaterial(setTestSprite2d.materialName);

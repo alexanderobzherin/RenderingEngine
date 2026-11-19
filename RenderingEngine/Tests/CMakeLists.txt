@@ -30,6 +30,11 @@ set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/color_space_tests.cpp
     ${PROJECT_SOURCE_DIR}/material_types_tests.cpp
     ${PROJECT_SOURCE_DIR}/model_material_tests.cpp
+    ${PROJECT_SOURCE_DIR}/physical_geometry_2d_tests.cpp
+    ${PROJECT_SOURCE_DIR}/collision_world_2d_tests.cpp
+    ${PROJECT_SOURCE_DIR}/drawable_2d_physical_geometry_tests.cpp
+    ${PROJECT_SOURCE_DIR}/camera_2d_tests.cpp
+    ${PROJECT_SOURCE_DIR}/interaction_router_2d_tests.cpp
 )
 
 add_executable(RenderingEngine_gtests ${SRC_FILES})

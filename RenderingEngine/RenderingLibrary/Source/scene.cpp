@@ -11,6 +11,7 @@
 #include "utility.hpp"
 #include "stats_overlay.hpp"
 #include "i_application.hpp"
+#include "input_controller.hpp"
 
 namespace rendering_engine
 {
@@ -19,7 +20,8 @@ namespace rendering_engine
 Scene::Scene(SceneManager& sceneManager)
 	:
 	mSceneManager(sceneManager),
-	mStatsOverlay(nullptr)
+	mStatsOverlay(nullptr),
+	mInteractionRouter2D(*this)
 {}
 
 void Scene::Initialize()
@@ -44,15 +46,37 @@ void Scene::Initialize()
 
 void Scene::Update(float deltaTime)
 {
-	// Update cameras
+	// Synchronize the camera with the actual window dimensions.
+	// This runs after GLFW event polling and before mouse hit testing.
 	if (mActiveCamera2D)
 	{
+		const auto screenSettings = mSceneManager.GetApplication()->GetScreenSettings();
+
+		if (screenSettings.width > 0 && screenSettings.height > 0)
+		{
+			mActiveCamera2D->SetViewportSize(
+				static_cast<float>(screenSettings.width),
+				static_cast<float>(screenSettings.height));
+		}
+
 		mActiveCamera2D->Update(deltaTime);
 	}
 	if (mActiveCamera3D)
 	{
 		// TO DO - uncomment
 		//mActiveCamera3D->Update(deltaTime);
+	}
+
+	if (auto* input = GetInputController())
+	{
+		for (const auto& event : input->GetEvents())
+		{
+			if (const auto* mouseEvent = std::get_if<MouseButtonEvent>(&event))
+			{
+				mInteractionRouter2D.ProcessMouseButtonEvent(
+					*mouseEvent);
+			}
+		}
 	}
 
 	for (auto& actor : mActors)
@@ -103,10 +127,11 @@ void Scene::Draw()
 
 void Scene::Shutdown()
 {
+	mInteractionRouter2D.Clear();
     // Finish any queued destroys first (so we don't double-delete later)
     FlushDestroyed();
 
-    // Destroy drawables FIRST (they may reference actor transforms as parents)
+	// Destroy drawables FIRST (they may reference actor transforms as parents)
     for (auto* d : mDrawables2D) { if (d) { d->Shutdown(); delete d; } }
     mDrawables2D.clear();
 
@@ -124,11 +149,24 @@ void Scene::Shutdown()
     mPendingDestroy3D.clear();
     mPendingDestroyActors.clear();
 	mPendingDestroyActors2D.clear();
+
+	mCollisionWorld2D.Clear();
 }
 
 SceneManager& Scene::GetSceneManager()
 {
 	return mSceneManager;
+}
+
+InputController* Scene::GetInputController()
+{
+	auto* application = mSceneManager.GetApplication();
+	return application ? application->GetInputController() : nullptr;
+}
+
+InteractionRouter2D& Scene::GetInteractionRouter2D()
+{
+	return mInteractionRouter2D;
 }
 
 void Scene::LoadScene(std::string newSceneName)
@@ -144,6 +182,11 @@ std::shared_ptr<Camera> Scene::GetActiveCamera3D()
 std::shared_ptr<Camera2D> Scene::GetActiveCamera2D()
 {
 	return mActiveCamera2D;
+}
+
+void Scene::SetActiveCamera2D(std::shared_ptr<Camera2D> camera)
+{
+	mActiveCamera2D = std::move(camera);
 }
 
 void Scene::DestroyDrawable3D(Drawable3D* drawable3D)
@@ -220,6 +263,22 @@ void Scene::FlushDestroyed()
 void Scene::SetBackgroundColor(glm::vec3 color)
 {
 	mSceneManager.GetRenderResourceContext().renderer->SetDefaultColor(color.r, color.g, color.b);
+}
+
+CollisionWorld2D& Scene::GetCollisionWorld2D()
+{
+	return mCollisionWorld2D;
+}
+
+const CollisionWorld2D& Scene::GetCollisionWorld2D() const
+{
+	return mCollisionWorld2D;
+}
+
+std::vector<PointHitResult2D> Scene::QueryPoint2D(
+	const glm::vec2& worldPoint) const
+{
+	return mCollisionWorld2D.QueryPoint(worldPoint);
 }
 
 } // namespace rendering_engine

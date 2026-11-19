@@ -2,6 +2,9 @@
 #include "scene_component_2d.hpp"
 #include "i_application.hpp"
 
+#include <glm/gtc/matrix_inverse.hpp>
+#include <stdexcept>
+
 namespace rendering_engine
 {
 
@@ -12,10 +15,13 @@ Camera2D::Camera2D(IApplication& app)
 	mViewportSize(glm::vec2(0.0f, 0.0f))
 {}
 
+Camera2D::~Camera2D()
+{
+}
+
 void Camera2D::Initialize()
 {
 	Reset();
-
 }
 
 void Camera2D::Update(float)
@@ -40,6 +46,44 @@ glm::mat4 Camera2D::GetProjectionMatrix() const
 	float far = 1.0f;
 
 	return glm::ortho(left, right, bottom, top, near, far);
+}
+
+glm::vec2 Camera2D::ScreenToWorld(const glm::vec2& screenPosition) const
+{
+	if (mViewportSize.x <= 0.0f || mViewportSize.y <= 0.0f)
+	{
+		throw std::runtime_error(
+			"Camera2D::ScreenToWorld: invalid viewport dimensions");
+	}
+
+	if (GetZoom() == 0.0f)
+	{
+		throw std::runtime_error(
+			"Camera2D::ScreenToWorld: camera zoom must be non-zero");
+	}
+
+	// Convert viewport-local screen coordinates to normalized
+	// device coordinates (NDC).
+	//
+	// Vulkan uses a positive viewport height in this engine,
+	// therefore screen Y and Vulkan NDC Y increase in the
+	// same direction.
+	const glm::vec2 ndc{
+		2.0f * screenPosition.x / mViewportSize.x - 1.0f,
+		2.0f * screenPosition.y / mViewportSize.y - 1.0f
+	};
+
+	// Match the same view-projection transformation
+	// used by the rendering pipeline.
+	const glm::mat4 viewProjection =
+		GetProjectionMatrix() * GetWorldView();
+
+	// Transform from NDC back into world coordinates.
+	const glm::vec4 worldPosition =
+		glm::inverse(viewProjection) *
+		glm::vec4(ndc, 0.0f, 1.0f);
+
+	return glm::vec2(worldPosition) / worldPosition.w;
 }
 
 void Camera2D::SetPosition(const glm::vec2& position)

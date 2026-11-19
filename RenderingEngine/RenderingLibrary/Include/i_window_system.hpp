@@ -22,12 +22,10 @@ struct WindowResolution
 };
 
 /**
- * @class IWindowSystem
- * @brief Abstract interface for platform-specific window management.
+ * @brief Abstract interface for window management.
  *
- * Provides a unified API for creating, managing, and querying window state.
- * Platform-specific implementations (e.g., GLFW, SDL, Win32, X11) are expected
- * to implement this interface to integrate with the rendering engine.
+ * Provides a platform-independent interface for creating windows,
+ * processing events, and querying window and framebuffer state.
  *
  * @see IApplication
  */
@@ -41,15 +39,37 @@ public:
      * @param title  Title displayed in the window caption.
      */
     virtual void CreateAppWindow(unsigned int width, unsigned int height, const std::string& title) = 0;
-    /** @brief Polls and processes OS-level window events (input, resize, close, etc.). */
+    /**
+     * @brief Polls and processes window system events.
+     */
     virtual void PollEvents() = 0;
     /** @brief Checks whether the user has requested to close the window. */
     virtual bool ShouldClose() const = 0;
     /**
-     * @brief Returns a pointer to the underlying native window handle.
-     * @return Platform-specific native handle (e.g., HWND, GLFWwindow*, X11 Window).
+     * @brief Returns the underlying native window handle.
+     *
+     * @return Platform-specific window handle as an opaque pointer.
      */
     virtual void* GetNativeHandle() const = 0;
+    /**
+     * @brief Returns the current window dimensions in screen-coordinate units.
+     *
+     * These dimensions correspond to the coordinate system used by
+     * mouse cursor positions. They may differ from framebuffer dimensions
+     * on high-DPI displays.
+     *
+     * @return Current window width and height.
+     */
+    virtual WindowResolution GetWindowResolution() const = 0;
+    /**
+     * @brief Returns the current framebuffer dimensions in pixels.
+     *
+     * These dimensions are used by the rendering backend to determine
+     * the actual drawable surface size.
+     *
+     * @return Current framebuffer width and height in pixels.
+     */
+    virtual WindowResolution GetFramebufferResolution() const = 0;
     /** @brief Checks if the framebuffer has been resized since the last frame. */
     virtual bool IsFramebufferResized() const = 0;
     /** @brief Resets the framebuffer resized flag after handling a resize event. */

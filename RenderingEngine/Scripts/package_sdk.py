@@ -62,6 +62,7 @@ DOC_FILES = [
     "Doc/project_creation_guide.md",
     "Doc/project_packaging_guide.md",
     "Doc/sdk_packaging_guide.md",
+    "Doc/input_controller_guide.md"
 ]
 
 # --------------------------------------------------------------------

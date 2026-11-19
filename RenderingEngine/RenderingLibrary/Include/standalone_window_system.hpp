@@ -13,13 +13,13 @@ namespace rendering_engine
 class IApplication;
 
 /**
- * @class StandaloneDesktopWindow
- * @brief Desktop implementation of the IWindowSystem interface using GLFW.
+ * @brief GLFW-based desktop implementation of IWindowSystem.
  *
- * Provides window creation, event polling, and framebuffer resize handling
- * for standalone desktop environments. This class represents the concrete
- * platform layer for rendering contexts that rely on desktop windowing systems
- * (e.g., Windows, Linux, FreeBSD).
+ * Manages application windows, event polling, and framebuffer
+ * resize notifications on supported desktop platforms.
+ *
+ * Provides access to the underlying GLFW window handle
+ * for subsystems that require native window integration.
  *
  * @see IWindowSystem
  * @see IApplication
@@ -40,6 +40,10 @@ public:
     bool ShouldClose() const override;
     /** @copydoc IWindowSystem::GetNativeHandle */
     void* GetNativeHandle() const override;
+    /** @copydoc IWindowSystem::GetWindowResolution */
+    WindowResolution GetWindowResolution() const override;
+    /** @copydoc IWindowSystem::GetFramebufferResolution */
+    WindowResolution GetFramebufferResolution() const override;
     /** @copydoc IWindowSystem::Shutdown */
     void Shutdown() override;
     /** @copydoc IWindowSystem::GetApplication */

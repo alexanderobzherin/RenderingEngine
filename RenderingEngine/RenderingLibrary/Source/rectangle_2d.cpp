@@ -1,6 +1,7 @@
 #include "rectangle_2d.hpp"
 #include "camera_2d.hpp"
 #include "scene.hpp"
+#include "physical_geometry_factory_2d.hpp"
 
 namespace rendering_engine
 {
@@ -20,7 +21,8 @@ void Rectangle2D::Initialize()
 	Drawable2D::Initialize();
 
 	SetColor(mProperties.color);
-	SetScale(mProperties.size);
+
+	InitializePhysicalGeometry();
 }
 
 void Rectangle2D::Update(float deltaTime)
@@ -47,6 +49,21 @@ void Rectangle2D::SetColor(glm::vec4 color)
 	{
 		renderBatch.materialParameters.SetMaterialVec4("Color", color);
 	}
+}
+
+void Rectangle2D::InitializePhysicalGeometry()
+{
+	SetScale(mProperties.size);
+
+	// The drawable scales a unit quad to the requested size.
+	// Therefore, physical geometry also uses unit dimensions
+	// and shares the same world transform.
+	auto geometry = PhysicalGeometryFactory2D::Create(
+		GetTransform(),
+		mProperties.physical,
+		{ 1.0f, 1.0f });
+
+	SetPhysicalGeometry(std::move(geometry));
 }
 
 

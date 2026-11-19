@@ -20,3 +20,4 @@ if(EXISTS "${RE_REGISTERED_PROJECTS_FILE}")
         )
     endforeach()
 endif()
+

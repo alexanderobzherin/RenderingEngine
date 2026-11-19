@@ -97,6 +97,20 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/stats_overlay.hpp
 
 	${PROJECT_SOURCE_DIR}/Include/color_space.hpp
+
+	# Input Controllers
+	${PROJECT_SOURCE_DIR}/Include/input_key.hpp
+	${PROJECT_SOURCE_DIR}/Include/input_event.hpp
+	${PROJECT_SOURCE_DIR}/Include/input_controller.hpp
+	${PROJECT_SOURCE_DIR}/Include/input_key_glfw.hpp
+	${PROJECT_SOURCE_DIR}/Include/interaction_router_2d.hpp
+
+	# Physics
+	${PROJECT_SOURCE_DIR}/Include/physical_geometry_definitions.hpp
+	${PROJECT_SOURCE_DIR}/Include/physical_geometry_2d.hpp
+	${PROJECT_SOURCE_DIR}/Include/rectangle_physical_geometry_2d.hpp
+	${PROJECT_SOURCE_DIR}/Include/physical_geometry_factory_2d.hpp
+	${PROJECT_SOURCE_DIR}/Include/collision_world_2d.hpp
 )
 
 set(RenderingLibrary_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/Include/")
@@ -172,6 +186,16 @@ set(SRC_FILES
 	${PROJECT_SOURCE_DIR}/Source/stats_overlay.cpp
 
 	${PROJECT_SOURCE_DIR}/Source/color_space.cpp
+
+	# Input Controllers
+	${PROJECT_SOURCE_DIR}/Source/input_controller.cpp
+	${PROJECT_SOURCE_DIR}/Source/interaction_router_2d.cpp
+
+	# Physics
+	${PROJECT_SOURCE_DIR}/Source/physical_geometry_2d.cpp
+	${PROJECT_SOURCE_DIR}/Source/rectangle_physical_geometry_2d.cpp
+	${PROJECT_SOURCE_DIR}/Source/physical_geometry_factory_2d.cpp
+	${PROJECT_SOURCE_DIR}/Source/collision_world_2d.cpp
 )
 
 

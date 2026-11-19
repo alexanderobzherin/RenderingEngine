@@ -17,33 +17,34 @@ class IApplication;
 class SceneComponent2D;
 
 /**
- * @class Camera2D
  * @brief Represents a 2D camera with position, rotation, and zoom control.
  *
- * Camera2D defines the view in a 2D scene, using a SceneComponent2D for transform (position, rotation, zoom).
- * The camera provides basic pan, rotation, and uniform zoom features.
+ * Defines the view of a 2D scene using a SceneComponent2D transform.
+ * Supports screen-to-world coordinate conversion for 2D interactions.
  *
- * The engine uses a left-handed coordinate system:
- * - X+ : Right
- * - Y+ : Up
- * Rotation is counterclockwise, in degrees, around the Z axis (out of the screen).
+ * The engine's 2D coordinate convention:
+ * - X increases to the right.
+ * - Y increases downward on screen.
+ * - Rotation is expressed in degrees around the Z axis.
  *
- * By default, the camera is at the origin, with zero rotation and unit zoom.
+ * By default, the camera is at the origin, with zero rotation
+ * and unit zoom.
  *
- * @see rendering_engine::SceneComponent2D
+ * @see SceneComponent2D
  */
 class RE_API Camera2D
 {
 public:
 	/**
-	 * @brief Constructs a 2D camera at the origin, with no rotation and unit zoom.
+	 * @brief Constructs a 2D camera at the origin with unit zoom.
+	 * @param app Application providing the initial viewport dimensions.
 	 */
 	Camera2D(IApplication& app);
 
 	/**
 	 * @brief Virtual destructor.
 	 */
-	virtual ~Camera2D() = default;
+	virtual ~Camera2D();
 
 	/**
 	 * @brief Initializes the camera (calls Reset()).
@@ -57,25 +58,41 @@ public:
 	virtual void Update(float deltaTime);
 
 	/**
-	 * @brief Sets the viewport dimensions used to compute the projection matrix.
+	 * @brief Sets the viewport dimensions.
 	 *
-	 * This defines the visible area of the camera in screen-space units.
-	 * The projection matrix will be recomputed based on these dimensions.
+	 * Used to calculate the orthographic projection matrix
+	 * and convert screen coordinates into world coordinates.
 	 *
-	 * @param width  Viewport width in pixels or world units.
-	 * @param height Viewport height in pixels or world units.
+	 * @param width Viewport width in pixels.
+	 * @param height Viewport height in pixels.
 	 */
 	void SetViewportSize(float width, float height);
 
 	/**
-	 * @brief Returns the current orthographic projection matrix.
+	 * @brief Returns the camera's orthographic projection matrix.
 	 *
-	 * The matrix is built from the camera�s viewport size, and is typically
-	 * multiplied with the view (world) matrix to transform coordinates into clip space.
+	 * The projection is calculated from the current viewport dimensions.
 	 *
-	 * @return 4�4 orthographic projection matrix.
+	 * @return 4x4 orthographic projection matrix.
 	 */
 	glm::mat4 GetProjectionMatrix() const;
+
+	/**
+	 * @brief Converts a viewport-local screen position into 2D world coordinates.
+	 *
+	 * Screen coordinates have their origin at the top-left corner
+	 * of the viewport, with X increasing rightward and Y downward.
+	 *
+	 * The conversion accounts for the camera's projection and
+	 * view transformations.
+	 *
+	 * @param screenPosition Position in viewport-local coordinates.
+	 * @return Corresponding position in 2D world coordinates.
+	 *
+	 * @throws std::runtime_error If viewport dimensions are non-positive
+	 *         or the camera zoom is zero.
+	 */
+	glm::vec2 ScreenToWorld(const glm::vec2& screenPosition) const;
 
 	/**
 	 * @brief Sets the camera position.
@@ -119,9 +136,9 @@ public:
 	float GetZoom() const;
 
 	/**
-	 * @brief Gets the world-view (model) matrix for the camera.
-	 * @return Model/view matrix (glm::mat3).
-	 * @note Use this to transform between world and screen space for rendering.
+	 * @brief Returns the camera's world-view transformation matrix.
+	 *
+	 * @return Reference to the 4x4 transformation matrix.
 	 */
 	const glm::mat4& GetWorldView() const;
 
