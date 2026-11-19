@@ -258,6 +258,8 @@ TEST_F(InteractionRouter2DTest, HigherPriorityWins)
 
     EXPECT_EQ(low.pressed, 0);
     EXPECT_EQ(high.pressed, 1);
+
+    Send(InputAction::Release);
 }
 
 TEST_F(InteractionRouter2DTest, NewerTargetWinsEqualPriority)
@@ -275,6 +277,8 @@ TEST_F(InteractionRouter2DTest, NewerTargetWinsEqualPriority)
 
     EXPECT_EQ(older.pressed, 0);
     EXPECT_EQ(newer.pressed, 1);
+
+    Send(InputAction::Release);
 }
 
 TEST_F(InteractionRouter2DTest, CaptureIgnoresRepeatedPress)

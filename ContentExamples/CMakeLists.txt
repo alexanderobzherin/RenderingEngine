@@ -4,3 +4,4 @@
 # Distributed under the terms of the zlib License. See LICENSE.md for details.
 
 add_subdirectory(MultilingualTextDemo)
+add_subdirectory(InputKeyboardMouse)

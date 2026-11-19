@@ -35,15 +35,17 @@ void StartLevel::Initialize()
 	const glm::vec2 keyboardSize = mKeyboard->GetDimensions();
 	const glm::vec2 keyboardMin = mKeyboard->GetLayoutMin();
 	const glm::vec2 keyboardCenter = keyboardMin + keyboardSize * 0.5f;
+	const glm::vec2 shiftDown = {0.0f, 70.0f};
 
-	constexpr float scale = 1.0f;
-	mKeyboard->SetScale({ scale, scale });
-	const auto centeredKeyboard = -keyboardCenter * scale;
-	mKeyboard->SetPosition(centeredKeyboard - glm::vec2{120.0f, 0.0f});
+	const auto keyboardScale = glm::vec2{ 1.0f };
+	mKeyboard->SetScale(keyboardScale);
+	const auto centeredKeyboard = -keyboardCenter * keyboardScale;
+	mKeyboard->SetPosition(centeredKeyboard - glm::vec2{120.0f, 0.0f} + shiftDown);
 	
+	const auto mouseScale = glm::vec2{ 1.0f };
 	mMouse = SpawnActor2D<PCMouseActor>();
-	mMouse->SetScale({1.0f, 1.0f});
-	mMouse->SetPosition({ 670.0f, 0.0f });
+	mMouse->SetScale(mouseScale);
+	mMouse->SetPosition(glm::vec2{ 670.0f, 0.0f } + shiftDown);
 }
 void StartLevel::Update(float deltaTime)
 {

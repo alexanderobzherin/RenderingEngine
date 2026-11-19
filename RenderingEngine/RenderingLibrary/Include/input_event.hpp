@@ -13,27 +13,39 @@
 
 namespace rendering_engine
 {
-
+/**
+ * @brief Identifies a mouse button.
+ */
 enum class MouseButton
 {
     Left,
     Right,
     Middle
 };
-
+/**
+ * @brief Describes an input button or key action.
+ *
+ * Repeat represents a repeated press while a key is held down.
+ */
 enum class InputAction
 {
     Press,
     Release,
     Repeat
 };
-
+/**
+ * @brief Describes a keyboard input event.
+ */
 struct KeyEvent
 {
     Key key;
     InputAction action;
 };
-
+/**
+ * @brief Describes a mouse button event.
+ *
+ * The cursor coordinates are relative to the application window.
+ */
 struct MouseButtonEvent
 {
     MouseButton button;
@@ -42,19 +54,33 @@ struct MouseButtonEvent
     double x = 0.0;
     double y = 0.0;
 };
-
+/**
+ * @brief Describes a mouse cursor movement event.
+ *
+ * Coordinates are relative to the application window.
+ */
 struct MouseMoveEvent
 {
     double x;
     double y;
 };
-
+/**
+ * @brief Describes a mouse wheel scrolling event.
+ *
+ * Horizontal and vertical offsets indicate scrolling direction
+ * and magnitude.
+ */
 struct MouseScrollEvent
 {
     double xOffset;
     double yOffset;
 };
-
+/**
+ * @brief Variant containing one of the supported input event types.
+ *
+ * Allows applications to process different input events
+ * through a common interface.
+ */
 using InputEvent = std::variant<
     KeyEvent,
     MouseButtonEvent,

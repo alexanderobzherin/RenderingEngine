@@ -19,9 +19,11 @@ class PhysicalGeometry2D;
 /**
  * @brief Routes pointer interactions to registered 2D geometry.
  *
- * Performs hit-testing, selects the highest-priority target,
- * and maintains pointer capture until release or cancellation.
+ * Performs hit-testing and selects the target with the highest
+ * interaction priority. For equal priorities, the most recently
+ * registered target takes precedence.
  *
+ * Maintains pointer capture until release or cancellation.
  * Registered geometry is referenced but not owned.
  */
 class RE_API InteractionRouter2D
@@ -35,7 +37,8 @@ public:
         /// Invoked when a pointer presses the target.
         std::function<void()> onPressed;
 
-        /// Invoked on release; true if released inside the target.
+        /// Invoked when the captured pointer is released.
+        /// The argument indicates whether release occurred inside the target.
         std::function<void(bool)> onReleased;
 
         /// Invoked when an active interaction is cancelled.
@@ -43,17 +46,24 @@ public:
     };
 
     /**
-     * @brief Constructs a router associated with a scene.
+     * @brief Constructs an interaction router associated with a scene.
+     * @param scene Scene containing the interactive geometry.
      */
     explicit InteractionRouter2D(Scene& scene);
 
     /**
      * @brief Registers geometry as an interactive target.
-     * @param geometry Non-owning pointer to registered scene geometry.
+     *
+     * The geometry must already be registered in the scene's
+     * collision world.
+     *
+     * @param geometry Non-owning pointer to the geometry.
      * @param callbacks Interaction callbacks.
      * @param priority Selection priority; higher values take precedence.
-     * @throws std::invalid_argument If geometry is null, unregistered,
-     *         or already registered.
+     *                 Equal priorities favor the latest registration.
+     *
+     * @throws std::invalid_argument If geometry is null, not registered
+     *         in the collision world, or already registered as a target.
      */
     void RegisterTarget(
         PhysicalGeometry2D* geometry,
@@ -61,19 +71,27 @@ public:
         int priority = 0);
 
     /**
-     * @brief Removes a target from interaction routing.
-     * @note Cancels an active interaction involving this target.
+     * @brief Removes a geometry from interaction routing.
+     *
+     * Cancels an active interaction if the geometry currently
+     * holds pointer capture.
+     *
+     * @param geometry Geometry to unregister.
      */
     void UnregisterTarget(PhysicalGeometry2D* geometry);
 
-
     /**
-     * @brief Processes a mouse button event.
+     * @brief Processes a mouse button event for 2D interactions.
      *
-     * Converts mouse input into the common pointer-event format.
+     * Currently handles left-button press and release events.
+     * Other mouse buttons and repeat events are ignored.
+     *
+     * Uses the active 2D camera to convert screen coordinates
+     * into world coordinates for hit-testing.
+     *
+     * @param event Mouse button event to process.
      */
     void ProcessMouseButtonEvent(const MouseButtonEvent& event);
-
 
     /**
      * @brief Cancels all active pointer interactions.

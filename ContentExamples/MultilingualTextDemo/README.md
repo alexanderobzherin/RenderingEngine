@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Docs/Images/multilingual_text_demo.png" alt="Multilingual Text Demo" width="800"/>
+  <img src="Docs/Images/MultilingualTextDemo.png" alt="Multilingual Text Demo" width="800"/>
 </p>
 
 # MultilingualTextDemo

@@ -7,7 +7,14 @@
 
 namespace rendering_engine
 {
-
+/**
+ * @brief Identifies a keyboard key independently of the input backend.
+ *
+ * Key identifiers represent physical key positions rather than
+ * characters produced by a particular keyboard layout.
+ *
+ * @note Key::Unknown represents an unrecognized or unsupported key.
+ */
 enum class Key
 {
     Unknown = 0,

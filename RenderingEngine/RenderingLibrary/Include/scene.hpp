@@ -27,21 +27,16 @@ class StatsOverlay;
 class InputController;
 
 /**
- * @class Scene
  * @brief Base class representing a renderable scene.
  *
- * A Scene acts as a container for drawable objects (2D and 3D) and defines
- * the update and draw lifecycle of a game or rendering context.
+ * Manages 2D and 3D actors, drawables, and their lifecycle.
+ * Provides cameras, input access, 2D collision queries,
+ * and interaction routing.
  *
- * Derived scene classes should override Initialize(), Update(), and Draw()
- * to implement specific logic and populate the drawable lists.
+ * Supports deferred destruction of scene-owned objects.
  *
  * @note Scenes are created and managed by SceneManager.
  * @see SceneManager, Drawable3D, Drawable2D, Camera, Camera2D
- * 
- * The Scene implements a deferred destruction mechanism to guarantee
- * safe removal of actors and drawables during update and render passes.
- * All objects spawned via the Scene are owned and lifetime-managed by it.
  */
 class RE_API Scene
 {
@@ -67,18 +62,15 @@ public:
 	 */
 	virtual void Initialize();
 	/**
-	 * @brief Updates all objects within the scene.
-	 * @param deltaTime Time elapsed since the last frame (in milliseconds).
+	 * @brief Updates the scene and its objects.
 	 *
-	 * Called once per frame. Override to implement per-frame logic such as
-	 * animation, physics updates, or scene transitions.
+	 * @param deltaTime Time elapsed since the last frame, in seconds.
 	 */
 	virtual void Update(float deltaTime);
 	/**
-	 * @brief Renders all 3D and 2D drawables in the scene.
+	 * @brief Renders the scene's 3D and 2D drawables.
 	 *
-	 * The base implementation can iterate through mDrawables3D and mDrawables2D
-	 * to call each object�s Draw() method, using the active cameras.
+	 * Uses the corresponding active cameras.
 	 */
 	virtual void Draw();
 	/**
@@ -92,9 +84,18 @@ public:
 	 * @return Reference to the owning SceneManager.
 	 */
 	SceneManager& GetSceneManager();
-
+	/**
+	 * @brief Returns the application's input controller.
+	 *
+	 * @return Non-owning pointer to the input controller,
+	 *         or nullptr if unavailable.
+	 */
 	InputController* GetInputController();
-
+	/**
+	 * @brief Returns the scene's 2D interaction router.
+	 *
+	 * @return Reference to the interaction router.
+	 */
 	InteractionRouter2D& GetInteractionRouter2D();
 
 	/**
@@ -116,16 +117,25 @@ public:
 	 * @return Active 2D camera.
 	 */
 	std::shared_ptr<Camera2D> GetActiveCamera2D();
-
+	/**
+	 * @brief Sets the active 2D camera.
+	 *
+	 * @param camera Camera to activate.
+	 */
 	void SetActiveCamera2D(std::shared_ptr<Camera2D> camera);
 
 	/**
-	 * @brief Accesses the scene's 2D collision registry.
+	 * @brief Returns the scene's 2D collision registry.
+	 *
+	 * @return Reference to the collision world.
 	 */
 	CollisionWorld2D& GetCollisionWorld2D();
 	const CollisionWorld2D& GetCollisionWorld2D() const;
 	/**
-	 * @brief Queries physical geometry containing a world-space point.
+	 * @brief Finds physical geometries containing a world-space point.
+	 *
+	 * @param worldPoint Point to test in world coordinates.
+	 * @return All matching geometries.
 	 */
 	std::vector<PointHitResult2D> QueryPoint2D(const glm::vec2& worldPoint) const;
 

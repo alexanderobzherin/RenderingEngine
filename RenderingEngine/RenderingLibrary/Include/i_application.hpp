@@ -57,12 +57,11 @@ struct FrameMetrics
 };
 
 /**
- * @class IApplication
  * @brief Defines a generic application interface for rendering-based programs.
  *
- * Provides lifecycle control for initialization, main loop, update, rendering,
- * and shutdown. All specific applications built on top of the Rendering Engine
- * should implement this interface.
+ * Provides lifecycle control for initialization, updating, rendering,
+ * and shutdown, along with access to application settings,
+ * frame metrics, and input.
  *
  * @see IRenderer
  */
@@ -75,7 +74,7 @@ public:
     virtual void Run() = 0;
     /**
      * @brief Updates the application state.
-     * @param deltaTime Time elapsed since the previous frame, in milliseconds.
+     * @param deltaTime Time elapsed since the previous frame, in seconds.
      */
     virtual void Update(float deltaTime) = 0;
     /** @brief Executes the rendering logic for the current frame. */
@@ -95,7 +94,12 @@ public:
      * @return FrameMetrics structure containing timing and FPS data.
      */
     virtual FrameMetrics GetFrameMetrics() const = 0;
-
+    /**
+     * @brief Returns the application's input controller.
+     *
+     * @return Non-owning pointer to the input controller,
+     *         or nullptr if unavailable.
+     */
     virtual InputController* GetInputController() = 0;
 };
 } //rendering_engine

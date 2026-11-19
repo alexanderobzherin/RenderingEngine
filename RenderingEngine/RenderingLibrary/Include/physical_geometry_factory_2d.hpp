@@ -16,10 +16,27 @@ namespace rendering_engine
 
 class PhysicalGeometry2D;
 class SceneComponent2D;
-
+/**
+ * @brief Factory for creating 2D physical geometries.
+ *
+ * Creates the appropriate physical geometry implementation
+ * based on the supplied configuration.
+ */
 class RE_API PhysicalGeometryFactory2D
 {
 public:
+    /**
+     * @brief Creates a 2D physical geometry.
+     *
+     * @param transform Scene component providing the world transform.
+     * @param properties Physical geometry configuration.
+     * @param localSize Geometry dimensions in local coordinates.
+     *
+     * @return Created geometry, or nullptr if collision is disabled.
+     *
+     * @throws std::invalid_argument If the geometry type is unsupported
+     *         or the rectangle dimensions are invalid.
+     */
     static std::unique_ptr<PhysicalGeometry2D> Create(
         SceneComponent2D& transform,
         const PhysicalProperties2D& properties,

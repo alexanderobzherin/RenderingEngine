@@ -20,17 +20,16 @@ class SceneManager;
 class InputController;
 
 /**
- * @class CoreApplication
  * @brief Default implementation of the IApplication interface.
  *
  * Coordinates the main execution flow of a rendering-based application,
- * including initialization, update, rendering, and shutdown. It acts as
- * the central manager that connects the renderer, window system, and
- * scene management subsystems.
+ * including initialization, input processing, updating, rendering,
+ * and shutdown.
  *
- * @see IApplication
- * @see IWindowSystem
- * @see IRenderer
+ * Connects the renderer, window system, input controller,
+ * and scene management subsystems.
+ *
+ * @see IApplication, IWindowSystem, IRenderer
  */
 class RE_API CoreApplication : public IApplication
 {
@@ -93,7 +92,7 @@ public:
 	ScreenSettings GetScreenSettings() const override;
 	/** @copydoc IApplication::GetFrameMetrics */
 	FrameMetrics GetFrameMetrics() const override;
-
+	/** @copydoc IApplication::GetInputController */
 	InputController* GetInputController() override;
 
 protected:

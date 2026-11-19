@@ -12,20 +12,24 @@ namespace rendering_engine
 {
 class Scene;
 /**
-	* @class Sprite2D
-	* @brief 2D drawable component for rendering textured quad.
-	*
-	* @note Not copyable or assignable.
-	* @see Quad2D, Drawable2D, DrawableComponent, SceneComponent2D, Camera2D
-	*/
+ * @brief Drawable 2D sprite rendered using a texture.
+ *
+ * The sprite's initial dimensions are determined by its
+ * texture size.
+ *
+ * @note Not copyable or assignable.
+ * @see Drawable2D, Camera2D
+ */
 class RE_API Sprite2D : public Drawable2D
 {
 public:
-   /**
-	* @brief Constructs the Sprite2D with a render context.
-	* @param renderContext Resource context.
-	* 
-	*/
+	/**
+	 * @brief Constructs a textured 2D sprite.
+	 *
+	 * @param renderContext Rendering resource context.
+	 * @param scene Scene that owns the sprite.
+	 * @param textureName Name of the texture resource.
+	 */
 	Sprite2D(RenderResourceContext renderContext, Scene& scene, std::string textureName);
 
    /**
@@ -60,6 +64,8 @@ public:
 	 * sampled texture color.
 	 *
 	 * White (1, 1, 1, 1) preserves the original texture.
+	 *
+	 * @param color Color multiplier in RGBA components.
 	 */
 	void SetColor(glm::vec4 color);
 
