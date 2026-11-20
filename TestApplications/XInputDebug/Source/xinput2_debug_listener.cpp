@@ -1,12 +1,6 @@
 
 #include "xinput2_debug_listener.hpp"
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
-#define GLFW_EXPOSE_NATIVE_X11
-#include <GLFW/glfw3native.h>
-
 #include <X11/Xlib.h>
 #include <X11/extensions/XInput2.h>
 
@@ -29,9 +23,6 @@ XInput2DebugListener::XInput2DebugListener(std::uint64_t windowId)
     {
         throw std::invalid_argument("Invalid X11 window ID");
     }
-
-    mDisplay = XOpenDisplay(nullptr);
-    // Keep the remaining initialization code.
 
     mDisplay = XOpenDisplay(nullptr);
     if (!mDisplay)
