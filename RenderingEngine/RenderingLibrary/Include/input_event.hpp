@@ -75,6 +75,37 @@ struct MouseScrollEvent
     double xOffset;
     double yOffset;
 };
+
+/**
+ * @brief Identifies a touch contact during its lifetime.
+ */
+using TouchId = std::uint64_t;
+
+/**
+ * @brief Describes the lifecycle phase of a touch contact.
+ */
+enum class TouchPhase
+{
+    Started,
+    Moved,
+    Ended,
+    Cancelled
+};
+
+/**
+ * @brief Describes a touchscreen contact event.
+ *
+ * The touch ID remains stable while the contact is active.
+ * Coordinates are relative to the application window,
+ * with the origin at the top-left corner.
+ */
+struct TouchEvent
+{
+    TouchId id;
+    TouchPhase phase;
+    glm::vec2 position;
+};
+
 /**
  * @brief Variant containing one of the supported input event types.
  *
@@ -85,7 +116,8 @@ using InputEvent = std::variant<
     KeyEvent,
     MouseButtonEvent,
     MouseMoveEvent,
-    MouseScrollEvent
+    MouseScrollEvent,
+    TouchEvent
 >;
 
 /**

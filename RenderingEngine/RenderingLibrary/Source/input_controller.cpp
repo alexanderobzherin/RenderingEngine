@@ -59,6 +59,10 @@ void InputController::BeginFrame()
     mJustPressedMouseButtons.clear();
     mJustReleasedMouseButtons.clear();
 
+    mJustStartedTouches.clear();
+    mJustEndedTouches.clear();
+    mJustCancelledTouches.clear();
+
     mMouseScrollX = 0.0;
     mMouseScrollY = 0.0;
 }
@@ -150,6 +154,83 @@ void InputController::OnMouseScrollEvent(const MouseScrollEvent& event)
     mMouseScrollY += event.yOffset;
 
     mEvents.emplace_back(event);
+}
+
+void InputController::OnTouchEvent(const TouchEvent& event)
+{
+    switch (event.phase)
+    {
+    case TouchPhase::Started:
+        if (mActiveTouches.emplace(event.id, event.position).second)
+        {
+            mJustStartedTouches.insert(event.id);
+        }
+        break;
+
+    case TouchPhase::Moved:
+    {
+        auto it = mActiveTouches.find(event.id);
+
+        if (it != mActiveTouches.end())
+        {
+            it->second = event.position;
+        }
+        break;
+    }
+
+    case TouchPhase::Ended:
+        if (mActiveTouches.erase(event.id) > 0)
+        {
+            mJustEndedTouches.insert(event.id);
+        }
+        break;
+
+    case TouchPhase::Cancelled:
+        if (mActiveTouches.erase(event.id) > 0)
+        {
+            mJustCancelledTouches.insert(event.id);
+        }
+        break;
+    }
+
+    mEvents.emplace_back(event);
+}
+
+bool InputController::IsTouchActive(TouchId id) const
+{
+    return mActiveTouches.find(id) != mActiveTouches.end();
+}
+
+const glm::vec2* InputController::GetTouchPosition(TouchId id) const
+{
+    const auto it = mActiveTouches.find(id);
+
+    if (it == mActiveTouches.end())
+    {
+        return nullptr;
+    }
+
+    return &it->second;
+}
+
+const std::unordered_map<TouchId, glm::vec2>& InputController::GetActiveTouches() const
+{
+    return mActiveTouches;
+}
+
+bool InputController::IsTouchStarted(TouchId id) const
+{
+    return mJustStartedTouches.find(id) != mJustStartedTouches.end();
+}
+
+bool InputController::IsTouchEnded(TouchId id) const
+{
+    return mJustEndedTouches.find(id) != mJustEndedTouches.end();
+}
+
+bool InputController::IsTouchCancelled(TouchId id) const
+{
+    return mJustCancelledTouches.find(id) != mJustCancelledTouches.end();
 }
 
 bool InputController::IsMouseButtonPressed(MouseButton button) const

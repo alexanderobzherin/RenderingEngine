@@ -4,6 +4,8 @@
 #include "input_event.hpp"
 
 #include <unordered_set>
+#include <unordered_map>
+#include <cstdint>
 #include <variant>
 #include <vector>
 
@@ -66,6 +68,54 @@ public:
      * @param event Mouse scrolling event to process.
      */
     void OnMouseScrollEvent(const MouseScrollEvent& event);
+
+    /**
+     * @brief Processes a touchscreen contact event.
+     *
+     * Updates the active touch state and records the event
+     * for the current input frame.
+     *
+     * @param event Touch event to process.
+     */
+    void OnTouchEvent(const TouchEvent& event);
+
+    /**
+     * @brief Checks whether a touch contact is currently active.
+     * @param id Touch contact identifier.
+     * @return True if the contact is active.
+     */
+    bool IsTouchActive(TouchId id) const;
+
+    /**
+     * @brief Returns the current position of an active touch.
+     *
+     * @param id Touch contact identifier.
+     * @return Pointer to the contact position, or nullptr
+     *         if the contact is not active.
+     */
+    const glm::vec2* GetTouchPosition(TouchId id) const;
+
+    /**
+     * @brief Returns all currently active touch contacts.
+     *
+     * Contact IDs are unique among active contacts.
+     */
+    const std::unordered_map<TouchId, glm::vec2>& GetActiveTouches() const;
+
+    /**
+     * @brief Checks whether a contact started during this frame.
+     */
+    bool IsTouchStarted(TouchId id) const;
+
+    /**
+     * @brief Checks whether a contact ended during this frame.
+     */
+    bool IsTouchEnded(TouchId id) const;
+
+    /**
+     * @brief Checks whether a contact was cancelled during this frame.
+     */
+    bool IsTouchCancelled(TouchId id) const;
 
     /**
      * @brief Checks whether a key is currently held down.
@@ -179,6 +229,14 @@ private:
 
     double mMouseScrollX = 0.0;
     double mMouseScrollY = 0.0;
+
+    // Persistent touchscreen state.
+    std::unordered_map<TouchId, glm::vec2> mActiveTouches;
+
+    // Touch transitions observed during the current frame.
+    std::unordered_set<TouchId> mJustStartedTouches;
+    std::unordered_set<TouchId> mJustEndedTouches;
+    std::unordered_set<TouchId> mJustCancelledTouches;
 };
 
 } // namespace rendering_engine
