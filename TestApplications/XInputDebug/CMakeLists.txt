@@ -109,6 +109,28 @@ endif()
 #add the executable
 add_executable(XInputDebug ${HEADER_FILES} ${SRC_FILES})
 
+find_package(X11 REQUIRED)
+
+find_path(XINPUT2_INCLUDE_DIR
+    NAMES X11/extensions/XInput2.h
+    REQUIRED
+)
+
+find_library(XINPUT2_LIBRARY
+    NAMES Xi
+    REQUIRED
+)
+
+target_include_directories(XInputDebug PRIVATE
+    ${X11_INCLUDE_DIR}
+    ${XINPUT2_INCLUDE_DIR}
+)
+
+target_link_libraries(XInputDebug PRIVATE
+    ${X11_LIBRARIES}
+    ${XINPUT2_LIBRARY}
+)
+
 if(WIN32 AND NOT RE_DEV_MODE)
     # The precompiled Windows SDK contains a Release Rendering Engine DLL.
     # Keep Debug consumer builds ABI-compatible with that binary while

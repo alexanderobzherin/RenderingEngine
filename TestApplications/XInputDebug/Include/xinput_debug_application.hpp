@@ -11,11 +11,6 @@
 
 using namespace rendering_engine;
 
-namespace rendering_engine
-{
-
-}
-
 namespace application
 {
 class XInput2DebugListener;

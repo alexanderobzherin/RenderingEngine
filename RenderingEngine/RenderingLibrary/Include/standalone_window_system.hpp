@@ -6,6 +6,8 @@
 
 #include "i_window_system.hpp"
 
+#include <cstdint>
+
 struct GLFWwindow;
 
 namespace rendering_engine
@@ -66,6 +68,10 @@ public:
     static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
     /** @copydoc IWindowSystem::GetFullScreenResolution */
     WindowResolution GetFullScreenResolution() const override;
+
+#if defined(__linux__)
+    std::uint64_t GetX11WindowId() const;
+#endif
 
 private:
     IApplication& mApp;
