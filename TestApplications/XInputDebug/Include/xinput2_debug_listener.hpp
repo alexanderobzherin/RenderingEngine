@@ -6,26 +6,28 @@
 #pragma once
 
 #include <memory>
+#include <cstdint>
 
-using namespace rendering_engine;
-
-namespace rendering_engine
-{
-
-}
+struct GLFWwindow;
+struct _XDisplay;
+using Display = _XDisplay;
 
 namespace application
 {
 class XInput2DebugListener
 {
 public:
-    explicit XInput2DebugListener(GLFWwindow* window);
+    explicit XInput2DebugListener(std::uint64_t windowId);
     ~XInput2DebugListener();
 
     XInput2DebugListener(const XInput2DebugListener&) = delete;
     XInput2DebugListener& operator=(const XInput2DebugListener&) = delete;
 
     void PollEvents();
+
+private:
+    Display* mDisplay = nullptr;
+    int mOpcode = 0;
 };
 
-};
+} // namespace application

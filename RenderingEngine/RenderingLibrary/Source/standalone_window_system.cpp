@@ -4,6 +4,11 @@
 #include <stdexcept>
 #include "i_application.hpp"
 
+#if defined(__linux__)
+#define GLFW_EXPOSE_NATIVE_X11
+#include <GLFW/glfw3native.h>
+#endif
+
 namespace rendering_engine
 {
     StandaloneDesktopWindow::StandaloneDesktopWindow(IApplication& app)
@@ -116,5 +121,15 @@ WindowResolution StandaloneDesktopWindow::GetFullScreenResolution() const
     return mFullScreenRes;
 }
 
+#if defined(__linux__)
+
+std::uint64_t StandaloneDesktopWindow::GetX11WindowId() const
+{
+    return static_cast<std::uint64_t>(
+        glfwGetX11Window(mWindow)
+    );
+}
+
+#endif
 
 }
