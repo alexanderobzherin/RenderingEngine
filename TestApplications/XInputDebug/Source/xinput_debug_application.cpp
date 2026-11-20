@@ -4,8 +4,13 @@ using namespace rendering_engine;
 
 namespace application
 {
-
-void XInputDebugApplication::Initialize()
+    XInputDebugApplication::XInputDebugApplication()
+    {
+    }
+    XInputDebugApplication::~XInputDebugApplication()
+    {
+    }
+    void XInputDebugApplication::Initialize()
 {
     CoreApplication::Initialize();
 

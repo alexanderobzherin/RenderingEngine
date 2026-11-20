@@ -1,6 +1,6 @@
 {
   "appName": "XInputDebug",
-  "isFullScreen": false,
+  "isFullScreen": true,
   "screenWidth": 800,
   "screenHeight": 600,
 

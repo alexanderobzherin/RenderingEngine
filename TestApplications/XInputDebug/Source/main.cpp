@@ -10,6 +10,7 @@
 #include "level_register.hpp"
 #include "utility.hpp"
 #include "core_application.hpp"
+#include "xinput_debug_application.hpp"
 
 
 using namespace rendering_engine;
@@ -18,7 +19,7 @@ int main(int argc, char *argv[])
 {
     Utility::InitializePaths(argc, argv);
 
-    std::unique_ptr<CoreApplication> app = std::make_unique<CoreApplication>();
+    std::unique_ptr<CoreApplication> app = std::make_unique<application::XInputDebugApplication>();
     try
     {
         app->Initialize();

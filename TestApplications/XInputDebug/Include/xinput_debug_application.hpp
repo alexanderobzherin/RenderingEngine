@@ -18,6 +18,8 @@ namespace rendering_engine
 
 namespace application
 {
+class XInput2DebugListener;
+
 class XInputDebugApplication final
     : public rendering_engine::CoreApplication
 {
