@@ -325,6 +325,70 @@ The installation uses `--no-install-recommends` to avoid pulling in a desktop
 environment, display manager, window manager, terminal emulator, or other
 desktop-oriented components that are not required by the HMI runtime.
 
+### Touchscreen Input Driver and Validation
+
+The physical GreenTouch industrial touchscreen is recognized by the Linux kernel as an ILITEK USB HID input device:
+
+```text
+Bus 003 Device 002: ID 222a:0001 ILI Technology Corp. Multi-Touch Screen
+```
+
+The Linux input subsystem exposes:
+
+- `ILITEK ILITEK-TP` — touchscreen interface (`/dev/input/event0`)
+- `ILITEK ILITEK-TP Mouse` — mouse-compatible interface (`/dev/input/event1`)
+
+Event device numbers are specific to the observed configuration and may change.
+
+#### Xorg input driver dependency
+
+The initial minimal Xorg configuration enumerated the touchscreen but did not assign an input driver:
+
+```text
+(II) No input driver specified, ignoring this device.
+```
+
+Install the missing userspace driver:
+
+```bash
+apt install --no-install-recommends xserver-xorg-input-libinput
+```
+
+Restart Xorg and verify the driver:
+
+```bash
+grep -Ei 'ilitek|touch|libinput|event[0-9]+|input driver' /var/log/Xorg.0.log
+```
+
+Expected confirmation:
+
+```text
+(II) Using input driver 'libinput' for 'ILITEK ILITEK-TP'
+(II) XINPUT: Adding extended input device "ILITEK ILITEK-TP" (type: TOUCHSCREEN, id 10)
+```
+
+#### Rendering Engine input validation
+
+`XInputDebug` application was executed on the physical HMI target:
+
+```bash
+DISPLAY=:0 ./Binaries/XInputDebug
+```
+
+The application successfully initialized XInput2 version 2.2 and received:
+
+- `XI_TouchBegin`
+- `XI_TouchUpdate`
+- `XI_TouchEnd`
+
+Validation covered individual taps, continuous dragging, and two simultaneous contacts with independently tracked IDs and coordinates.
+
+The test confirms successful physical input-event delivery through the Linux/Xorg stack to a Rendering Engine application.
+
+This is a hardware/input-stack validation milestone. Integration into the reusable `InputController` abstraction and implementation of `TouchScreenEvents` are tracked by [issue #47](https://github.com/alexanderobzherin/RenderingEngine/issues/47).
+
+Validation log: `XInputDebug_2026-11-21_08-45-35.log`.
+
 ### Graphics Device Access
 
 The Intel graphics device is exposed through DRM:
