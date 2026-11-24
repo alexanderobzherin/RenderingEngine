@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include "i_application.hpp"
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__FreeBSD__)
 #define GLFW_EXPOSE_NATIVE_X11
 #include <GLFW/glfw3native.h>
 #endif
@@ -121,7 +121,7 @@ WindowResolution StandaloneDesktopWindow::GetFullScreenResolution() const
     return mFullScreenRes;
 }
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__FreeBSD__)
 
 std::uint64_t StandaloneDesktopWindow::GetX11WindowId() const
 {

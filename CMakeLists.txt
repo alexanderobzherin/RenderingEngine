@@ -244,6 +244,21 @@ if(UNIX AND NOT WIN32)
 
     message(STATUS "GLFW static library: ${RE_GLFW_STATIC_LIBRARY}")
     message(STATUS "GLFW include directory: ${RE_GLFW_INCLUDE_DIR}")
+
+    find_package(X11 REQUIRED)
+
+    find_path(XINPUT2_INCLUDE_DIR
+        NAMES X11/extensions/XInput2.h
+        REQUIRED
+    )
+
+    find_library(XINPUT2_LIBRARY
+        NAMES Xi
+        REQUIRED
+    )
+
+    message(STATUS "Rendering Engine X11 libraries: ${X11_LIBRARIES}")
+    message(STATUS "Rendering Engine XInput2 library: ${XINPUT2_LIBRARY}")
 endif()
 
 if(WIN32)

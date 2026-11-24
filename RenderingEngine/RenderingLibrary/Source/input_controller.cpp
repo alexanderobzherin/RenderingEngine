@@ -6,6 +6,8 @@
 #include <variant>
 #include <unordered_map>
 #include "input_key_glfw.hpp"
+#include "i_touch_backend.hpp"
+#include "touch_backend_factory.hpp"
 
 namespace
 {
@@ -35,6 +37,15 @@ InputController::InputController(void* nativeWindow)
     glfwSetScrollCallback(mWindow, &InputController::ScrollCallback);
 
     glfwGetCursorPos(mWindow, &mMouseX, &mMouseY);
+
+    TouchBackendContext context;
+    context.nativeWindow = mWindow;
+    TouchEventCallback callback = [this](const TouchEvent& event)
+    {
+        OnTouchEvent(event);
+    };
+    mTouchBackend = std::move(TouchBackendfactory::CreateTouchBackend(context, callback));
+
 }
 
 InputController::~InputController()
@@ -67,6 +78,13 @@ void InputController::BeginFrame()
     mMouseScrollY = 0.0;
 }
 
+void InputController::PollEvents()
+{
+    if(mTouchBackend)
+    {
+        mTouchBackend->PollEvents();
+    }
+}
 
 void InputController::OnKeyEvent(const KeyEvent& event)
 {

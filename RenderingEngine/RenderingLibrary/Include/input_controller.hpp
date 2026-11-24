@@ -3,6 +3,7 @@
 #include "rendering_engine_export.hpp"
 #include "input_event.hpp"
 
+#include <memory>
 #include <unordered_set>
 #include <unordered_map>
 #include <cstdint>
@@ -13,6 +14,7 @@ struct GLFWwindow;
 
 namespace rendering_engine
 {
+class ITouchBackend;
 /**
  * @brief Provides access to input device states and events.
  *
@@ -48,6 +50,8 @@ public:
      * the current key and mouse button states.
      */
     void BeginFrame();
+
+    void PollEvents();
     /**
      * @brief Processes a keyboard input event.
      * @param event Keyboard event to process.
@@ -230,6 +234,7 @@ private:
     double mMouseScrollX = 0.0;
     double mMouseScrollY = 0.0;
 
+    std::unique_ptr<ITouchBackend> mTouchBackend;
     // Persistent touchscreen state.
     std::unordered_map<TouchId, glm::vec2> mActiveTouches;
 

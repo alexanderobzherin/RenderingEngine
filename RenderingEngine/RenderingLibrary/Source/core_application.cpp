@@ -147,6 +147,7 @@ void CoreApplication::Run()
         appClock.UpdateAppTime(*mAppTime);
         mInputController->BeginFrame();
         mWindowSystem->PollEvents();
+        mInputController->PollEvents();
 
         const auto updateStart = std::chrono::steady_clock::now();
         Update(mAppTime->ElapsedAppTimeSeconds());

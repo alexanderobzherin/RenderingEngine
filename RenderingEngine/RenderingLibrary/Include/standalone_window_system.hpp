@@ -69,7 +69,7 @@ public:
     /** @copydoc IWindowSystem::GetFullScreenResolution */
     WindowResolution GetFullScreenResolution() const override;
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__FreeBSD__)
     std::uint64_t GetX11WindowId() const;
 #endif
 

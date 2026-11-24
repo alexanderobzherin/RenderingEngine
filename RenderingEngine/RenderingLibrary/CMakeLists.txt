@@ -102,8 +102,11 @@ set(HEADER_FILES
 	${PROJECT_SOURCE_DIR}/Include/input_key.hpp
 	${PROJECT_SOURCE_DIR}/Include/input_event.hpp
 	${PROJECT_SOURCE_DIR}/Include/input_controller.hpp
+	${PROJECT_SOURCE_DIR}/Include/i_touch_backend.hpp
+	${PROJECT_SOURCE_DIR}/Include/touch_backend_factory.hpp
 	${PROJECT_SOURCE_DIR}/Include/input_key_glfw.hpp
 	${PROJECT_SOURCE_DIR}/Include/interaction_router_2d.hpp
+	${PROJECT_SOURCE_DIR}/Include/xinput2_touch_backend.hpp
 
 	# Physics
 	${PROJECT_SOURCE_DIR}/Include/physical_geometry_definitions.hpp
@@ -190,14 +193,24 @@ set(SRC_FILES
 	# Input Controllers
 	${PROJECT_SOURCE_DIR}/Source/input_controller.cpp
 	${PROJECT_SOURCE_DIR}/Source/interaction_router_2d.cpp
-
+	
 	# Physics
 	${PROJECT_SOURCE_DIR}/Source/physical_geometry_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/rectangle_physical_geometry_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/physical_geometry_factory_2d.cpp
 	${PROJECT_SOURCE_DIR}/Source/collision_world_2d.cpp
-)
-
+	)
+	
+if(WIN32)
+    list(APPEND SRC_FILES
+		${PROJECT_SOURCE_DIR}/Source/touch_backend_factory_Win32.cpp
+		)
+elseif(UNIX)
+	list(APPEND SRC_FILES
+		${PROJECT_SOURCE_DIR}/Source/xinput2_touch_backend.cpp
+		${PROJECT_SOURCE_DIR}/Source/touch_backend_factory_X11.cpp
+	)
+endif()
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 #  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
@@ -232,6 +245,8 @@ if(UNIX AND NOT WIN32)
             ${RE_HARFBUZZ_INCLUDE_DIR}
             ${RE_FREETYPE_INCLUDE_DIR}
 			${RE_ASSIMP_INCLUDE_DIR}
+			${X11_INCLUDE_DIR}
+            ${XINPUT2_INCLUDE_DIR}
     )
 
     set(RE_JPEG_LINK_TARGET
@@ -250,6 +265,10 @@ if(UNIX AND NOT WIN32)
 	set(RE_ASSIMP_LINK_TARGET
         ${RE_ASSIMP_STATIC_LIBRARY}
     )
+	set(RE_X11_INPUT_LINK_TARGETS
+		${X11_LIBRARIES}
+		${XINPUT2_LIBRARY}
+	)
 else()
     set(RE_JPEG_LINK_TARGET
         JPEG::JPEG
@@ -264,6 +283,7 @@ else()
 	set(RE_ASSIMP_LINK_TARGET
         assimp::assimp
     )
+	set(RE_X11_INPUT_LINK_TARGETS "")
 endif()
 
 if(NOT WIN32)
@@ -280,6 +300,7 @@ target_link_libraries(RenderingEngine
         ${RE_JPEG_LINK_TARGET}
         ${RE_TEXT_RENDERING_LINK_TARGETS}
 		${RE_ASSIMP_LINK_TARGET}
+		${RE_X11_INPUT_LINK_TARGETS}
         glm::glm
         nlohmann_json::nlohmann_json
 )
