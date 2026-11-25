@@ -9,6 +9,8 @@
 #include <cstdint>
 #include <functional>
 #include <unordered_map>
+#include <map>
+#include <utility>
 
 namespace rendering_engine
 {
@@ -28,6 +30,8 @@ class PhysicalGeometry2D;
  */
 class RE_API InteractionRouter2D
 {
+using PointerKey = std::pair<PointerType, std::uint64_t>;
+
 public:
     /**
      * @brief Callbacks invoked during a pointer interaction.
@@ -94,6 +98,17 @@ public:
     void ProcessMouseButtonEvent(const MouseButtonEvent& event);
 
     /**
+     * @brief Processes a touchscreen contact event
+     *        for 2D interactions.
+     *
+     * Translates the touch event into a device-independent
+     * pointer event and routes it to interactive geometry.
+     *
+     * @param event Touch event to process.
+     */
+    void ProcessTouchEvent(const TouchEvent& event);
+
+    /**
      * @brief Cancels all active pointer interactions.
      * @note Invokes onCancelled callbacks for captured targets.
      */
@@ -117,7 +132,7 @@ private:
      * @note Invokes the target's onCancelled callback if the pointer
      *       currently holds a captured target.
      */
-    void CancelPointerInteraction(std::uint64_t pointerId);
+    void CancelPointerInteraction(const PointerKey& pointer);
 
 private:
     struct Target
@@ -139,8 +154,8 @@ private:
 
     std::unordered_map<PhysicalGeometry2D*, Target> mTargets;
 
-    // Non-owning pointer to the currently captured geometry.
-    PhysicalGeometry2D* mCapturedGeometry = nullptr;
+    // Non-owning captured geometry for each active pointer.
+    std::map<PointerKey, PhysicalGeometry2D*> mCapturedGeometries;
 
     std::uint64_t mNextOrder = 0;
 };

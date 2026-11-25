@@ -52,16 +52,20 @@ void InteractionRouter2D::UnregisterTarget(PhysicalGeometry2D* geometry)
         return;
     }
 
-    if (mCapturedGeometry == geometry)
+    for (auto it = mCapturedGeometries.begin();
+        it != mCapturedGeometries.end();
+        ++it)
     {
-        CancelAllInteractions();
+        if (it->second == geometry)
+        {
+            const PointerKey pointer = it->first;
+
+            CancelPointerInteraction(pointer);
+            break;
+        }
     }
 
-    auto found = mTargets.find(geometry);
-    if (found != mTargets.end())
-    {
-        mTargets.erase(found);
-    }
+    mTargets.erase(geometry);
 }
 
 InteractionRouter2D::Target*
@@ -106,7 +110,6 @@ InteractionRouter2D::FindTarget(const glm::vec2& worldPosition) const
 
 void InteractionRouter2D::ProcessMouseButtonEvent(const MouseButtonEvent& event)
 {
-    // C2 supports the left mouse button only.
     if (event.button != MouseButton::Left)
     {
         return;
@@ -117,93 +120,57 @@ void InteractionRouter2D::ProcessMouseButtonEvent(const MouseButtonEvent& event)
         return;
     }
 
-    const auto camera = mScene.GetActiveCamera2D();
+    const PointerAction action = event.action == InputAction::Press ? PointerAction::Press : PointerAction::Release;
 
-    if (!camera)
+    ProcessPointerEvent({
+        PointerType::Mouse,
+        0,
+        action,
+        glm::vec2{static_cast<float>(event.x), static_cast<float>(event.y)}
+    });
+}
+
+void InteractionRouter2D::ProcessTouchEvent(const TouchEvent& event)
+{
+    PointerAction action;
+
+    switch (event.phase)
     {
-        CancelAllInteractions();
-        return;
+        case TouchPhase::Started:
+            action = PointerAction::Press;
+            break;
+
+        case TouchPhase::Moved:
+            action = PointerAction::Move;
+            break;
+
+        case TouchPhase::Ended:
+            action = PointerAction::Release;
+            break;
+
+        case TouchPhase::Cancelled:
+            action = PointerAction::Cancel;
+            break;
+
+        default:
+            return;
     }
 
-    const glm::vec2 screenPosition{
-        static_cast<float>(event.x),
-        static_cast<float>(event.y)
-    };
-
-    const glm::vec2 worldPosition = camera->ScreenToWorld(screenPosition);
-
-    if (event.action == InputAction::Press)
-    {
-        // Do not start another interaction while captured.
-        if (mCapturedGeometry)
-        {
-            return;
-        }
-
-        mCapturedGeometry = FindTarget(worldPosition);
-
-        if (auto* target = FindRegistration(mCapturedGeometry))
-        {
-            // Copy before invoking user code: callbacks may
-            // modify target registrations.
-            auto callback = target->callbacks.onPressed;
-
-            if (callback)
-            {
-                callback();
-            }
-        }
-    }
-    else if (event.action == InputAction::Release)
-    {
-        PhysicalGeometry2D* captured = mCapturedGeometry;
-
-        // Clear capture before invoking user code.
-        mCapturedGeometry = nullptr;
-
-        if (!captured)
-        {
-            return;
-        }
-
-        auto* target = FindRegistration(captured);
-
-        if (!target)
-        {
-            return;
-        }
-
-        // The captured target receives the release even
-        // when the cursor is outside its bounds.
-        const bool releasedInside = captured->ContainsPoint(worldPosition);
-
-        auto callback = target->callbacks.onReleased;
-
-        if (callback)
-        {
-            callback(releasedInside);
-        }
-    }
+    ProcessPointerEvent({
+        PointerType::Touch,
+        event.id,
+        action,
+        event.position
+        });
 }
 
 void InteractionRouter2D::CancelAllInteractions()
 {
-    PhysicalGeometry2D* captured = mCapturedGeometry;
-    mCapturedGeometry = nullptr;
-
-    if (!captured)
+    while (!mCapturedGeometries.empty())
     {
-        return;
-    }
+        const PointerKey pointer = mCapturedGeometries.begin()->first;
 
-    if (auto* target = FindRegistration(captured))
-    {
-        auto callback = target->callbacks.onCancelled;
-
-        if (callback)
-        {
-            callback();
-        }
+        CancelPointerInteraction(pointer);
     }
 }
 
@@ -215,12 +182,139 @@ void InteractionRouter2D::Clear()
 
 void InteractionRouter2D::ProcessPointerEvent(const PointerEvent2D& event)
 {
-    static_cast<void>(event);
+    const PointerKey pointer{
+        event.type,
+        event.pointerId
+    };
+
+    if (event.action == PointerAction::Cancel)
+    {
+        CancelPointerInteraction(pointer);
+        return;
+    }
+
+    const auto camera = mScene.GetActiveCamera2D();
+
+    if (!camera)
+    {
+        CancelAllInteractions();
+        return;
+    }
+
+    const glm::vec2 worldPosition = camera->ScreenToWorld(event.screenPosition);
+
+    switch (event.action)
+    {
+        case PointerAction::Press:
+        {
+            // This pointer already holds a capture.
+            if (mCapturedGeometries.find(pointer) !=
+                mCapturedGeometries.end())
+            {
+                return;
+            }
+
+            auto* geometry = FindTarget(worldPosition);
+
+            if (!geometry)
+            {
+                return;
+            }
+
+            // A target can be captured by only one pointer.
+            for (const auto& capture : mCapturedGeometries)
+            {
+                if (capture.second == geometry)
+                {
+                    return;
+                }
+            }
+
+            auto* target = FindRegistration(geometry);
+
+            if (!target)
+            {
+                return;
+            }
+
+            mCapturedGeometries.emplace(pointer, geometry);
+
+            auto callback = target->callbacks.onPressed;
+
+            if (callback)
+            {
+                callback();
+            }
+
+            break;
+        }
+
+        case PointerAction::Move:
+            // Preserve capture while the pointer is moving.
+            // Movement callbacks may be introduced later.
+            break;
+
+        case PointerAction::Release:
+        {
+            const auto found = mCapturedGeometries.find(pointer);
+
+            if (found == mCapturedGeometries.end())
+            {
+                return;
+            }
+
+            auto* geometry = found->second;
+
+            // Clear capture before invoking user code.
+            mCapturedGeometries.erase(found);
+
+            auto* target = FindRegistration(geometry);
+
+            if (!target)
+            {
+                return;
+            }
+
+            const bool releasedInside =
+                geometry->ContainsPoint(worldPosition);
+
+            auto callback = target->callbacks.onReleased;
+
+            if (callback)
+            {
+                callback(releasedInside);
+            }
+
+            break;
+        }
+
+        case PointerAction::Cancel:
+            break;
+        }
 }
 
-void InteractionRouter2D::CancelPointerInteraction(std::uint64_t pointerId)
+void InteractionRouter2D::CancelPointerInteraction(const PointerKey& pointer)
 {
-    static_cast<void>(pointerId);
+    const auto found = mCapturedGeometries.find(pointer);
+
+    if (found == mCapturedGeometries.end())
+    {
+        return;
+    }
+
+    auto* geometry = found->second;
+
+    mCapturedGeometries.erase(found);
+
+    if (auto* target = FindRegistration(geometry))
+    {
+        auto callback = target->callbacks.onCancelled;
+
+        if (callback)
+        {
+            callback();
+        }
+    }
 }
 
 } // namespace rendering_engine

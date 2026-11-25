@@ -73,8 +73,11 @@ void Scene::Update(float deltaTime)
 		{
 			if (const auto* mouseEvent = std::get_if<MouseButtonEvent>(&event))
 			{
-				mInteractionRouter2D.ProcessMouseButtonEvent(
-					*mouseEvent);
+				mInteractionRouter2D.ProcessMouseButtonEvent(*mouseEvent);
+			}
+			else if (const auto* touchEvent = std::get_if<TouchEvent>(&event))
+			{
+				mInteractionRouter2D.ProcessTouchEvent(*touchEvent);
 			}
 		}
 	}

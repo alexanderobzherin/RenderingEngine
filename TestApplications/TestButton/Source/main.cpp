@@ -35,6 +35,6 @@ int main(int argc, char *argv[])
 /**
  * @brief Test application for interactive 2D buttons.
  *
- * Demonstrates mouse press and release interactions
- * with 2D objects using physical geometry.
+ * Demonstrates mouse and touchscreen press and release
+ * interactions with 2D objects using physical geometry.
  */

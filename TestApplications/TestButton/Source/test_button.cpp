@@ -38,7 +38,7 @@ void TestButton::Initialize()
 
 	auto* geometry = mRectangle2D->GetPhysicalGeometry();
 
-	// Bind button interaction with mouse
+	// Bind device-independent pointer interactions.
 	// on pressed action
 	auto onButtonPressed = [this]() {OnButtonPressed(); };
 	// on released action
