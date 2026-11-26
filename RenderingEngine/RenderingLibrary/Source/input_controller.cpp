@@ -44,7 +44,7 @@ InputController::InputController(void* nativeWindow)
     {
         OnTouchEvent(event);
     };
-    mTouchBackend = std::move(TouchBackendfactory::CreateTouchBackend(context, callback));
+    mTouchBackend = TouchBackendfactory::CreateTouchBackend(context, callback);
 
 }
 
