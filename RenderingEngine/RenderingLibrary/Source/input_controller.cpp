@@ -8,6 +8,7 @@
 #include "input_key_glfw.hpp"
 #include "i_touch_backend.hpp"
 #include "touch_backend_factory.hpp"
+#include "logger.hpp"
 
 namespace
 {
@@ -46,6 +47,14 @@ InputController::InputController(void* nativeWindow)
     };
     mTouchBackend = TouchBackendfactory::CreateTouchBackend(context, callback);
 
+    if (mTouchBackend)
+    {
+        LOG_INFO("Native touchscreen input backend initialized.");
+    }
+    else
+    {
+        LOG_INFO("Native touchscreen input backend is not available on this platform.");
+    }
 }
 
 InputController::~InputController()
