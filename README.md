@@ -57,7 +57,7 @@ SDK consumers require a C++ toolchain, CMake, the Vulkan SDK, and the precompile
 Rendering Engine SDK.
 
 Packaged applications have a minimal runtime dependency set consisting primarily
-of the Vulkan loader, zlib on Unix platforms, and standard operating-system
+of the Vulkan loader, zlib and X11/XInput2 libraries on Unix platforms, and standard operating-system
 runtime libraries.
 
 For platform-specific setup instructions, see

@@ -307,7 +307,9 @@ apt install --no-install-recommends \
     xinit \
     x11-xserver-utils \
     mesa-vulkan-drivers \
-    vulkan-tools
+    vulkan-tools \
+    libx11-6 \
+    libxi6
 ```
 
 Their primary roles are:
@@ -319,6 +321,8 @@ Their primary roles are:
 |`x11-xserver-utils` | X server utilities including `xrandr` and `xset`|
 |`mesa-vulkan-drivers` | Mesa userspace Vulkan drivers|
 |`vulkan-tools` | Vulkan diagnostic and validation tools including `vulkaninfo` and `vkcube`|
+|`libx11-6` | X11 client runtime library |
+|`libxi6` | XInput extension runtime library, including XInput2 support |
 
 
 The installation uses `--no-install-recommends` to avoid pulling in a desktop
@@ -366,6 +370,14 @@ Expected confirmation:
 (II) Using input driver 'libinput' for 'ILITEK ILITEK-TP'
 (II) XINPUT: Adding extended input device "ILITEK ILITEK-TP" (type: TOUCHSCREEN, id 10)
 ```
+
+Install the input diagnostic tool:
+
+```bash
+apt install --no-install-recommends xinput
+```
+
+`xinput` is used to inspect device properties, validate the transformation matrix, and diagnose XInput2 events.
 
 #### Rendering Engine input validation
 
@@ -438,11 +450,15 @@ For initial commissioning, Xorg was started remotely and attached explicitly to
 the physical virtual terminal:
 
 ```bash
-Xorg :0 vt1 -keeptty
+Xorg :0 vt1 -keeptty -noreset
 ```
 
 This command is a commissioning/validation procedure and is not intended to be
 the final HMI startup mechanism.
+
+The `-noreset` option prevents Xorg from resetting when its last client disconnects. This is particularly important for the minimal reference platform, where Xorg is launched manually without a persistent desktop session. 
+
+During commissioning, server resets caused temporary touchscreen coordinate transformations to revert to their defaults. The persistent transformation is configured separately through 20-touchscreen.conf.
 
 The Xorg log confirmed:
 
@@ -546,6 +562,68 @@ timeouts so that the HMI display remains active during operation.
 
 System-level suspend configuration remains unchanged.
 
+### Xorg Touchscreen Coordinate Configuration
+
+The GreenTouch display is mounted in portrait orientation, but rotating the
+Xorg display does not automatically rotate the touchscreen's absolute input
+coordinates. Without the corresponding input transformation, touch activation
+may not align with the graphical interface.
+
+The native touchscreen is recognized as `ILITEK ILITEK-TP`, alongside a
+separate mouse-compatible interface named `ILITEK ILITEK-TP Mouse`.
+
+Create the touchscreen configuration:
+
+```bash
+su -
+nano /etc/X11/xorg.conf.d/20-touchscreen.conf
+```
+
+File contents:
+
+```text
+Section "InputClass"
+    Identifier "ILITEK touchscreen portrait orientation"
+    MatchProduct "ILITEK ILITEK-TP"
+    MatchIsTouchscreen "on"
+    Option "TransformationMatrix" "0 1 0 -1 0 1 0 0 1"
+EndSection
+```
+
+`MatchIsTouchscreen "on"` ensures that the transformation applies only to
+the native touchscreen, not to the mouse-compatible interface.
+
+The transformation maps physical touch coordinates into the logical
+1080 × 1920 Xorg portrait display established by the `Rotate "left"`
+monitor configuration.
+
+Restart Xorg or reboot the target, then verify:
+
+```bash
+DISPLAY=:0 xinput list-props "ILITEK ILITEK-TP"
+```
+
+Expected Coordinate Transformation Matrix:
+
+```text
+0.000000, 1.000000, 0.000000,
+-1.000000, 0.000000, 1.000000,
+0.000000, 0.000000, 1.000000
+```
+
+The libinput Calibration Matrix remains unchanged (identity). The same
+rotation must not be applied to both transformation mechanisms.
+
+XInput device IDs and Linux `/dev/input/eventN` paths may change between
+boots and should not be hardcoded.
+
+The configuration was validated after a complete power cycle. Physical
+touch activation accurately matched the rendered button boundaries in
+the `TestButton` application.
+
+No touchscreen-specific coordinate correction is required in the
+Rendering Engine itself.
+
 ## Application Deployment Workflow
 
 The HMI reference platform uses a deliberately simple remote deployment workflow.
@@ -626,7 +704,7 @@ HMI display without installing a desktop environment or terminal emulator.
 
 Start the minimal Xorg environment in the first SSH terminal:
 ```bash
-Xorg :0 vt1 -keeptty
+Xorg :0 vt1 -keeptty -noreset
 ```
 Then launch the graphical application from a second SSH terminal:
 

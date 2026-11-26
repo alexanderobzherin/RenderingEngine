@@ -27,8 +27,10 @@ It is intended for applications that consume the engine as a binary dependency
 and do not need to modify or debug the engine implementation.
 
 SDK users require a C++ toolchain, CMake, Python, the Vulkan SDK, and the
-precompiled Rendering Engine SDK. The engine's implementation dependencies are
-already included in the precompiled Rendering Engine library.
+precompiled Rendering Engine SDK. The engine's statically linked implementation dependencies are already
+included in the precompiled Rendering Engine library. Platform-specific
+shared system libraries must be available in the development and runtime
+environments.
 
 ---
 
@@ -110,7 +112,7 @@ and/or create new projects. See: [Project Creation Guide](project_creation_guide
 
 ```bash
 sudo apt update
-sudo apt install git cmake build-essential nasm pkg-config libglm-dev libgtest-dev nlohmann-json3-dev chrpath
+sudo apt install git cmake build-essential nasm pkg-config libglm-dev libgtest-dev nlohmann-json3-dev chrpath libx11-dev libxi-dev
 ```
 
 2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
@@ -161,7 +163,7 @@ Run
 
 ```bash
 sudo apt update
-sudo apt install git cmake build-essential nasm pkg-config chrpath
+sudo apt install git cmake build-essential nasm pkg-config chrpath libx11-dev libxi-dev
 ```
 
 2. Install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
@@ -199,7 +201,7 @@ and/or create new projects. See: [Project Creation Guide](project_creation_guide
 1. Install build tools and libraries:
 
 ```bash
-sudo pkg install pkgconf glm googletest vulkan-loader vulkan-headers shaderc nlohmann-json chrpath
+sudo pkg install pkgconf glm googletest vulkan-loader vulkan-headers shaderc nlohmann-json chrpath libX11 libXi
 ```
 
 2. Download the source code:
@@ -233,7 +235,7 @@ Run
 1. Install build tools and libraries:
 
 ```bash
-sudo pkg install pkgconf glm vulkan-loader shaderc chrpath
+sudo pkg install pkgconf glm vulkan-loader shaderc chrpath libX11 libXi
 ```
 
 2. Download latest release from 
@@ -260,7 +262,14 @@ Typical runtime requirements are:
 - RenderingEngine.dll / libRenderingEngine.so
 - Vulkan loader and compatible graphics driver
 - zlib (Linux and FreeBSD)
+- X11 and XInput2 shared libraries (Linux and FreeBSD)
 - Standard operating-system runtime libraries
+
+On Unix platforms, the current native touchscreen backend uses XInput2
+and requires a compatible Xorg environment for native touch input.
+
+The X11 and XInput2 libraries are provided by the target operating system
+and are not statically integrated into the Rendering Engine library.
 
 For more details see:
 

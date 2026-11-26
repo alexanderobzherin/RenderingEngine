@@ -28,6 +28,19 @@ This folder can then be uploaded to platforms like Steam, or wrapped into an ins
 
 or delivered in any other custom way.
 
+## System Runtime Dependencies
+
+Application packages include the Rendering Engine runtime library and
+application-specific files. Platform-provided system libraries are not
+necessarily included in the application package.
+
+On Linux and FreeBSD, the target system must provide the Vulkan loader,
+a compatible graphics driver, zlib, X11 and XInput2 shared libraries,
+and the required operating-system runtime libraries.
+
+For platform-specific installation instructions, see
+[Prepare Environment](prepare_environment.md).
+
 ## Rationale
 
 The packaging system of the Rendering Engine is intentionally aligned with Steam’s content structure requirements, which are practical, consistent, and easy for developers to follow.
